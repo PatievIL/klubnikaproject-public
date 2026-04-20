@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <title>Klubnika Project — расчёт, комплектация и запуск клубничных ферм</title>
+  <meta
+    name="description"
+    content="Klubnika Project помогает собрать рабочую схему клубничной фермы: расчёт, комплектация, запуск, расходники, подбор оборудования и сопровождение решений."
+  />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <link rel="stylesheet" href="./styles.css?v=20260406b" />
+  <link rel="canonical" href="https://patievil.github.io/klubnikaproject-public/" />
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "@id": "https://patievil.github.io/klubnikaproject-public/#webpage",
+      "url": "https://patievil.github.io/klubnikaproject-public/",
+      "name": "Запуск и развитие клубничных ферм",
+      "description": "Klubnika Project помогает собрать рабочую схему клубничной фермы: расчёт, комплектация, запуск, расходники, подбор оборудования и сопровождение решений.",
+      "inLanguage": "ru-RU",
+      "isPartOf": {
+        "@id": "https://patievil.github.io/klubnikaproject-public/#website"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://patievil.github.io/klubnikaproject-public/#organization",
+      "name": "Klubnika Project",
+      "url": "https://patievil.github.io/klubnikaproject-public/",
+      "logo": "https://patievil.github.io/klubnikaproject-public/documents/logo/header-lockup-v1-close-compact-light.svg?v=20260403aa"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://patievil.github.io/klubnikaproject-public/#website",
+      "url": "https://patievil.github.io/klubnikaproject-public/",
+      "name": "Klubnika Project",
+      "inLanguage": "ru-RU",
+      "publisher": {
+        "@id": "https://patievil.github.io/klubnikaproject-public/#organization"
+      }
+    }
+  ]
+  </script>
+  <style>
+    body.index-text-pass .hero-copy.hero-copy-lean {
+      max-width: 820px;
+    }
+
+    body.index-text-pass .hero-copy.hero-copy-lean h1 {
+      max-width: 520px;
+    }
+
+    body.index-text-pass .hero-copy.hero-copy-lean .lead {
+      max-width: 540px;
+    }
+
+    @media (min-width: 981px) {
+      body.index-text-pass .hero-copy.hero-copy-lean .eyebrow {
+        margin-bottom: 20px;
+      }
+
+      body.index-text-pass .hero-copy.hero-copy-lean h1 {
+        margin-top: 36px;
+      }
+
+      body.index-text-pass .hero-copy.hero-copy-lean .lead {
+        margin-top: 34px;
+      }
+
+      body.index-text-pass .hero-copy.hero-copy-lean .hero-cta {
+        margin-top: 46px;
+      }
+
+      body.index-text-pass .hero-main .hero-grid {
+        align-items: center;
+      }
+
+      body.index-text-pass .hero-copy.hero-copy-lean {
+        align-content: center;
+        min-height: 100%;
+      }
+
+      body.index-text-pass .hero-main .hero-shell {
+        padding-bottom: 10px;
+      }
+    }
+
+    body.index-text-pass #routes .section-frame {
+      max-width: 1120px;
+      margin-inline: auto;
+    }
+
+    body.index-text-pass #routes .section-head {
+      max-width: 760px;
+    }
+
+    body.index-text-pass #routes .route-selector-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    body.index-text-pass #routes .route-selector-card,
+    body.index-text-pass #routes .route-selector-card-wide {
+      gap: 14px;
+      padding: 22px;
+      border-radius: 24px;
+    }
+
+    body.index-text-pass #routes .route-selector-card h3 {
+      font-size: clamp(24px, 2vw, 32px);
+    }
+
+    body.index-text-pass #routes .route-selector-text {
+      max-width: 34ch;
+    }
+
+    body.index-text-pass #routes .route-selector-lines {
+      gap: 6px;
+    }
+
+    body.index-text-pass #routes .route-selector-card-wide {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px 22px;
+      margin-top: 18px;
+    }
+
+    body.index-text-pass #routes .route-selector-wide-copy {
+      gap: 12px;
+      max-width: 42ch;
+    }
+
+    body.index-text-pass #routes .route-selector-wide-actions {
+      gap: 14px;
+    }
+
+    body.index-text-pass #education .course-teaser {
+      max-width: 1120px;
+      margin-inline: auto;
+      grid-template-columns: minmax(0, 1.16fr) minmax(340px, 0.84fr);
+      gap: 20px;
+      padding: 28px 30px;
+    }
+
+    body.index-text-pass #education .course-teaser-copy h2 {
+      max-width: 18ch;
+    }
+
+    body.index-text-pass #education .course-teaser-copy .sublead {
+      max-width: 52ch;
+    }
+
+    body.index-text-pass #education .course-teaser-side {
+      gap: 10px;
+    }
+
+    body.index-text-pass #education .course-teaser-points {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    body.index-text-pass #education .course-teaser-chip {
+      padding: 12px 14px;
+      border-radius: 16px;
+    }
+
+    body.index-text-pass #education .course-teaser-note {
+      margin: 0;
+      max-width: 40ch;
+      color: rgba(245, 236, 223, 0.74);
+      font-size: var(--type-ui);
+      line-height: 1.45;
+    }
+
+    body.index-text-pass #education .course-teaser-link-row {
+      margin-top: -2px;
+    }
+
+    body.index-text-pass #trust .trust-main {
+      gap: 16px;
+      padding: 32px;
+    }
+
+    body.index-text-pass #trust .trust-main h2 {
+      max-width: 16ch;
+    }
+
+    body.index-text-pass #trust .trust-main .sublead {
+      max-width: 44ch;
+    }
+
+    body.index-text-pass #trust .trust-pill-grid {
+      gap: 10px;
+    }
+
+    body.index-text-pass #trust .trust-pill {
+      padding: 14px;
+    }
+
+    body.index-text-pass #trust .trust-proof {
+      gap: 14px;
+      padding: 22px;
+    }
+
+    body.index-text-pass #trust .trust-proof-bar {
+      min-height: 38px;
+      justify-content: flex-start;
+      width: fit-content;
+      padding: 0 12px;
+    }
+
+    body.index-text-pass #trust .trust-stat-grid {
+      gap: 8px;
+    }
+
+    body.index-text-pass #trust .trust-stat {
+      padding: 10px 12px;
+    }
+
+    body.index-text-pass #trust .trust-proof-cases {
+      display: grid;
+      gap: 0;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0, 77, 43, 0.12);
+    }
+
+    body.index-text-pass #trust .trust-proof-case {
+      display: grid;
+      gap: 4px;
+      padding: 10px 0;
+      border-radius: 0;
+      background: transparent;
+      border: 0;
+    }
+
+    body.index-text-pass #trust .trust-proof-case + .trust-proof-case {
+      border-top: 1px solid rgba(0, 77, 43, 0.08);
+    }
+
+    body.index-text-pass #trust .trust-proof-case strong {
+      color: var(--green);
+      font-size: 14px;
+      line-height: 1.2;
+    }
+
+    body.index-text-pass #trust .trust-proof-case span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.38;
+    }
+
+    body.index-text-pass #solutions .section-head {
+      max-width: 760px;
+    }
+
+    body.index-text-pass #solutions .solutions-grid .product-card {
+      min-height: auto;
+      padding: 24px;
+    }
+
+    body.index-text-pass #solutions .product-card h3 {
+      max-width: 18ch;
+    }
+
+    body.index-text-pass #solutions .product-card ul {
+      display: grid;
+      gap: 8px;
+    }
+
+    body.index-text-pass #solutions .solutions-grid .btn-row {
+      margin-top: 4px;
+    }
+
+    body.index-text-pass #solutions .solutions-note {
+      margin-top: 18px;
+      padding: 18px 20px;
+    }
+
+    body.index-text-pass #process .section-head {
+      max-width: 620px;
+    }
+
+    body.index-text-pass #process .section-frame {
+      max-width: 1120px;
+      margin-inline: auto;
+    }
+
+    body.index-text-pass #process .process-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    body.index-text-pass #process .process-grid .scenario-card {
+      min-height: auto;
+      padding: 18px;
+    }
+
+    body.index-text-pass #process .scenario-card .tag {
+      margin-bottom: 10px;
+    }
+
+    body.index-text-pass #process .scenario-card ul {
+      margin: 0;
+      gap: 0;
+    }
+
+    body.index-text-pass #process .scenario-card li {
+      padding-left: 0;
+      color: var(--muted);
+    }
+
+    body.index-text-pass #process .scenario-card li::before {
+      content: none;
+    }
+
+    body.index-text-pass #contact .contact-shell {
+      max-width: 1120px;
+      margin-inline: auto;
+      grid-template-columns: minmax(0, 0.94fr) minmax(380px, 1.06fr);
+      gap: 18px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    body.index-text-pass #contact .contact-main {
+      gap: 12px;
+      padding: 16px 0 0;
+    }
+
+    body.index-text-pass #contact .contact-main h2 {
+      max-width: 16ch;
+    }
+
+    body.index-text-pass #contact .contact-main .sublead {
+      max-width: 46ch;
+    }
+
+    body.index-text-pass #contact .contact-signal-list {
+      margin: 2px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+      max-width: 48ch;
+    }
+
+    body.index-text-pass #contact .contact-signal-list li {
+      position: relative;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: var(--type-ui);
+      line-height: 1.42;
+    }
+
+    body.index-text-pass #contact .contact-signal-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 9px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(0, 77, 43, 0.72);
+    }
+
+    body.index-text-pass #contact .contact-form-card {
+      gap: 12px;
+      padding: 20px;
+      border-radius: 28px;
+      border: 1px solid rgba(0, 77, 43, 0.12);
+      background: #fffaf5;
+      box-shadow: none;
+    }
+
+    body.index-text-pass #contact .contact-form-head {
+      gap: 6px;
+    }
+
+    body.index-text-pass #contact .contact-form-head h3 {
+      margin: 0;
+      max-width: 16ch;
+    }
+
+    body.index-text-pass #contact .contact-form-head .sublead {
+      max-width: 44ch;
+    }
+
+    body.index-text-pass #contact .field-group {
+      gap: 5px;
+    }
+
+    body.index-text-pass #contact .choice-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body.index-text-pass #contact .choice-chip {
+      min-height: 44px;
+      padding: 8px 10px;
+    }
+
+    body.index-text-pass #contact .brief-success-card {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(0, 77, 43, 0.05);
+      border: 1px solid rgba(0, 77, 43, 0.08);
+    }
+
+    @media (max-width: 767px) {
+      body.index-text-pass #routes .route-selector-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      body.index-text-pass #routes .route-selector-card-wide {
+        grid-template-columns: 1fr;
+      }
+
+      body.index-text-pass #education .course-teaser {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        padding: 22px 18px;
+      }
+
+      body.index-text-pass #education .course-teaser-note {
+        display: none;
+      }
+
+      body.index-text-pass #trust .trust-main,
+      body.index-text-pass #trust .trust-proof {
+        padding: 20px;
+      }
+
+      body.index-text-pass #solutions .solutions-grid .product-card {
+        padding: 20px;
+      }
+
+      body.index-text-pass #process .process-grid {
+        grid-template-columns: 1fr;
+      }
+
+      body.index-text-pass #process {
+        display: none;
+      }
+
+      body.index-text-pass #contact .contact-shell {
+        grid-template-columns: 1fr;
+      }
+
+      body.index-text-pass #contact .contact-main {
+        padding-top: 0;
+      }
+
+      body.index-text-pass #contact .contact-main .eyebrow,
+      body.index-text-pass #contact .contact-signal-list {
+        display: none;
+      }
+
+      body.index-text-pass #contact .contact-main {
+        gap: 8px;
+      }
+
+      body.index-text-pass #contact .choice-grid {
+        grid-template-columns: 1fr;
+      }
+
+      body.index-text-pass .hero-main .hero-grid {
+        gap: 14px;
+      }
+
+      body.index-text-pass .hero-copy.hero-copy-lean {
+        max-width: none;
+      }
+
+      body.index-text-pass .hero-copy.hero-copy-lean h1,
+      body.index-text-pass .hero-copy.hero-copy-lean .lead,
+      body.index-text-pass .hero-copy.hero-copy-lean .sublead {
+        max-width: none;
+      }
+
+      body.index-text-pass .hero-cta {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      body.index-text-pass .hero-cta .btn {
+        width: 100%;
+        flex: none;
+        min-height: 56px;
+        padding: 14px 18px;
+        white-space: normal;
+        line-height: 1.18;
+      }
+
+      body.index-text-pass .hero-quiet-cta {
+        margin-top: 2px;
+      }
+
+      body.index-text-pass .hero-quiet-cta a {
+        display: inline-flex;
+        min-height: 44px;
+        align-items: center;
+        padding: 0;
+      }
+
+      body.index-text-pass .hero-aside {
+        margin-top: 2px;
+      }
+
+      body.index-text-pass .visual-note {
+        line-height: 1.35;
+      }
+
+      body.index-text-pass #routes .route-selector-lines {
+        gap: 4px;
+      }
+
+      body.index-text-pass #routes .route-selector-lines li:last-child {
+        display: none;
+      }
+
+      body.index-text-pass #routes .route-selector-card-wide {
+        gap: 12px;
+      }
+
+      body.index-text-pass #routes .route-selector-chips a:nth-child(4) {
+        display: none;
+      }
+    }
+
+    @media (max-width: 650px) {
+      body.index-text-pass .hero-main {
+        padding-top: 12px;
+      }
+
+      body.index-text-pass .hero-main .hero-shell {
+        padding: 10px 10px 12px;
+      }
+
+      body.index-text-pass .hero-main .topbar {
+        margin-bottom: 12px;
+      }
+
+      body.index-text-pass .hero-main .hero-grid {
+        gap: 10px;
+      }
+
+      body.index-text-pass .hero-copy.hero-copy-lean {
+        gap: 0;
+        text-align: left;
+        align-items: start;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      body.index-text-pass .hero-copy.hero-copy-lean h1 {
+        max-width: 12.4ch;
+        margin-left: 0;
+        margin-right: 0;
+        letter-spacing: -0.05em;
+        text-align: left;
+      }
+
+      body.index-text-pass .hero-copy.hero-copy-lean .lead {
+        margin-top: 10px;
+        max-width: 34ch;
+        text-align: left;
+      }
+
+      body.index-text-pass .hero-copy.hero-copy-lean .eyebrow,
+      body.index-text-pass .hero-copy.hero-copy-lean .lead,
+      body.index-text-pass .hero-copy.hero-copy-lean .text-link-row {
+        justify-self: start;
+      }
+
+      body.index-text-pass .hero-copy.hero-copy-lean .eyebrow {
+        text-align: left;
+        font-size: 11px;
+        padding: 8px 12px;
+      }
+
+      body.index-text-pass .hero-cta {
+        gap: 10px;
+      }
+
+      body.index-text-pass .hero-cta .btn {
+        min-height: 54px;
+        padding: 13px 16px;
+        font-size: 15px;
+      }
+
+      body.index-text-pass .hero-quiet-cta {
+        margin-top: 0;
+      }
+
+      body.index-text-pass .visual-panel-home {
+        gap: 8px;
+      }
+
+      body.index-text-pass .visual-panel-home .visual-main {
+        aspect-ratio: 1.35;
+      }
+
+      body.index-text-pass .hero-main .visual-panel-home .visual-note {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="index-text-pass">
+  <header class="hero hero-main">
+    <div class="container">
+      <div class="hero-shell">
+        <div class="topbar">
+          <div class="brand">
+            <a class="brand-home" href="./">
+              <img class="brand-lockup brand-lockup-primary" src="./documents/logo/header-lockup-v1-close-compact-dark.svg?v=20260403aa" alt="KLUBNIKA PROJECT" />
+              <img class="brand-lockup brand-lockup-compact" src="./documents/logo/header-lockup-v1-close-compact-dark.svg?v=20260403aa" alt="KLUBNIKA PROJECT" />
+            </a>
+          </div>
+          <nav class="nav">
+            <a class="nav-link" href="./">Главная</a>
+            <div class="nav-group">
+              <button class="nav-trigger" type="button">Решения</button>
+              <div class="nav-menu">
+                <a href="./farm/"><strong>Расчёт фермы</strong><span>Состав комплекта, рамка бюджета и следующий шаг.</span></a>
+                <a href="./study/"><strong>Сопровождение</strong><span>Разбор действующей фермы, критических узлов и технологии.</span></a>
+                <a href="./consultations/"><strong>Консультации</strong><span>Точечный разбор задачи, совместимости и следующего шага.</span></a>
+                <a href="./klubhack/"><strong>Клубничный Хак</strong><span>База по клубнике в контролируемой среде без проектной сметы.</span></a>
+              </div>
+            </div>
+            <div class="nav-group">
+              <button class="nav-trigger" type="button">Каталог</button>
+              <div class="nav-menu nav-menu-wide">
+                <a href="./catalog/index.html"><strong>Магазин</strong><span>Весь каталог решений для клубничной фермы.</span></a>
+                <a href="./catalog/led/index.html"><strong>LED</strong><span>Линейные и тепличные световые решения.</span></a>
+                <a href="./catalog/irrigation/index.html"><strong>Полив</strong><span>Капельницы, магистрали и готовые наборы.</span></a>
+                <a href="./catalog/racks/index.html"><strong>Стеллажи</strong><span>Каркасы, лотки и модульные ряды.</span></a>
+                <a href="./catalog/substrates/index.html"><strong>Субстрат</strong><span>Маты, кубики и стартовая корневая зона.</span></a>
+                <a href="./seeds/"><strong>Семена и Frigo</strong><span>Посадочный материал под фермерский запуск.</span></a>
+              </div>
+            </div>
+            <a class="nav-link" href="./calc/">Калькулятор</a>
+            <div class="nav-mobile-utility">
+              <a class="site-header-link" href="./catalog/index.html">Поиск в каталоге</a>
+              <a class="site-header-link site-phone-link" href="tel:+79255831669">+7 925 583-16-69</a>
+              <a class="site-header-link" href="./cabinet/login/">Кабинет</a>
+              <a class="site-header-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Telegram</a>
+              <a class="nav-cta" href="#contact">Разобрать задачу</a>
+            </div>
+          </nav>
+
+          <div class="site-header-actions">
+            <a class="site-header-link" href="./cabinet/login/">Кабинет</a>
+            <a class="nav-cta" href="#contact">Разобрать задачу</a>
+          </div>
+
+          <a class="site-mobile-quick" href="tel:+79255831669">Связь</a>
+          <button class="nav-toggle" type="button" aria-label="Открыть меню" aria-expanded="false">
+            <span></span>
+          </button>
+        </div>
+
+        <div class="hero-grid">
+          <div class="hero-copy hero-copy-lean">
+            <span class="eyebrow">Клубничные фермы в контролируемой среде</span>
+            <h1>Запуск и развитие клубничных ферм</h1>
+            <p class="lead">Расчёт, оборудование, запуск и сопровождение для клубничных ферм в контролируемой среде.</p>
+
+            <div class="btn-row hero-cta">
+              <a class="btn btn-primary" href="./farm/">Начать с расчёта фермы</a>
+              <a class="btn btn-secondary" href="./catalog/index.html">Открыть каталог решений</a>
+            </div>
+            <div class="text-link-row hero-quiet-cta">
+              <a href="#contact">Разобрать задачу</a>
+            </div>
+          </div>
+
+          <div class="hero-aside">
+            <aside class="visual-panel visual-panel-home">
+              <div class="visual-grid visual-grid-single">
+                <img
+                  class="visual-main"
+                  src="./assets/site-drive/best-of/strawberry-hero-01.jpg"
+                  alt="Клубничная ферма в контролируемой среде"
+                />
+              </div>
+              <div class="visual-note">Начните с расчёта, откройте каталог или передайте задачу на разбор.</div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="section" id="routes">
+    <div class="container">
+      <div class="section-frame">
+        <div class="section-head">
+          <span class="eyebrow">С чего начать</span>
+          <h2>Выберите тип задачи</h2>
+          <p class="sublead">Три входа: запуск, рабочая ферма и конкретный узел.</p>
+        </div>
+
+        <div class="route-selector-grid">
+          <article class="route-selector-card route-selector-card-primary">
+            <span class="route-selector-label">Запуск</span>
+            <h3>Новый запуск</h3>
+            <p class="route-selector-text">Состав фермы, запуск и рамка бюджета.</p>
+            <ul class="route-selector-lines">
+              <li>Новый объект или первая очередь</li>
+              <li>Нужен расчёт и состав</li>
+              <li>Переход в расчёт фермы</li>
+            </ul>
+            <div class="btn-row">
+              <a class="btn btn-primary" href="./farm/">Начать с расчёта</a>
+            </div>
+          </article>
+
+          <article class="route-selector-card">
+            <span class="route-selector-label">Действующий объект</span>
+            <h3>Рабочая ферма</h3>
+            <p class="route-selector-text">Разбор узла, схемы и ближайших изменений.</p>
+            <ul class="route-selector-lines">
+              <li>Ферма уже работает</li>
+              <li>Нужно понять, что менять первым</li>
+              <li>Переход в разбор задачи</li>
+            </ul>
+            <div class="btn-row">
+              <a class="btn btn-secondary" href="./study/">Разобрать объект</a>
+            </div>
+          </article>
+        </div>
+
+        <article class="route-selector-card route-selector-card-wide">
+          <div class="route-selector-wide-copy">
+            <span class="route-selector-label">Подбор узлов</span>
+            <h3>Конкретный узел</h3>
+            <p class="route-selector-text">Когда задача уже понятна и нужно быстро открыть свет, полив, стеллажи или посадочный материал.</p>
+          </div>
+          <div class="route-selector-wide-actions">
+            <div class="route-selector-chips">
+              <a href="./catalog/led/index.html">Освещение</a>
+              <a href="./catalog/irrigation/index.html">Полив</a>
+              <a href="./catalog/racks/index.html">Стеллажи</a>
+              <a href="./catalog/planting-material/index.html">Посадочный материал</a>
+            </div>
+            <div class="btn-row">
+              <a class="btn btn-secondary" href="./catalog/index.html">Открыть каталог решений</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight" id="education">
+    <div class="container">
+      <div class="action-panel course-teaser">
+        <div class="course-teaser-copy">
+          <span class="eyebrow">Новый продукт</span>
+          <h2>Клубничный Хак</h2>
+          <p class="sublead">База по технологии выращивания в контролируемой среде. Если нужен не разбор объекта, а системное понимание фермы, вход лучше начинать здесь.</p>
+        </div>
+
+        <div class="course-teaser-side">
+          <div class="course-teaser-points">
+            <div class="course-teaser-chip"><strong>5 модулей</strong><span>от запуска до плодоношения</span></div>
+            <div class="course-teaser-chip"><strong>1 год доступа</strong><span>к урокам и материалам</span></div>
+          </div>
+          <p class="course-teaser-note">Если нужен не учебный вход, а разбор действующего объекта, лучше идти в сопровождение.</p>
+          <div class="btn-row">
+            <a class="btn btn-primary" href="./klubhack/">Открыть Клубничный Хак</a>
+          </div>
+          <div class="text-link-row course-teaser-link-row">
+            <a href="./study/">Если нужен разбор объекта</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight" id="trust">
+    <div class="container">
+      <div class="trust-shell">
+        <div class="trust-main">
+          <span class="eyebrow">Почему доверяют</span>
+          <h2>Собираем ферму как систему</h2>
+          <p class="sublead">Сначала логика проекта, потом закупка. Так проще запускать ферму и меньше риск ошибиться в связке узлов.</p>
+
+          <div class="trust-pill-grid">
+            <article class="trust-pill">
+              <strong>Клубника как профиль</strong>
+              <span>Смотрим на объект в логике клубники, а не “вообще по гидропонике”.</span>
+            </article>
+            <article class="trust-pill">
+              <strong>Схема целиком</strong>
+              <span>Свет, полив, конструкция и субстрат сверяются как одна схема.</span>
+            </article>
+            <article class="trust-pill">
+              <strong>Типовое vs проектное</strong>
+              <span>Сразу видно, что можно брать из каталога, а что нужно считать под объект.</span>
+            </article>
+            <article class="trust-pill">
+              <strong>Маршрут без лишних кругов</strong>
+              <span>Задача сразу уходит в расчёт, каталог или разбор.</span>
+            </article>
+          </div>
+        </div>
+
+        <aside class="trust-proof card">
+          <div class="trust-proof-bar">Основание доверия</div>
+
+          <div class="trust-stat-grid">
+            <article class="trust-stat">
+              <strong>6 лет</strong>
+              <span>в нише клубничных ферм</span>
+            </article>
+            <article class="trust-stat">
+              <strong>10 000+ м²</strong>
+              <span>проектной площади</span>
+            </article>
+            <article class="trust-stat">
+              <strong>Реальные объекты</strong>
+              <span>Решения проверяются не только в презентациях.</span>
+            </article>
+            <article class="trust-stat">
+              <strong>Системный подход</strong>
+              <span>Собираем ферму как связанную систему, а не как набор позиций.</span>
+            </article>
+          </div>
+
+          <div class="trust-proof-cases">
+            <div class="trust-proof-case">
+              <strong>Новый запуск</strong>
+              <span>Когда нужно собрать первую рамку проекта до закупки и монтажа.</span>
+            </div>
+            <div class="trust-proof-case">
+              <strong>Действующий объект</strong>
+              <span>Когда проблема уже упирается в связку света, полива и корневой зоны.</span>
+            </div>
+            <div class="trust-proof-case">
+              <strong>Дооснащение</strong>
+              <span>Когда нужно менять часть схемы и не ломать остальную систему.</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight" id="solutions">
+    <div class="container">
+      <div class="section-frame">
+        <div class="section-head">
+          <span class="eyebrow">Готовые решения</span>
+          <h2>Готовые решения для старта и дооснащения</h2>
+          <p class="sublead">Смотрите готовые позиции, когда задача уже понятна и нужно быстро перейти к выбору.</p>
+        </div>
+
+        <div class="solutions-grid">
+          <article class="card product-card">
+            <img class="product-photo" src="./assets/site-drive/folder-1oXGMDXcTSEFmkNbMwC1HVafosxrZIvgp/selected/tray-seedlings-01.jpg" alt="Стартовый комплект" />
+            <div class="product-meta">
+              <div class="tag">Стартовый комплект</div>
+              <div class="price">105 000 ₽</div>
+            </div>
+            <h3>Модуль для первого запуска</h3>
+            <ul>
+              <li>Для пилотного запуска и первой очереди.</li>
+              <li>Базовый модуль со светом, конструкцией и посадкой.</li>
+              <li>Если дальше нужен расчёт под объект.</li>
+            </ul>
+            <div class="btn-row">
+              <a class="btn btn-primary" href="./catalog/index.html">Смотреть каталог</a>
+            </div>
+          </article>
+
+          <article class="card product-card">
+            <img class="product-photo" src="./assets/catalog/catalog-led/m23-300w-legacy-main.webp" alt="Комплект света" />
+            <div class="product-meta">
+              <div class="tag">Техничная позиция</div>
+              <div class="price">9 900 ₽</div>
+            </div>
+            <h3>Светильник M23 для яруса</h3>
+            <ul>
+              <li>Для дооснащения и типовой схемы.</li>
+              <li>Понятная позиция для ряда или яруса.</li>
+              <li>Если нужно быстро открыть карточку и параметры.</li>
+            </ul>
+            <div class="btn-row">
+              <a class="btn btn-primary" href="./catalog/linear-led/luma-line-191/index.html">Открыть карточку</a>
+            </div>
+          </article>
+
+          <article class="card product-card">
+            <img class="product-photo" src="./assets/site-drive/best-of/strawberry-technical-01.png" alt="Комплект полива" />
+            <div class="product-meta">
+              <div class="tag">Проектная позиция</div>
+              <div class="price">от 1 940 ₽</div>
+            </div>
+            <h3>Комплект полива под объект</h3>
+            <ul>
+              <li>Для нового объекта и пересборки корневой зоны.</li>
+              <li>Состав схемы и ключевые узлы.</li>
+              <li>Если важно не ошибиться в расходе и магистрали.</li>
+            </ul>
+            <div class="btn-row">
+              <a class="btn btn-primary" href="./catalog/irrigation/index.html">Открыть решение</a>
+            </div>
+          </article>
+
+          <article class="card product-card">
+            <img class="product-photo" src="./assets/site-drive/folder-1oXGMDXcTSEFmkNbMwC1HVafosxrZIvgp/selected/greenhouse-structure-01.jpg" alt="Каркас и стеллажи" />
+            <div class="product-meta">
+              <div class="tag">Каркас / модуль</div>
+              <div class="price">от 104 500 ₽</div>
+            </div>
+            <h3>Стеллажная система или модуль</h3>
+            <ul>
+              <li>Для объекта под конкретную площадь.</li>
+              <li>Рамка конструкции и связка с другими узлами.</li>
+              <li>Если конструкцию уже нужно считать под помещение.</li>
+            </ul>
+            <div class="btn-row">
+              <a class="btn btn-primary" href="./catalog/racks/index.html">Открыть решения</a>
+            </div>
+          </article>
+        </div>
+
+        <div class="solutions-note">
+          <div>
+            <strong>Если вопрос не в одной позиции, не начинайте с комплекта.</strong>
+            <span>Для действующего объекта правильнее сначала разобрать узел и совместимость.</span>
+          </div>
+          <a class="btn btn-secondary" href="./consultations/">Перейти к консультации</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="calculator">
+    <div class="container">
+      <div class="calculator-shell">
+        <div class="section-frame calculator-main calc-ad-main">
+          <span class="eyebrow">Калькулятор</span>
+          <h2>Модель считает не одну позицию, а ферму целиком</h2>
+          <p class="sublead">Стеллажи, свет, полив, субстрат, посадка, электрика и щит. Плюс дополнительные модули, линии и шаг расширения.</p>
+          <div class="calc-hero-meta">
+            <span class="calc-hero-chip">стеллажи, свет и полив</span>
+            <span class="calc-hero-chip">щит, автоматы и кабель</span>
+            <span class="calc-hero-chip">доп. модули и расширение</span>
+          </div>
+          <ol class="calc-flow">
+            <li><strong>Сначала.</strong><span>Выберите формат фермы и базовые параметры объекта.</span></li>
+            <li><strong>Дальше.</strong><span>Модель собирает узлы в одну схему, а не считает их по отдельности.</span></li>
+            <li><strong>Итог.</strong><span>Сразу видно состав, диапазон бюджета и где нужен уже точный разбор.</span></li>
+          </ol>
+          <div class="btn-row">
+            <a class="btn btn-primary" href="./calc/">Открыть калькулятор проекта</a>
+            <a class="btn btn-secondary" href="./farm/">Если нужен расчёт под объект</a>
+          </div>
+        </div>
+
+        <aside class="calculator-preview-card calc-ad-card">
+          <div class="tag">Что считает модель</div>
+          <div class="calc-result-kicker">Первая цифра уже опирается на состав</div>
+          <div class="calc-preview-estimate">
+            <strong class="calc-preview-value">Полный ориентир по комплекту</strong>
+            <span class="calc-preview-caption">Не только по железу, но и по связанным узлам, которые тянут бюджет и запуск.</span>
+          </div>
+          <div class="calc-result-lines">
+            <div class="calc-result-line">
+              <strong>Что входит в модель</strong>
+              <span>Стеллажи, свет, полив, субстрат, посадка, электрика, щит, линии, кабель и сервисная группа.</span>
+            </div>
+            <div class="calc-result-line">
+              <strong>Что можно добавлять</strong>
+              <span>Базовые и дополнительные модули, полив на базовый и доп. стеллаж, климат и шаг расширения.</span>
+            </div>
+          </div>
+          <div class="calc-result-footnote">Это ориентир по системе, а не финальная смета. Для точного расчёта всё равно нужен разбор помещения.</div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight" id="process">
+    <div class="container">
+      <div class="section-frame">
+        <div class="section-head">
+          <span class="eyebrow">Как идёт проект</span>
+          <h2>Как идёт работа</h2>
+          <p class="sublead">От вводных до рабочей схемы без лишних кругов.</p>
+        </div>
+
+        <div class="process-grid">
+          <article class="card scenario-card">
+            <div class="tag">Шаг 01</div>
+            <h3>Сбор вводных</h3>
+            <ul>
+              <li>Площадь, стадия проекта и ограничения объекта.</li>
+            </ul>
+          </article>
+
+          <article class="card scenario-card">
+            <div class="tag">Шаг 02</div>
+            <h3>Расчёт и подбор</h3>
+            <ul>
+              <li>Состав ключевых узлов и логика схемы.</li>
+            </ul>
+          </article>
+
+          <article class="card scenario-card">
+            <div class="tag">Шаг 03</div>
+            <h3>Комплектация и запуск</h3>
+            <ul>
+              <li>Что идёт как товар, а что требует проектной позиции и монтажа.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight" id="contact">
+    <div class="container">
+      <div class="contact-shell">
+        <div class="contact-main">
+          <span class="eyebrow">Следующий шаг</span>
+          <h2>Коротко опишите объект</h2>
+          <p class="sublead">Этого достаточно, чтобы собрать следующий шаг без лишней переписки.</p>
+
+          <ul class="contact-signal-list">
+            <li>Поймём, нужен ли вам расчёт, каталог, разбор объекта или сопровождение.</li>
+            <li>Сразу учтём площадь, уже собранные узлы и ограничения по помещению.</li>
+          </ul>
+        </div>
+
+        <div class="card form-card contact-form-card">
+          <div class="contact-form-head">
+            <h3>Передать вводные по объекту</h3>
+            <p class="sublead">Контакт, этап и короткое описание. Дальше задача уходит в нужный маршрут.</p>
+          </div>
+
+          <form
+            class="form-grid final-cta-form"
+            data-brief-form="Главная — финальный CTA"
+            data-brief-form-variant="routing"
+            data-block-source="final_cta"
+            data-brief-button-label="Отправить задачу"
+            data-brief-done-label="Задачу получили"
+            data-brief-link-label="Написать в Telegram"
+            data-brief-note-backend="Заявка сохранится в системе и сразу уйдёт в нужный маршрут. Если удобнее, можно продолжить в Telegram."
+          >
+            <label class="field-group">
+              <span class="field-label">Имя</span>
+              <input class="input" type="text" placeholder="Имя или удобное обращение" data-field-role="name" data-field-label="Как к вам обращаться" />
+            </label>
+
+            <label class="field-group">
+              <span class="field-label">Контакт для связи</span>
+              <input class="input" type="text" placeholder="Телефон, Telegram или WhatsApp" data-field-role="contact" data-field-label="Контакт для связи" />
+            </label>
+
+            <div class="field-group">
+              <span class="field-label">На каком вы этапе</span>
+              <div class="choice-grid" data-choice-group>
+                <input type="hidden" value="" data-field-role="stage" data-field-label="На каком вы этапе" />
+                <button class="choice-chip" type="button" data-choice-value="Запуск с нуля">Запуск с нуля</button>
+                <button class="choice-chip" type="button" data-choice-value="Действующая ферма">Действующая ферма</button>
+                <button class="choice-chip" type="button" data-choice-value="Пересборка / замена узлов">Пересборка / замена узлов</button>
+                <button class="choice-chip" type="button" data-choice-value="Нужен ориентир по старту">Нужен ориентир по старту</button>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <span class="field-label">Что нужно</span>
+              <div class="choice-grid" data-choice-group>
+                <input type="hidden" value="" data-field-role="request" data-field-label="Что нужно сейчас" />
+                <button class="choice-chip" type="button" data-choice-value="Расчёт и ориентир по смете">Расчёт и ориентир</button>
+                <button class="choice-chip" type="button" data-choice-value="Подбор решений и каталога">Подбор решений</button>
+                <button class="choice-chip" type="button" data-choice-value="Разобрать действующий объект">Разобрать объект</button>
+                <button class="choice-chip" type="button" data-choice-value="Сопровождение / консультация">Сопровождение / консультация</button>
+              </div>
+            </div>
+
+            <label class="field-group">
+              <span class="field-label">Что важно по объекту</span>
+              <textarea class="textarea final-cta-textarea" placeholder="Площадь, что уже собрано, какие есть ограничения и что нужно решить сейчас" data-field-role="summary" data-field-label="Что важно по объекту"></textarea>
+            </label>
+
+            <div class="brief-form-actions final-cta-actions">
+              <button class="btn btn-primary" data-brief-button type="button">Отправить задачу</button>
+              <a class="brief-telegram-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Написать в Telegram</a>
+            </div>
+
+            <p class="brief-form-status" data-brief-status aria-live="polite"></p>
+
+            <div class="brief-success-card" data-brief-success hidden>
+              <strong class="brief-success-title">Задачу получили</strong>
+              <p class="brief-success-text">Мы сохранили вводные и отправили их в нужный маршрут. Дальше можно открыть следующий шаг или продолжить диалог в Telegram.</p>
+              <div class="brief-form-actions">
+                <a class="btn btn-primary" data-brief-success-primary href="./calc/">Открыть следующий шаг</a>
+                <a class="brief-telegram-link" data-brief-success-secondary href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Написать в Telegram</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+<script src="./site.js?v=20260405m" defer></script>
+</body>
+</html>

@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
+  <link rel="manifest" href="../site.webmanifest" />
+  <title>Калькулятор клубничной фермы — понятный ориентир по проекту</title>
+  <meta
+    name="description"
+    content="Калькулятор клубничной фермы помогает быстро понять состав проекта, рамку бюджета и что делать дальше без длинной анкеты и лишнего давления."
+  />
+  <script>
+    if (!["127.0.0.1", "localhost"].includes(window.location.hostname)) {
+      const globalStyles = document.createElement("link");
+      globalStyles.rel = "stylesheet";
+      globalStyles.href = "../styles.css?v=20260405h";
+      document.head.appendChild(globalStyles);
+    } else {
+      const localFallback = document.createElement("style");
+      localFallback.textContent = `
+        :root {
+          --bg: #f6f4ee;
+          --surface-2: #fffaf2;
+          --surface-3: #fffcf7;
+          --surface-4: #fffdf8;
+          --text: #173526;
+          --muted: #526257;
+          --green: #1f5a3d;
+          --green-2: #2f7a53;
+          --accent: #efe7d7;
+          --line: rgba(23, 53, 38, 0.12);
+          --radius-md: 18px;
+          --radius-lg: 28px;
+          --shadow-soft: 0 18px 44px rgba(15, 31, 23, 0.08);
+          --shadow-card: 0 10px 24px rgba(15, 31, 23, 0.05);
+        }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+        body { font-family: "Exo 2", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.45; }
+        img { max-width: 100%; display: block; }
+        a { color: inherit; }
+        .container { width: min(1200px, calc(100% - 32px)); margin: 0 auto; }
+        .hero, main, section { display: block; }
+        .hero { display: none !important; }
+        main { padding: 20px 0 40px; }
+        section { margin-bottom: 16px; }
+        .section-frame,
+        .guided-estimate,
+        .guided-flow,
+        .guided-summary {
+          display: grid;
+          gap: 14px;
+        }
+        .card,
+        .hero-shell, .guided-step, .summary-card, .micro-result, .summary-interpretation-card, .calc-details-disclosure {
+          background: var(--surface-3);
+          border: 1px solid var(--line);
+          border-radius: var(--radius-lg);
+          box-shadow: var(--shadow-card);
+        }
+        .card-pad,
+        .hero-shell,
+        .guided-step,
+        .summary-card,
+        .micro-result,
+        .summary-interpretation-card,
+        .calc-details-panel,
+        .calc-howto,
+        .calc-crop-switch {
+          padding: 16px;
+        }
+        .hero-shell { padding: 20px; }
+        .topbar, .hero-grid, .guided-layout { display: block; }
+        .brand-mark, .hero-media, .summary-visual-shell { display: none !important; }
+        .tag {
+          display: inline-flex;
+          align-items: center;
+          min-height: 26px;
+          padding: 0 10px;
+          border-radius: 999px;
+          border: 1px solid rgba(31, 90, 61, 0.14);
+          background: rgba(31, 90, 61, 0.06);
+          color: var(--green);
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 0.01em;
+        }
+        .section-header,
+        .section-subtitle,
+        .guided-step-head,
+        .summary-shell-head,
+        .calc-details-head {
+          margin-bottom: 12px;
+        }
+        .section-title,
+        h1, h2, h3 {
+          margin: 0 0 8px;
+          color: var(--green);
+        }
+        .calc-card-title {
+          margin: 0;
+          font-size: 28px;
+          line-height: 1.05;
+          letter-spacing: -0.02em;
+        }
+        .guided-step-head > div,
+        .guided-block-head > div {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+        .guided-block-head,
+        .guided-summary-top {
+          display: flex;
+          justify-content: space-between;
+          gap: 18px;
+          align-items: end;
+        }
+        .guided-step h3,
+        .guided-summary h3,
+        .calc-details-disclosure h3 { margin: 0; }
+        .scenario-grid,
+        .feature-grid,
+        .summary-grid,
+        .budget-structure-grid,
+        .electrical-summary-grid,
+        .electrical-kit-grid {
+          display: grid;
+          gap: 10px;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+        .scenario-card,
+        .summary-item,
+        .brief-chip,
+        .detail-note,
+        .economy-scenario-row {
+          background: #fff;
+          border: 1px solid var(--line);
+          border-radius: 16px;
+          padding: 12px;
+        }
+        .scenario-card,
+        .option-button,
+        .quick-preset-button,
+        .feature-toggle {
+          position: relative;
+          display: grid;
+          gap: 6px;
+          align-content: start;
+          text-align: left;
+          min-height: 92px;
+          background:
+            linear-gradient(180deg, rgba(255, 250, 242, 0.96), rgba(248, 240, 226, 0.92));
+          border: 1px solid rgba(0, 77, 43, 0.12);
+          border-radius: 20px;
+          cursor: pointer;
+          transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+        .scenario-card:hover,
+        .option-button:hover,
+        .quick-preset-button:hover,
+        .feature-toggle:hover {
+          transform: translateY(-1px);
+          border-color: rgba(0, 77, 43, 0.24);
+        }
+        .scenario-card strong,
+        .option-button strong,
+        .quick-preset-button strong,
+        .feature-toggle strong {
+          color: var(--green);
+        }
+        .scenario-card span,
+        .option-button span,
+        .quick-preset-button span,
+        .feature-toggle small {
+          color: var(--muted);
+          font-size: 13px;
+          line-height: 1.35;
+        }
+        .scenario-card.is-active,
+        .option-button.is-active,
+        .quick-preset-button.is-active,
+        .feature-toggle.is-active {
+          border-color: var(--green);
+          box-shadow: 0 14px 28px rgba(0, 77, 43, 0.08);
+        }
+        .economy-scenario-row { display: grid; gap: 6px; }
+        .compact-grid,
+        .calc-howto-grid {
+          display: grid;
+          gap: 10px;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+        .compact-control {
+          background: #fff;
+          border: 1px solid var(--line);
+          border-radius: 16px;
+          padding: 12px;
+        }
+        .compact-control-head {
+          display: block;
+          min-height: 38px;
+          margin-bottom: 8px;
+          color: var(--green);
+          font-size: 13px;
+          font-weight: 700;
+          line-height: 1.15;
+        }
+        .control-number-wrap {
+          position: relative;
+          display: grid;
+          grid-template-columns: 34px minmax(0, 1fr) 34px;
+          gap: 8px;
+          align-items: center;
+        }
+        .control-step-button {
+          min-width: 34px;
+          min-height: 34px;
+          padding: 0;
+          border-radius: 999px;
+          border: 1px solid rgba(31, 90, 61, 0.16);
+          background: #fffaf2;
+          color: var(--green);
+          font-size: 18px;
+          line-height: 1;
+        }
+        .control-number {
+          width: 100%;
+          min-height: 46px;
+          padding: 0 14px;
+          border-radius: 14px;
+          border: 1px solid rgba(0, 77, 43, 0.18);
+          background: #fffaf2;
+          color: var(--text);
+          font: inherit;
+          text-align: center;
+        }
+        .control-number:focus {
+          outline: none;
+          border-color: var(--green);
+          box-shadow: 0 0 0 3px rgba(0, 77, 43, 0.08);
+        }
+        .room-size-layout {
+          display: grid;
+          grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+          gap: 12px;
+        }
+        .room-dimensions-row {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 10px;
+        }
+        .room-dimensions-row-all {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .room-quick-presets {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+        }
+        .quick-preset-button {
+          padding: 12px 14px;
+          min-height: 72px;
+        }
+        .quick-preset-discount {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          display: inline-flex;
+          align-items: center;
+          min-height: 20px;
+          padding: 0 7px;
+          border-radius: 999px;
+          background: var(--green-2);
+          color: #fff;
+          font-size: 11px;
+          font-style: normal;
+          font-weight: 700;
+        }
+        .room-size-hint {
+          margin: 10px 0 0;
+          color: var(--muted);
+          font-size: 13px;
+        }
+        .reset-inline-link {
+          border: 0;
+          background: transparent;
+          color: var(--muted);
+          text-decoration: underline;
+          padding: 0;
+          margin-top: 8px;
+        }
+        .choice-clusters {
+          display: grid;
+          gap: 12px;
+        }
+        .choice-cluster {
+          display: grid;
+          gap: 10px;
+        }
+        .choice-cluster-title {
+          color: var(--green);
+          font-size: 14px;
+          font-weight: 700;
+        }
+        .option-grid {
+          display: grid;
+          gap: 10px;
+        }
+        .option-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .option-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .option-button {
+          padding: 14px 42px 14px 14px;
+          min-height: 90px;
+        }
+        .option-button::after,
+        .feature-toggle::after {
+          content: "";
+          position: absolute;
+          top: 14px;
+          right: 14px;
+          width: 18px;
+          height: 18px;
+          border-radius: 999px;
+          border: 1px solid rgba(0, 77, 43, 0.16);
+          background: #fffaf2;
+        }
+        .option-button.is-active::after,
+        .feature-toggle.is-active::after {
+          content: "✓";
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--green);
+          border-color: var(--green);
+          color: #fff;
+          font-size: 10px;
+          font-weight: 800;
+        }
+        .feature-toggle {
+          padding: 14px 42px 14px 14px;
+        }
+        .feature-toggle input {
+          position: absolute;
+          opacity: 0;
+          pointer-events: none;
+        }
+        .btn, button {
+          appearance: none;
+          border: 1px solid var(--green);
+          background: #fff;
+          color: var(--green);
+          border-radius: 999px;
+          padding: 10px 16px;
+          text-decoration: none;
+          cursor: pointer;
+          font: inherit;
+        }
+        .btn-primary { background: var(--green); color: #fff; }
+        .btn-secondary { background: transparent; color: var(--green); }
+        .guided-layout {
+          display: grid !important;
+          grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr) !important;
+          gap: 16px !important;
+          align-items: start;
+        }
+        .guided-layout-direct .guided-summary {
+          position: sticky;
+          top: 16px;
+        }
+        .summary-main, .guided-flow, .guided-summary { overflow: visible !important; }
+        .summary-main {
+          padding: 14px 16px;
+          border-radius: 22px;
+          background: var(--green);
+          color: #fff;
+        }
+        .summary-main-label {
+          color: rgba(255,255,255,0.76);
+          font-size: 14px;
+          font-weight: 600;
+        }
+        .summary-main-value {
+          margin-top: 4px;
+          font-size: clamp(30px, 3vw, 38px);
+          line-height: 0.96;
+          letter-spacing: -0.04em;
+          font-weight: 800;
+        }
+        .summary-main-note {
+          margin: 6px 0 0;
+          color: rgba(255,255,255,0.82);
+          font-size: 13px;
+        }
+        .summary-breakdown-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 10px 0;
+          border-bottom: 1px solid var(--line);
+        }
+        .summary-breakdown-row:last-child { border-bottom: 0; }
+        .summary-breakdown-row.is-total { font-weight: 700; }
+        .summary-footer-dock,
+        .calc-summary-actions {
+          display: grid;
+          gap: 10px;
+        }
+        .summary-utility {
+          display: grid;
+          gap: 10px;
+        }
+        .summary-interpretation-line p,
+        .model-limits-list,
+        .calc-details-disclaimer {
+          margin: 6px 0 0;
+          color: var(--muted);
+          font-size: 14px;
+        }
+        .model-limits-list {
+          padding-left: 18px;
+        }
+        .calc-details-disclosure summary {
+          list-style: none;
+          cursor: pointer;
+          display: flex;
+          justify-content: space-between;
+          gap: 16px;
+          align-items: center;
+          padding: 16px;
+        }
+        .calc-details-disclosure summary::-webkit-details-marker { display: none; }
+        .calc-details-summary-title {
+          display: block;
+          color: var(--green);
+          font-size: 18px;
+          font-weight: 700;
+        }
+        .calc-details-summary-note {
+          display: block;
+          color: var(--muted);
+          font-size: 13px;
+        }
+        .calc-details-summary-badge {
+          display: inline-flex;
+          align-items: center;
+          min-height: 28px;
+          padding: 0 12px;
+          border-radius: 999px;
+          border: 1px solid rgba(31, 90, 61, 0.14);
+          background: rgba(31, 90, 61, 0.06);
+          color: var(--green);
+          font-size: 12px;
+          font-weight: 700;
+        }
+        .calc-details-body {
+          padding: 0 16px 16px;
+        }
+        .calc-section-grid,
+        .grid.calc-section-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+        }
+        @media (max-width: 980px) {
+          .guided-layout,
+          .room-size-layout,
+          .calc-section-grid,
+          .grid.calc-section-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .guided-layout-direct .guided-summary {
+            position: static;
+          }
+        }
+        @media (max-width: 720px) {
+          .container { width: min(1200px, calc(100% - 20px)); }
+          .room-dimensions-row,
+          .room-dimensions-row-all,
+          .room-quick-presets,
+          .option-grid-2,
+          .option-grid-3 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+      `;
+      document.head.appendChild(localFallback);
+    }
+  </script>
+  <link rel="stylesheet" href="./calc.css?v=20260414a" />
+  <!-- SEO:START -->
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <link rel="canonical" href="https://patievil.github.io/klubnikaproject-public/calc/" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": "https://patievil.github.io/klubnikaproject-public/calc/#webpage",
+    "url": "https://patievil.github.io/klubnikaproject-public/calc/",
+    "name": "Калькулятор расчёта клубничной фермы",
+    "description": "Калькулятор клубничной фермы помогает быстро понять состав проекта, рамку бюджета и что делать дальше без длинной анкеты и лишнего давления.",
+    "inLanguage": "ru-RU",
+    "isPartOf": {
+      "@id": "https://patievil.github.io/klubnikaproject-public/#website"
+    }
+  }
+  </script>
+  <!-- SEO:END -->
+</head>
+<body>
+  <header class="hero">
+    <div class="container">
+      <div class="hero-shell hero-shell-tool">
+        <div class="topbar">
+          <div class="brand">
+            <a class="brand-home" href="../">
+              <img class="brand-lockup brand-lockup-primary" src="../documents/logo/header-lockup-v1-close-compact-dark.svg?v=20260403aa" alt="KLUBNIKA PROJECT" />
+              <img class="brand-lockup brand-lockup-compact" src="../documents/logo/header-lockup-v1-close-compact-dark.svg?v=20260403aa" alt="KLUBNIKA PROJECT" />
+            </a>
+          </div>
+
+          <nav class="nav">
+            <a class="nav-link" href="../">Главная</a>
+            <div class="nav-group">
+              <button class="nav-trigger" type="button">Решения</button>
+              <div class="nav-menu">
+                <a href="../farm/"><strong>Расчёт фермы</strong><span>Состав комплекта, рамка бюджета и что делать дальше.</span></a>
+                <a href="../study/"><strong>Сопровождение</strong><span>Разбор действующей фермы, критических узлов и технологии.</span></a>
+                <a href="../consultations/"><strong>Консультации</strong><span>Точечный разбор задачи, совместимости и следующего шага.</span></a>
+                <a href="../klubhack/"><strong>Клубничный Хак</strong><span>Система по клубнике без проектной сметы.</span></a>
+              </div>
+            </div>
+            <div class="nav-group">
+              <button class="nav-trigger" type="button">Каталог</button>
+              <div class="nav-menu nav-menu-wide">
+                <a href="../catalog/index.html"><strong>Магазин</strong><span>Весь каталог решений для клубничной фермы.</span></a>
+                <a href="../catalog/led/index.html"><strong>LED</strong><span>Линейные и тепличные световые решения.</span></a>
+                <a href="../catalog/irrigation/index.html"><strong>Полив</strong><span>Комплектующие, узлы и типовые комплекты.</span></a>
+                <a href="../catalog/racks/index.html"><strong>Стеллажи</strong><span>Модули, каркасы и конструктив фермы.</span></a>
+                <a href="../catalog/substrates/index.html"><strong>Субстрат</strong><span>Grodan и корневая зона под controlled environment.</span></a>
+                <a href="../seeds/"><strong>Семена и Frigo</strong><span>Посадочный материал под фермерский запуск.</span></a>
+              </div>
+            </div>
+            <a class="nav-link" aria-current="page" href="./">Калькулятор</a>
+            <div class="nav-mobile-utility">
+              <a class="site-header-link" href="../catalog/index.html">Поиск в каталоге</a>
+              <a class="site-header-link site-phone-link" href="tel:+79255831669">+7 925 583-16-69</a>
+              <a class="site-header-link" href="../cabinet/login/">Кабинет</a>
+              <a class="site-header-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Telegram</a>
+              <a class="nav-cta" href="../consultations/#request">Разобрать задачу</a>
+            </div>
+          </nav>
+
+          <div class="site-header-actions">
+            <a class="site-header-link" href="../cabinet/login/">Кабинет</a>
+            <a class="nav-cta" href="../consultations/#request">Разобрать задачу</a>
+          </div>
+
+          <a class="site-mobile-quick" href="tel:+79255831669">Связь</a>
+          <button class="nav-toggle" type="button" aria-label="Открыть меню" aria-expanded="false">
+            <span></span>
+          </button>
+        </div>
+
+        <div class="hero-grid calc-hero-grid-compact">
+          <div class="hero-copy hero-copy-lean">
+            <span class="eyebrow">Ориентир по проекту</span>
+            <h1>Калькулятор расчёта клубничной фермы</h1>
+            <p class="lead">
+              Быстро понять масштаб, что влияет на цифру и какой следующий шаг логичен без длинной анкеты и лишнего шума.
+            </p>
+
+            <div class="anti-fear-row anti-fear-row-hero">
+              <span class="anti-fear-chip">Без сложных терминов</span>
+              <span class="anti-fear-chip">Первый ориентир сразу</span>
+              <span class="anti-fear-chip">Дальше только 3–4 уточнения</span>
+            </div>
+
+            <div class="btn-row hero-cta calc-hero-cta">
+              <a class="btn btn-primary" href="#calculator-app">Выбрать сценарий</a>
+              <a class="btn btn-secondary" href="../consultations/#request">Нужен разбор под объект</a>
+            </div>
+
+            <div class="calc-hero-summary-band">
+              <div class="calc-hero-summary-item">
+                <span>Что получите</span>
+                <strong>Ориентир по бюджету</strong>
+              </div>
+              <div class="calc-hero-summary-item">
+                <span>Что увидите</span>
+                <strong>Что сильнее всего влияет</strong>
+              </div>
+              <div class="calc-hero-summary-item">
+                <span>Что дальше</span>
+                <strong>Логичный следующий шаг</strong>
+              </div>
+            </div>
+          </div>
+
+          <aside class="calc-hero-aside">
+            <div class="calc-hero-visual">
+              <img
+                class="calc-hero-visual-main"
+                src="../assets/catalog/catalog-context/hero-process-context.webp"
+                alt="Разбор клубничной фермы и проектных решений"
+              />
+
+              <div class="calc-hero-floating calc-hero-floating-top">
+                <span>Ориентир по входу</span>
+                <strong>2–5 млн ₽</strong>
+                <p>Не обещание, а рабочая рамка для старта разговора.</p>
+              </div>
+
+              <div class="calc-hero-floating calc-hero-floating-bottom">
+                <span>Как работает экран</span>
+                <strong>Сценарий → ориентир → уточнение</strong>
+                <p>Сначала смысл, потом детали. Не форма ради формы.</p>
+              </div>
+            </div>
+
+            <div class="calc-hero-sidecard">
+              <div class="tag">Зачем идти дальше</div>
+              <h3>Сложная тема становится короче и понятнее уже на первом экране</h3>
+              <p>Вы не считаете ферму вручную. Вы выбираете задачу, а система сразу показывает масштаб и следующий разумный шаг.</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section" id="calculator-app">
+      <div class="container">
+        <div class="section-frame">
+          <section class="calc-crop-switch card card-pad" aria-labelledby="calc-crop-switch-title">
+            <div class="guided-step-head">
+              <div>
+                <div class="tag">Выбор калькулятора</div>
+                <h2 id="calc-crop-switch-title" class="calc-card-title">Что считаем?</h2>
+              </div>
+            </div>
+
+            <div class="scenario-grid calc-crop-grid" id="crop-selector-grid">
+              <button class="scenario-card" type="button" data-crop-choice="strawberry">
+                <strong>Клубника</strong>
+                <span>Текущий расчёт клубничной фермы.</span>
+              </button>
+              <button class="scenario-card" type="button" data-crop-choice="cucumber">
+                <strong>Огурец</strong>
+                <span>Свет по всем этажам, корневая зона только на первом.</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="calc-howto card card-pad" aria-labelledby="calc-howto-title">
+            <div class="guided-step-head">
+              <div>
+                <div class="tag">Как пользоваться</div>
+                <h2 id="calc-howto-title" class="calc-card-title">Как пользоваться калькулятором</h2>
+              </div>
+            </div>
+
+            <div class="calc-howto-grid">
+              <article class="calc-howto-item">
+                <strong>Сначала просто введите размер помещения</strong>
+                <p>По длине мы сами закладываем запас: 1 м с одной стороны и 50 см с другой.</p>
+              </article>
+              <article class="calc-howto-item">
+                <strong>Смотрите не только на помещение, но и на стеллажи</strong>
+                <p>Калькулятор отдельно покажет, сколько метров стеллажей реально помещается внутри.</p>
+              </article>
+              <article class="calc-howto-item">
+                <strong>Если помещение длинное, мы разобьём линию на части</strong>
+                <p>Когда один длинный прогон уже не собирается, калькулятор сам добавит проходы между прогонами.</p>
+              </article>
+              <article class="calc-howto-item">
+                <strong>Высота тоже влияет на результат</strong>
+                <p>От 3 м считаем 5 этажей, от 3.6 м считаем 6. Итог ниже — это понятный ориентир, а не финальный проект.</p>
+              </article>
+            </div>
+          </section>
+
+          <div class="guided-estimate">
+            <div class="guided-layout guided-layout-direct">
+              <section class="guided-flow guided-entry card card-pad">
+                <div class="guided-block">
+                  <div class="guided-block-head">
+                    <div>
+                      <div class="tag">Шаг 1</div>
+                      <h3 class="calc-card-title">Что хотите понять?</h3>
+                    </div>
+                  </div>
+
+                  <div class="scenario-grid goal-grid" id="goal-choice-grid">
+                    <button class="scenario-card" type="button" data-choice-key="goalType" data-choice-value="entry">
+                      <strong>Сколько это стоит</strong>
+                      <span>Быстрый ориентир по бюджету.</span>
+                    </button>
+                    <button class="scenario-card" type="button" data-choice-key="goalType" data-choice-value="object">
+                      <strong>Подойдёт ли помещение</strong>
+                      <span>Понять, можно ли запускаться.</span>
+                    </button>
+                    <button class="scenario-card" type="button" data-choice-key="goalType" data-choice-value="kit">
+                      <strong>Что войдёт в комплект</strong>
+                      <span>Состав базовой сборки.</span>
+                    </button>
+                  </div>
+
+                </div>
+
+                <section class="guided-step is-visible" id="room-size-panel" data-room-panel="have-room">
+                  <div class="guided-step-head">
+                    <div>
+                      <h3>Параметры расчёта</h3>
+                    </div>
+                  </div>
+
+                  <div class="room-size-stack">
+                    <div class="room-size-layout">
+                      <div class="room-dimensions-row room-dimensions-row-all">
+                        <label class="compact-control" data-control-key="a0">
+                          <span class="compact-control-head">Ширина,<br>м</span>
+                          <div class="control-number-wrap">
+                            <button class="control-step-button" type="button" data-step-control="a0" data-step-direction="-1" aria-label="Уменьшить">-</button>
+                            <input class="control-number" data-input-type="number" data-key="a0" type="number" min="2" max="20" step="0.5" inputmode="decimal" placeholder="4" />
+                            <button class="control-step-button" type="button" data-step-control="a0" data-step-direction="1" aria-label="Увеличить">+</button>
+                          </div>
+                        </label>
+                        <label class="compact-control" data-control-key="a1">
+                          <span class="compact-control-head">Длина,<br>м</span>
+                          <div class="control-number-wrap">
+                            <button class="control-step-button" type="button" data-step-control="a1" data-step-direction="-1" aria-label="Уменьшить">-</button>
+                            <input class="control-number" data-input-type="number" data-key="a1" type="number" min="2" max="100" step="0.5" inputmode="decimal" placeholder="8" />
+                            <button class="control-step-button" type="button" data-step-control="a1" data-step-direction="1" aria-label="Увеличить">+</button>
+                          </div>
+                        </label>
+                        <label class="compact-control" data-control-key="a2">
+                          <span class="compact-control-head">Высота,<br>м</span>
+                          <div class="control-number-wrap">
+                            <button class="control-step-button" type="button" data-step-control="a2" data-step-direction="-1" aria-label="Уменьшить">-</button>
+                            <input class="control-number" data-input-type="number" data-key="a2" type="number" min="2" max="6" step="0.1" inputmode="decimal" placeholder="3.0" />
+                            <button class="control-step-button" type="button" data-step-control="a2" data-step-direction="1" aria-label="Увеличить">+</button>
+                          </div>
+                        </label>
+                        <label class="compact-control" data-control-key="a3">
+                          <span class="compact-control-head">Энергия,<br>₽/кВт·ч</span>
+                          <div class="control-number-wrap">
+                            <button class="control-step-button" type="button" data-step-control="a3" data-step-direction="-1" aria-label="Уменьшить">-</button>
+                            <input class="control-number" data-input-type="number" data-key="a3" type="number" min="0" max="100000" step="0.5" inputmode="numeric" placeholder="5" />
+                            <button class="control-step-button" type="button" data-step-control="a3" data-step-direction="1" aria-label="Увеличить">+</button>
+                          </div>
+                        </label>
+                        <label class="compact-control" data-control-key="a4">
+                          <span class="compact-control-head">Аренда,<br>₽/м²</span>
+                          <div class="control-number-wrap">
+                            <button class="control-step-button" type="button" data-step-control="a4" data-step-direction="-1" aria-label="Уменьшить">-</button>
+                            <input class="control-number" data-input-type="number" data-key="a4" type="number" min="0" max="100000" step="50" inputmode="numeric" placeholder="0" />
+                            <button class="control-step-button" type="button" data-step-control="a4" data-step-direction="1" aria-label="Увеличить">+</button>
+                          </div>
+                        </label>
+                        <label class="compact-control" data-control-key="a5">
+                          <span class="compact-control-head">Ягода,<br>₽/кг</span>
+                          <div class="control-number-wrap">
+                            <button class="control-step-button" type="button" data-step-control="a5" data-step-direction="-1" aria-label="Уменьшить">-</button>
+                            <input class="control-number" data-input-type="number" data-key="a5" type="number" min="0" max="100000" step="50" inputmode="numeric" placeholder="1600" />
+                            <button class="control-step-button" type="button" data-step-control="a5" data-step-direction="1" aria-label="Увеличить">+</button>
+                          </div>
+                        </label>
+                      </div>
+                      <aside class="room-quick-presets" id="room-quick-presets">
+                        <button class="quick-preset-button" type="button" data-quick-preset="2x2">
+                          <strong>2 × 2</strong>
+                          <span>Старт</span>
+                        </button>
+                        <button class="quick-preset-button" type="button" data-quick-preset="2x8">
+                          <strong>2 × 8</strong>
+                          <span>База</span>
+                        </button>
+                        <button class="quick-preset-button" type="button" data-quick-preset="3x8">
+                          <strong>3 × 8</strong>
+                          <span>Усиленный</span>
+                        </button>
+                        <button class="quick-preset-button" type="button" data-quick-preset="4x8">
+                          <strong>4 × 8</strong>
+                          <span>Рабочий</span>
+                        </button>
+                        <button class="quick-preset-button" type="button" data-quick-preset="5x10">
+                          <strong>5 × 10</strong>
+                          <span>Расширенный</span>
+                        </button>
+                        <button class="quick-preset-button" type="button" data-quick-preset="6x10">
+                          <i class="quick-preset-discount">−2%</i>
+                          <strong>6 × 10</strong>
+                          <span>Верхний</span>
+                        </button>
+                        <button class="quick-preset-button" type="button" data-quick-preset="7x12">
+                          <i class="quick-preset-discount">−3%</i>
+                          <strong>7 × 12</strong>
+                          <span>Большая</span>
+                        </button>
+                        <button class="quick-preset-button" type="button" data-quick-preset="8x14">
+                          <i class="quick-preset-discount">−5%</i>
+                          <strong>8 × 14</strong>
+                          <span>XL ферма</span>
+                        </button>
+                      </aside>
+                    </div>
+                    <p class="room-size-hint">Быстрый выбор формата: пресеты справа подставляют размеры в один клик.</p>
+                    <button class="reset-inline-link" id="reset-defaults-button" type="button">сбросить</button>
+                  </div>
+                </section>
+
+                <section class="guided-step" id="preset-panel" data-room-panel="need-room">
+                  <div class="guided-step-head">
+                    <div>
+                      <h3>Какой размер взять для примера?</h3>
+                    </div>
+                  </div>
+
+                  <div class="preset-grid" id="preset-grid"></div>
+
+                </section>
+
+                <section class="guided-step is-visible" id="feature-step">
+                  <div class="guided-step-head">
+                    <div>
+                      <div class="tag">Шаг 3</div>
+                      <h3>Что добавить?</h3>
+                    </div>
+                  </div>
+
+                  <div class="feature-grid" id="feature-grid"></div>
+                </section>
+
+                <section class="guided-step is-visible" id="electrical-step">
+                  <div class="guided-step-head">
+                    <div>
+                      <div class="tag">Шаг 4</div>
+                      <h3>Как подключаем?</h3>
+                    </div>
+                  </div>
+
+                  <div class="choice-clusters">
+                    <div class="choice-cluster">
+                      <strong class="choice-cluster-title">Питание</strong>
+                      <div class="option-grid option-grid-2 option-grid-compact" id="phase-mode-grid">
+                        <button class="option-button option-button-compact" type="button" data-choice-key="phaseMode" data-choice-value="one-phase">
+                          <strong>1 фаза</strong>
+                          <span>Простая схема для малого объекта.</span>
+                        </button>
+                        <button class="option-button option-button-compact" type="button" data-choice-key="phaseMode" data-choice-value="three-phase">
+                          <strong>3 фазы</strong>
+                          <span>Ровная нагрузка и запас по вводу.</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="choice-cluster">
+                      <strong class="choice-cluster-title">Как кладём кабель</strong>
+                      <div class="option-grid option-grid-3 option-grid-compact" id="cable-layout-grid">
+                        <button class="option-button option-button-compact" type="button" data-choice-key="cableLayoutMode" data-choice-value="short">
+                          <strong>Коротко</strong>
+                          <span>Минимум по трассам.</span>
+                        </button>
+                        <button class="option-button option-button-compact" type="button" data-choice-key="cableLayoutMode" data-choice-value="tray">
+                          <strong>По лотку</strong>
+                          <span>Рабочий ориентир.</span>
+                        </button>
+                        <button class="option-button option-button-compact" type="button" data-choice-key="cableLayoutMode" data-choice-value="real">
+                          <strong>С запасом</strong>
+                          <span>Ближе к реальному монтажу.</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+              </section>
+
+              <aside class="guided-summary card card-pad" id="guided-summary">
+                <div class="guided-summary-top">
+                  <div>
+                    <div class="tag">Расчёт</div>
+                    <h3 class="calc-card-title">Что получилось по вашим вводным</h3>
+                  </div>
+                </div>
+
+                <div class="summary-main">
+                  <div class="summary-main-label">Ориентир по сборке</div>
+                  <div class="summary-main-value" id="total-equipment-cost">0 ₽</div>
+                  <p class="summary-main-note" id="summary-meaning-note">
+                    Ориентир по рабочей конфигурации.
+                  </p>
+                </div>
+
+                <div class="summary-reveal-shell" id="summary-reveal-shell">
+                  <div class="summary-reveal-zone" id="summary-reveal-zone">
+                    <div class="summary-grid" id="summary-grid"></div>
+
+                    <div class="summary-breakdown" id="summary-breakdown"></div>
+
+                    <div class="summary-footer-dock">
+                      <div class="summary-interpretation-line">
+                        <span>Что это значит</span>
+                        <strong id="summary-interpretation-title">Это уже не «пример в вакууме»</strong>
+                        <p id="summary-interpretation-text">Простыми словами: видно, что помещается, сколько это стоит и что делать дальше.</p>
+                      </div>
+                      <div class="summary-model-limits">
+                        <span>Ограничения модели</span>
+                        <ul class="model-limits-list model-limits-list-compact">
+                          <li>Локальные строительные и монтажные работы на объекте.</li>
+                          <li>Точная логистика проходов, дверей и сервисных зон.</li>
+                          <li>Индивидуальные режимы климата и полива по фазам роста.</li>
+                          <li>Коммерческие риски по сбыту и фактической урожайности.</li>
+                        </ul>
+                      </div>
+
+                      <div class="calc-summary-actions">
+                        <div class="summary-utility summary-utility-main">
+                          <a class="btn btn-primary" id="project-brief-link" href="../farm/#brief">Получить разбор под мой объект</a>
+                          <a class="btn btn-secondary" id="summary-secondary-link" href="#calc-details">Разобрать расчет</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="summary-reveal-overlay" id="summary-reveal-overlay">
+                    <p>Детали доступны после входа в кабинет.</p>
+                    <a class="btn btn-secondary" id="summary-login-link" href="../cabinet/login/">Войти в кабинет</a>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-tight calc-secondary-layer" id="calc-details">
+      <div class="container">
+        <details class="calc-details-disclosure" open>
+          <summary>
+            <span class="calc-details-summary-copy">
+              <span class="calc-details-summary-title">Разобрать расчет</span>
+              <span class="calc-details-summary-note">Инженерная экономика проекта по трем сценариям урожайности.</span>
+            </span>
+            <span class="calc-details-summary-badge">Разбор</span>
+          </summary>
+          <div class="calc-details-body">
+            <div class="summary-reveal-shell calc-details-reveal-shell" id="calc-details-reveal-shell">
+              <div class="summary-reveal-zone calc-details-reveal-zone" id="calc-details-reveal-zone">
+                <p class="calc-details-disclaimer">Расчет упрощен и зависит от условий.</p>
+                <div class="grid calc-section-grid">
+                  <article class="card card-pad">
+                    <div class="tag">Разбивка экономики</div>
+                    <h3 class="calc-card-title">Разовые и ежемесячные расходы</h3>
+                    <div class="budget-structure-grid" id="economy-summary-grid">
+                      <div class="summary-item">
+                        <span>Разовые вложения</span>
+                        <strong id="economy-capex">0 ₽</strong>
+                      </div>
+                      <div class="summary-item">
+                        <span>Ежемесячные расходы</span>
+                        <strong id="economy-opex-total">0 ₽</strong>
+                      </div>
+                      <div class="summary-item">
+                        <span>Энергия / мес</span>
+                        <strong id="economy-opex-energy">0 ₽</strong>
+                      </div>
+                      <div class="summary-item">
+                        <span>Вода / мес</span>
+                        <strong id="economy-opex-water">0 ₽</strong>
+                      </div>
+                      <div class="summary-item">
+                        <span>Аренда / мес</span>
+                        <strong id="economy-opex-rent">0 ₽</strong>
+                      </div>
+                      <div class="summary-item">
+                        <span>Ягода / мес (оценка)</span>
+                        <strong id="economy-berry-kg">0 кг</strong>
+                      </div>
+                      <div class="summary-item">
+                        <span>Выручка / мес (реал.)</span>
+                        <strong id="economy-revenue-month-real">0 ₽</strong>
+                      </div>
+                      <div class="summary-item">
+                        <span>Выручка / год (реал.)</span>
+                        <strong id="economy-revenue-year-real">0 ₽</strong>
+                      </div>
+                      <div class="summary-item">
+                        <span>Чистый поток / мес (реал.)</span>
+                        <strong id="economy-net-month-real">0 ₽</strong>
+                      </div>
+                      <div class="summary-item">
+                        <span>Окупаемость (реал.)</span>
+                        <strong id="economy-payback-real">—</strong>
+                      </div>
+                    </div>
+                    <h3 class="calc-card-title economy-scenarios-title">Экономика по сценариям</h3>
+                    <ul class="economy-scenarios-grid" id="economy-scenarios-grid">
+                      <li class="economy-scenario-row">
+                        <strong>Оптимистичный</strong>
+                        <span>Ягода 0 кг/мес · Выручка 0 ₽/мес · Чистый поток 0 ₽/мес · Окупаемость —</span>
+                      </li>
+                      <li class="economy-scenario-row">
+                        <strong>Реалистичный</strong>
+                        <span>Ягода 0 кг/мес · Выручка 0 ₽/мес · Чистый поток 0 ₽/мес · Окупаемость —</span>
+                      </li>
+                      <li class="economy-scenario-row">
+                        <strong>Пессимистичный</strong>
+                        <span>Ягода 0 кг/мес · Выручка 0 ₽/мес · Чистый поток 0 ₽/мес · Окупаемость —</span>
+                      </li>
+                    </ul>
+                  </article>
+                </div>
+
+                <div class="calc-details-actions">
+                  <a class="btn btn-primary" id="adapt-conditions-link" href="../farm/#brief">Адаптировать под мои условия</a>
+                </div>
+              </div>
+
+              <div class="summary-reveal-overlay calc-details-reveal-overlay" id="calc-details-reveal-overlay">
+                <p>Экономика проекта доступна после входа в кабинет.</p>
+                <a class="btn btn-secondary" id="calc-details-login-link" href="../cabinet/login/">Войти в кабинет</a>
+                <a class="btn btn-primary" href="../farm/#brief">Адаптировать под мои условия</a>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="section-tight">
+      <div class="container">
+        <div class="action-panel">
+          <div class="split-hero calc-final-cta">
+            <div class="calc-final-cta__main">
+              <span class="eyebrow">Финальный CTA</span>
+              <h2>По этому расчёту уже видно рамку проекта и порядок цифр</h2>
+              <p class="sublead">
+                Дальше не нужно начинать заново. Если рамка подходит, следующий шаг — привязать её к вашему помещению, задаче и ограничениям.
+              </p>
+              <div class="calc-final-cta__focus">
+                <strong>Главный следующий шаг</strong>
+                <span>Передать расчёт на разбор под ваш объект и проверить, что изменится по помещению, климату и бюджету.</span>
+              </div>
+              <div class="btn-row calc-final-cta__actions">
+                <a class="btn btn-primary" href="../farm/#brief">Подогнать под мой объект</a>
+                <a class="btn btn-secondary" href="#calculator-app">Вернуться к расчёту</a>
+              </div>
+            </div>
+
+            <div class="card form-card calc-final-cta__routes">
+              <div class="tag">Куда идти дальше</div>
+              <div class="calc-final-cta__route-list">
+                <a class="calc-final-cta__route" href="../farm/#brief">
+                  <strong>Расчёт под объект</strong>
+                  <span>Когда нужно уточнить эту модель под реальное помещение.</span>
+                </a>
+                <a class="calc-final-cta__route" href="../study/#request">
+                  <strong>Сопровождение и разбор</strong>
+                  <span>Когда вопрос уже в запуске, ошибках или действующей ферме.</span>
+                </a>
+                <a class="calc-final-cta__route" href="../catalog/">
+                  <strong>Каталог и типовые позиции</strong>
+                  <span>Когда нужно быстро открыть узлы, комплекты и карточки товаров.</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script>
+    if (!["127.0.0.1", "localhost"].includes(window.location.hostname)) {
+      const siteScript = document.createElement("script");
+      siteScript.src = "../site.js?v=20260407live";
+      siteScript.defer = true;
+      document.head.appendChild(siteScript);
+    }
+  </script>
+  <script src="./calc.js?v=20260414a" type="module"></script>
+</body>
+</html>

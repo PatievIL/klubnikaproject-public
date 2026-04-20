@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
+  <link rel="manifest" href="../site.webmanifest" />
+  <title>Расчёт клубничной фермы под ваш объект — Klubnika Project</title>
+  <meta
+    name="description"
+    content="Расчёт клубничной фермы под ваш объект: стеллажи, свет, полив, субстрат, посадочный материал, состав комплекта и следующий коммерческий шаг."
+  />
+  <link rel="stylesheet" href="../styles.css?v=20260405h" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <link rel="canonical" href="https://patievil.github.io/klubnikaproject-public/farm/" />
+  <style>
+    body.farm-page {
+      --farm-surface: #f3eadb;
+      --farm-surface-soft: #f7efe4;
+      --farm-surface-border: rgba(30, 48, 34, 0.08);
+    }
+
+    body.farm-page .farm-deliverables h3,
+    body.farm-page .farm-process-grid h3 {
+      margin-bottom: 10px;
+    }
+
+    body.farm-page .farm-deliverables p,
+    body.farm-page .farm-process-grid p {
+      margin: 0;
+    }
+
+    body.farm-page .farm-deliverables {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 12px;
+    }
+
+    body.farm-page .farm-deliverables .card {
+      background: var(--farm-surface);
+      border: 1px solid var(--farm-surface-border);
+      padding: 22px;
+      box-shadow: none;
+    }
+
+    body.farm-page .farm-deliverables .tag {
+      margin-bottom: 12px;
+    }
+
+    body.farm-page .farm-preview-strip,
+    body.farm-page .farm-decision-strip {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+      margin-top: 22px;
+      padding: 20px 22px;
+      border-radius: 26px;
+      border: 1px solid var(--farm-surface-border);
+      background: var(--farm-surface);
+    }
+
+    body.farm-page .farm-preview-strip strong,
+    body.farm-page .farm-decision-strip strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 20px;
+      line-height: 1.15;
+      color: var(--ink);
+    }
+
+    body.farm-page .farm-preview-strip p,
+    body.farm-page .farm-decision-strip p {
+      margin: 0;
+      max-width: 62ch;
+    }
+
+    body.farm-page .farm-preview-strip {
+      display: none;
+    }
+
+    body.farm-page .farm-brief-grid {
+      display: grid;
+      grid-template-columns: 0.88fr 1.12fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    body.farm-page #brief .section-frame {
+      background: var(--green);
+      border: 1px solid rgba(245, 236, 223, 0.12);
+      box-shadow: 0 20px 38px rgba(6, 38, 24, 0.14);
+      color: var(--bg);
+    }
+
+    body.farm-page .farm-brief-grid .contact-main,
+    body.farm-page .farm-brief-grid .form-card {
+      background: var(--farm-surface);
+      border: 1px solid var(--farm-surface-border);
+      border-radius: 28px;
+      box-shadow: none;
+      padding: 24px;
+    }
+
+    body.farm-page .farm-brief-grid .contact-main {
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.farm-page .farm-brief-grid .form-card h3 {
+      color: var(--green);
+    }
+
+    body.farm-page .farm-brief-grid .form-card .sublead {
+      color: var(--muted);
+    }
+
+    body.farm-page #brief .section-head .eyebrow {
+      background: rgba(255, 250, 242, 0.12);
+      border-color: rgba(245, 236, 223, 0.14);
+      color: var(--bg);
+    }
+
+    body.farm-page #brief .section-head h2,
+    body.farm-page #brief .section-head .sublead {
+      color: rgba(245, 236, 223, 0.92);
+    }
+
+    body.farm-page .farm-brief-list {
+      display: grid;
+      gap: 0;
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    body.farm-page .farm-brief-list li {
+      padding: 14px 0 16px;
+      border-bottom: 1px solid rgba(30, 48, 34, 0.08);
+      background: transparent;
+    }
+
+    body.farm-page .farm-brief-list strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+
+    body.farm-page .farm-brief-list li:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    body.farm-page .farm-brief-grid .choice-chip {
+      background: var(--farm-surface-soft);
+      border-color: rgba(30, 48, 34, 0.1);
+    }
+
+    body.farm-page .farm-brief-grid .choice-chip:hover {
+      background: #f8efe2;
+      border-color: rgba(30, 48, 34, 0.2);
+    }
+
+    body.farm-page .farm-brief-grid .choice-chip.is-active {
+      background: rgba(0, 77, 43, 0.12);
+      border-color: rgba(0, 77, 43, 0.34);
+    }
+
+    body.farm-page .farm-brief-grid .input,
+    body.farm-page .farm-brief-grid .textarea {
+      background: var(--farm-surface-soft);
+      border-color: rgba(30, 48, 34, 0.1);
+    }
+
+    body.farm-page .farm-brief-grid .brief-telegram-link {
+      border-color: rgba(30, 48, 34, 0.1);
+      background: var(--farm-surface-soft);
+    }
+
+    body.farm-page .farm-process-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    body.farm-page .farm-process-grid .card {
+      padding: 18px;
+    }
+
+    body.farm-page .farm-process-grid .tag {
+      margin-bottom: 12px;
+    }
+
+    body.farm-page #trust .section-frame,
+    body.farm-page #process .section-frame,
+    body.farm-page #faq .section-frame {
+      background: var(--green);
+      border: 1px solid rgba(245, 236, 223, 0.12);
+      box-shadow: 0 20px 38px rgba(6, 38, 24, 0.14);
+      color: var(--bg);
+    }
+
+    body.farm-page #trust .section-head .eyebrow,
+    body.farm-page #process .section-head .eyebrow,
+    body.farm-page #faq .section-head .eyebrow {
+      background: rgba(255, 250, 242, 0.12);
+      border-color: rgba(245, 236, 223, 0.14);
+      color: var(--bg);
+    }
+
+    body.farm-page #trust .section-head h2,
+    body.farm-page #process .section-head h2,
+    body.farm-page #faq .section-head h2,
+    body.farm-page #trust .section-head .sublead,
+    body.farm-page #process .section-head .sublead,
+    body.farm-page #faq .section-head .sublead {
+      color: rgba(245, 236, 223, 0.88);
+    }
+
+    body.farm-page #trust .farm-deliverables .card,
+    body.farm-page #process .card,
+    body.farm-page #faq .faq-box {
+      background: var(--surface);
+      border: 1px solid rgba(245, 236, 223, 0.14);
+      box-shadow: none;
+      color: var(--text);
+    }
+
+    body.farm-page #trust .farm-deliverables .card h3,
+    body.farm-page #trust .farm-deliverables .card p,
+    body.farm-page #trust .farm-deliverables .card .tag {
+      color: inherit;
+    }
+
+    body.farm-page #trust .farm-deliverables .tag,
+    body.farm-page #process .tag,
+    body.farm-page #faq .faq-box strong {
+      background: rgba(0, 77, 43, 0.08);
+      border-color: rgba(0, 77, 43, 0.12);
+      color: var(--green);
+    }
+
+    body.farm-page #trust .farm-decision-strip {
+      background: rgba(255, 250, 242, 0.08);
+      border-color: rgba(245, 236, 223, 0.12);
+      color: var(--bg);
+    }
+
+    body.farm-page #trust .farm-decision-strip strong,
+    body.farm-page #trust .farm-decision-strip p {
+      color: rgba(245, 236, 223, 0.9);
+    }
+
+    body.farm-page #trust .farm-decision-strip .btn-primary {
+      background: var(--surface);
+      color: var(--green);
+      border-color: var(--surface);
+    }
+
+    body.farm-page #trust .farm-decision-strip .btn-secondary {
+      color: var(--bg);
+      border-color: rgba(245, 236, 223, 0.34);
+      background: rgba(255, 250, 242, 0.04);
+    }
+
+
+
+    body.farm-page #process .farm-process-grid .card h3,
+    body.farm-page #process .farm-process-grid .card p {
+      color: var(--text);
+    }
+
+    body.farm-page #faq .faq-grid {
+      gap: 14px;
+    }
+
+    body.farm-page #faq .faq-box p {
+      color: var(--text);
+      margin-bottom: 0;
+    }
+
+    body.farm-page #when .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    body.farm-page #when .path-card {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+      min-width: 0;
+      min-height: auto;
+      padding: 20px;
+      border-radius: 22px;
+      border: 1px solid rgba(0, 77, 43, 0.1);
+      background: var(--farm-surface);
+      box-shadow: none;
+    }
+
+    body.farm-page #when .path-card::after {
+      content: none !important;
+      display: none !important;
+    }
+
+    body.farm-page #when .path-card .kicker {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(0, 77, 43, 0.06);
+      border: 1px solid rgba(0, 77, 43, 0.08);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+
+    body.farm-page #when .path-card h3 {
+      margin: 0;
+      color: var(--green);
+      font-size: clamp(20px, 1.8vw, 26px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      white-space: nowrap;
+    }
+
+    body.farm-page #when .path-card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    body.farm-page #when .path-card ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    body.farm-page #when .path-card li {
+      position: relative;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: var(--type-ui-sm);
+      line-height: 1.45;
+    }
+
+    body.farm-page #when .path-card li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 8px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(0, 77, 43, 0.72);
+    }
+
+    body.farm-page #when .path-card-note {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-height: 38px;
+      margin-top: 0;
+      padding: 0 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(0, 77, 43, 0.14);
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 700;
+      background: var(--farm-surface-soft);
+    }
+
+    body.farm-page #when .section-frame {
+      padding-bottom: 18px;
+    }
+
+    @media (max-width: 1023px) {
+      body.farm-page #when .grid-3,
+      body.farm-page .farm-deliverables,
+      body.farm-page .farm-process-grid,
+      body.farm-page .farm-brief-grid,
+      body.farm-page .farm-preview-strip,
+      body.farm-page .farm-decision-strip {
+        grid-template-columns: 1fr;
+      }
+
+      body.farm-page .farm-brief-grid .contact-main,
+      body.farm-page .farm-brief-grid .form-card {
+        padding: 22px;
+      }
+    }
+
+    body.farm-page .card,
+    body.farm-page .faq-box,
+    body.farm-page .section-frame {
+      background: transparent;
+    }
+
+    body.farm-page .faq-box,
+    body.farm-page .result-card,
+    body.farm-page .farm-process-grid .card {
+      background: var(--farm-surface);
+      border-color: var(--farm-surface-border);
+      box-shadow: none;
+    }
+
+
+  </style>
+</head>
+<body class="farm-page">
+  <header class="hero">
+    <div class="container">
+      <div class="hero-shell hero-shell-service hero-shell-farm">
+        <div class="topbar">
+          <div class="brand">
+            <a class="brand-home" href="../">
+              <img class="brand-lockup brand-lockup-primary" src="../documents/logo/header-lockup-v1-close-compact-dark.svg?v=20260403aa" alt="KLUBNIKA PROJECT" />
+              <img class="brand-lockup brand-lockup-compact" src="../documents/logo/header-lockup-v1-close-compact-dark.svg?v=20260403aa" alt="KLUBNIKA PROJECT" />
+            </a>
+          </div>
+
+          <nav class="nav">
+            <a class="nav-link" href="../">Главная</a>
+            <div class="nav-group">
+              <button class="nav-trigger" type="button">Решения</button>
+              <div class="nav-menu">
+              <a href="../farm/"><strong>Расчёт фермы</strong><span>Состав комплекта, рамка бюджета и что делать дальше.</span></a>
+                <a href="../study/"><strong>Сопровождение</strong><span>Разбор действующей фермы, критических узлов и технологии.</span></a>
+                <a href="../consultations/"><strong>Консультации</strong><span>Точечный разбор задачи, совместимости и того, как лучше действовать дальше.</span></a>
+                <a href="../klubhack/"><strong>Клубничный Хак</strong><span>База по клубнике без проектной сметы.</span></a>
+              </div>
+            </div>
+            <div class="nav-group">
+              <button class="nav-trigger" type="button">Каталог</button>
+              <div class="nav-menu nav-menu-wide">
+                <a href="../catalog/index.html"><strong>Магазин</strong><span>Весь каталог решений для клубничной фермы.</span></a>
+                <a href="../catalog/led/index.html"><strong>LED</strong><span>Светильники M23 и тепличные модели.</span></a>
+                <a href="../catalog/irrigation/index.html"><strong>Полив</strong><span>Комплектующие, узлы и типовые комплекты.</span></a>
+                <a href="../catalog/racks/index.html"><strong>Стеллажи</strong><span>Модули, каркасы и конструктив фермы.</span></a>
+                <a href="../catalog/substrates/index.html"><strong>Субстрат</strong><span>Grodan и корневая зона под controlled environment.</span></a>
+                <a href="../seeds/"><strong>Семена и Frigo</strong><span>Посадочный материал под фермерский запуск.</span></a>
+              </div>
+            </div>
+            <a class="nav-link" href="../calc/">Калькулятор</a>
+            <div class="nav-mobile-utility">
+              <a class="site-header-link" href="../catalog/index.html">Поиск в каталоге</a>
+              <a class="site-header-link site-phone-link" href="tel:+79255831669">+7 925 583-16-69</a>
+              <a class="site-header-link" href="../cabinet/login/">Кабинет</a>
+              <a class="site-header-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Telegram</a>
+              <a class="nav-cta" href="#brief">Разобрать задачу</a>
+            </div>
+          </nav>
+
+          <div class="site-header-actions">
+            <a class="site-header-link" href="../cabinet/login/">Кабинет</a>
+            <a class="nav-cta" href="#brief">Разобрать задачу</a>
+          </div>
+
+          <a class="site-mobile-quick" href="tel:+79255831669">Связь</a>
+          <button class="nav-toggle" type="button" aria-label="Открыть меню" aria-expanded="false">
+            <span></span>
+          </button>
+        </div>
+
+        <div class="hero-grid farm-hero-grid">
+          <div class="hero-copy hero-copy-lean">
+            <span class="eyebrow">Продолжение расчёта</span>
+            <h1>Расчёт клубничной фермы под ваш объект</h1>
+            <p class="lead">
+              Когда вопрос уже не в одном товаре, а в составе фермы и порядке закупки.
+            </p>
+            <p class="sublead">
+              Здесь быстро видно, что оставить как в базовой модели, а что поправить под реальный объект до закупки и монтажа.
+            </p>
+
+            <div class="btn-row hero-cta">
+              <a class="btn btn-primary" href="#brief">Оставить вводные на расчёт</a>
+              <a class="btn btn-secondary" href="../calc/">Вернуться в калькулятор</a>
+            </div>
+            <div class="hero-quiet-cta">
+              <a href="../study/">Нужен разбор действующей фермы</a>
+            </div>
+          </div>
+
+          <aside class="farm-hero-proof">
+            <div class="farm-hero-proof__visual">
+              <img
+                class="farm-hero-proof__image"
+                src="../assets/catalog/catalog-racks/greenhouse-rack-context.webp"
+                alt="Клубничная ферма"
+              />
+              <div class="farm-hero-proof__note">Базовая цифра уже есть. Здесь проверяем, как она меняется на реальном объекте.</div>
+            </div>
+            <div class="farm-hero-proof__grid">
+              <div class="farm-hero-proof__card">
+                <strong>Что меняет модель</strong>
+                <span>Площадь, ярусность, проходы, климат и инженерные ограничения.</span>
+              </div>
+              <div class="farm-hero-proof__card">
+                <strong>Что уточняем в первую очередь</strong>
+                <span>Что оставить как в расчёте, а что пересобрать до запуска.</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="section" id="when">
+    <div class="container">
+      <div class="section-frame">
+        <div class="section-head">
+          <span class="eyebrow">После калькулятора</span>
+          <h2>Когда вам нужен расчёт</h2>
+          <p class="sublead">Если вопрос уже шире одной цифры, лучше не собирать объект по разрозненным покупкам.</p>
+        </div>
+
+        <div class="grid grid-3">
+          <article class="path-card">
+            <div class="kicker">Запуск</div>
+            <h3>Есть помещение</h3>
+            <p>Есть реальный объект и нужно сверить проходы, воду и свет.</p>
+            <ul>
+              <li>Площадь, ярусность и ограничения помещения</li>
+              <li>Следующий шаг: расчёт под объект</li>
+            </ul>
+            <a class="path-card-note" href="#brief">Оставить вводные</a>
+          </article>
+
+          <article class="path-card">
+            <div class="kicker">Пересборка</div>
+            <h3>Есть решения</h3>
+            <p>Часть решений уже куплена или выбрана, но схему надо сверить.</p>
+            <ul>
+              <li>Что уже куплено и что менять нельзя</li>
+              <li>Следующий шаг: сверка схемы и узлов</li>
+            </ul>
+            <a class="path-card-note" href="#brief">Сверить схему</a>
+          </article>
+
+          <article class="path-card">
+            <div class="kicker">Рост</div>
+            <h3>Новый пакет</h3>
+            <p>Нужна следующая очередь или новый объём без сборки по частям.</p>
+            <ul>
+              <li>Новый объём, очередь или рабочий комплект</li>
+              <li>Следующий шаг: расчёт следующего пакета</li>
+            </ul>
+            <a class="path-card-note" href="../calc/">Открыть калькулятор</a>
+          </article>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight" id="trust">
+    <div class="container">
+      <div class="section-frame">
+        <div class="section-head">
+          <span class="eyebrow">Что вы получите</span>
+          <h2>После расчёта вы получаете не просто счёт, а рабочую рамку проекта</h2>
+          <p class="sublead">
+            Не набор отдельных позиций, а собранную схему: что считается вместе, что можно брать как типовое и что делать дальше.
+          </p>
+        </div>
+
+        <div class="farm-deliverables">
+          <article class="card result-card">
+            <div class="tag">Компоновка</div>
+            <h3>Стеллажная схема</h3>
+            <p>Как собрать модуль, проходы, ярусность и логику размещения под вашу площадь.</p>
+          </article>
+          <article class="card result-card">
+            <div class="tag">Среда</div>
+            <h3>Свет и полив</h3>
+            <p>Что считать вместе со стеллажной схемой, чтобы система сходилась не только на бумаге.</p>
+          </article>
+          <article class="card result-card">
+            <div class="tag">Расходники</div>
+            <h3>Субстрат и посадочный материал</h3>
+            <p>Какие расходные и посадочные позиции нужны именно под выбранную схему и запуск.</p>
+          </article>
+          <article class="card result-card">
+            <div class="tag">Коммерция</div>
+            <h3>Состав и смета</h3>
+            <p>Граница между типовым и проектным, порядок закупки и следующий коммерческий шаг.</p>
+          </article>
+        </div>
+
+        <div class="farm-decision-strip">
+          <div>
+            <strong>Если узлы уже связаны между собой, не собирайте объект по разрозненным покупкам.</strong>
+            <p>Начните с расчёта и дальше идите либо в каталог, либо в сопровождение.</p>
+          </div>
+          <div class="btn-row">
+            <a class="btn btn-primary" href="#brief">Оставить вводные</a>
+            <a class="btn btn-secondary" href="../study/">Перейти в сопровождение</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight" id="brief">
+    <div class="container">
+      <div class="section-frame">
+        <div class="farm-brief-grid">
+          <div class="contact-main">
+            <span class="eyebrow">Что прислать</span>
+            <h2>Что прислать</h2>
+            <p class="sublead">Трёх вводных достаточно, чтобы быстро понять следующий шаг без долгой переписки.</p>
+
+            <ul class="farm-brief-list">
+              <li>
+                <strong>Площадь и тип помещения</strong>
+                <span>Теплица, помещение, ярусность, проходы.</span>
+              </li>
+              <li>
+                <strong>Стадия проекта</strong>
+                <span>Запуск с нуля, пересборка или следующая очередь.</span>
+              </li>
+              <li>
+                <strong>Что уже куплено и что менять нельзя</strong>
+                <span>Так видно, что оставляем, а что пересобираем.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card form-card">
+            <h3>Передать вводные</h3>
+            <p class="sublead">Контакт, объект, стадия проекта и короткое описание. Дальше задача уходит в нужный маршрут.</p>
+            <form class="form-grid" data-brief-form="Расчёт фермы — уточнение под объект" data-brief-button-label="Передать расчёт" data-brief-done-label="Передано на разбор">
+              <input class="input" id="farm-contact" type="text" placeholder="Telegram / WhatsApp для связи" data-field-role="contact" data-field-label="Контакт для связи" />
+              <input class="input" id="farm-location" type="text" placeholder="Площадь и тип помещения" data-field-role="summary" data-field-label="Площадь и тип помещения" />
+              <div class="field-group">
+                <span class="field-label">Стадия проекта</span>
+                <div class="choice-grid" data-choice-group>
+                  <input type="hidden" value="" data-field-role="stage" data-field-label="Стадия проекта" />
+                  <button class="choice-chip" type="button" data-choice-value="Запуск с нуля">Запуск с нуля</button>
+                  <button class="choice-chip" type="button" data-choice-value="Действующая ферма">Действующая ферма</button>
+                  <button class="choice-chip" type="button" data-choice-value="Пересборка / замена узлов">Пересборка / замена узлов</button>
+                  <button class="choice-chip" type="button" data-choice-value="Нужен ориентир по старту">Нужен ориентир по старту</button>
+                </div>
+              </div>
+              <div class="field-group">
+                <span class="field-label">Что нужно сейчас</span>
+                <div class="choice-grid" data-choice-group>
+                  <input type="hidden" value="" data-field-role="request" data-field-label="Что нужно сейчас" />
+                  <button class="choice-chip" type="button" data-choice-value="Расчёт и ориентир по смете">Расчёт и ориентир</button>
+                  <button class="choice-chip" type="button" data-choice-value="Подбор решений и каталога">Подбор решений</button>
+                  <button class="choice-chip" type="button" data-choice-value="Разобрать действующий объект">Разобрать объект</button>
+                  <button class="choice-chip" type="button" data-choice-value="Сопровождение / консультация">Сопровождение / консультация</button>
+                </div>
+              </div>
+              <input class="input" id="farm-purchased" type="text" placeholder="Что уже куплено / что менять нельзя" data-field-label="Что уже куплено" />
+              <textarea class="textarea" id="farm-details" placeholder="Что ещё важно по объекту: бюджет, вода, свет, проходы, климат или ограничения по запуску" data-field-role="summary" data-field-label="Что важно по объекту"></textarea>
+              <div class="brief-form-actions">
+                <button class="btn btn-primary" data-brief-button type="button">Передать вводные</button>
+                <a class="brief-telegram-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Открыть Telegram</a>
+              </div>
+              <p class="brief-form-note">Если удобнее, можно сразу написать в <a href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">@patiev_admin</a>.</p>
+              <p class="brief-form-status" data-brief-status aria-live="polite"></p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight" id="process">
+    <div class="container">
+      <div class="section-frame">
+        <div class="section-head">
+          <span class="eyebrow">Как идёт работа</span>
+          <h2>Что будет дальше</h2>
+          <p class="sublead">Короткий маршрут после вводных: считаем, собираем, доставляем и запускаем.</p>
+        </div>
+
+        <div class="farm-process-grid">
+          <article class="card">
+            <div class="tag">Шаг 01</div>
+            <h3>Считаем</h3>
+            <p>Сверяем вводные, состав узлов и то, что нужно считать вместе.</p>
+          </article>
+          <article class="card">
+            <div class="tag">Шаг 02</div>
+            <h3>Собираем заказ</h3>
+            <p>Отделяем типовые позиции от проектных и собираем рабочий пакет.</p>
+          </article>
+          <article class="card">
+            <div class="tag">Шаг 03</div>
+            <h3>Доставляем</h3>
+            <p>Формируем порядок закупки и логистику под объект и очередь запуска.</p>
+          </article>
+          <article class="card">
+            <div class="tag">Шаг 04</div>
+            <h3>Запускаем</h3>
+            <p>Понимаем, что монтировать и в каком порядке входить в запуск без лишних кругов.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-frame">
+        <div class="section-head">
+          <span class="eyebrow">FAQ</span>
+          <h2>Что важно понять перед расчётом</h2>
+        </div>
+
+        <div class="faq-grid">
+          <article class="card faq-box">
+            <strong>С чего начать, если есть только идея?</strong>
+            <p>Начните с калькулятора. Если после первой цифры уже нужно привязать схему к объекту, переходите сюда.</p>
+          </article>
+          <article class="card faq-box">
+            <strong>Можно ли считать только часть системы?</strong>
+            <p>Да, но только если понятно, как этот узел связан с остальной схемой и что уже нельзя менять.</p>
+          </article>
+          <article class="card faq-box">
+            <strong>Что я получу после расчёта?</strong>
+            <p>Рабочую рамку проекта: состав, порядок закупки, границу между типовым и проектным и следующий шаг.</p>
+          </article>
+          <article class="card faq-box">
+            <strong>Если ферма уже работает, мне сюда или в сопровождение?</strong>
+            <p>Если вопрос уже в технологии, проблемах или действующей работе фермы, лучше идти в сопровождение.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+<script src="../site.js?v=20260405m" defer></script>
+  <script src="./farm.js"></script>
+</body>
+</html>

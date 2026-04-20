@@ -1,0 +1,301 @@
+{
+  "meta": {
+    "name": "KlubnikaProject Guided Estimate",
+    "currency": "RUB",
+    "version": 4
+  },
+  "constants": {
+    "heightBreakpoints": {
+      "threeTierMax": 2.5,
+      "fourTierMax": 3,
+      "fiveTierMin": 3,
+      "sixTierMin": 3.6
+    },
+    "rackGeometry": {
+      "segmentLength": 2,
+      "maxRackLength": 12,
+      "serviceGapLength": 1,
+      "singleRunExceptionMaxLength": 14,
+      "lengthPrimaryClearance": 1,
+      "lengthSecondaryClearance": 0.5,
+      "rackWidth": 0.4,
+      "aisleWidth": 0.6,
+      "wallOffset": 0.5
+    },
+    "trayKit": {
+      "plantsPerTray": 12,
+      "matsPerTray": 2,
+      "drippersPerTray": 12,
+      "lightsPerTray": 1,
+      "blindTubePerTray": 2,
+      "blindTubePerRack": 3
+    },
+    "purchaseUnits": {
+      "matPackSize": 12,
+      "minMatReserve": 2,
+      "blindTubeCoilMeters": 200
+    },
+    "assemblyPerPlant": 1300,
+    "electricalModel": {
+      "fixturePowerW": 100,
+      "driverCountPerFixture": 2,
+      "driverPowerW": 50,
+      "maxLinePowerW": 2500,
+      "panelToRackZoneM": 4,
+      "lightLineTerminalReserveM": 2,
+      "layoutCoefficients": {
+        "short": 1,
+        "tray": 1.15,
+        "real": 1.25
+      },
+      "exhaustPowerW": 1000,
+      "serviceReserveW": 1500,
+      "splitColdFactor": 1.2,
+      "btuPerW": 3.412,
+      "splitEer": 3.2,
+      "lineContactorA": 25,
+      "serviceSocketPoints": 7,
+      "standardBreakersA": [6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100]
+    },
+    "energyProfile": {
+      "daysPerMonth": 30,
+      "lightHoursFull": 12,
+      "lightHoursHalf": 4,
+      "lightHalfFactor": 0.5,
+      "condenserDuty": 0.5,
+      "exhaustHours": 24,
+      "exhaustDuty": 1,
+      "pumpPowerW": 200,
+      "pumpMinutesPerDay": 5,
+      "automationPowerW": 200,
+      "automationHoursPerDay": 24
+    },
+    "waterProfile": {
+      "perDripperMlPerDay": 250,
+      "daysPerMonth": 30,
+      "waterTariffPerM3": 60
+    },
+    "economyProfile": {
+      "berrySalePricePerKg": 1600,
+      "avgBerryGramsPerPlantPerMonth": 85,
+      "pessimisticGramsPerPlantPerMonth": 60,
+      "realisticGramsPerPlantPerMonth": 85,
+      "optimisticGramsPerPlantPerMonth": 120
+    }
+  },
+  "baseAssemblyIncludes": [
+    "Каркас и стеллажи на базовую 3- или 4-рядную сборку",
+    "Дренажные лотки и опоры под маты",
+    "LED-свет на рабочую конфигурацию",
+    "Капельный полив, трубка и комплект фитингов",
+    "Маты / субстрат под посадку",
+    "Базовый контроль раствора: фильтр, дозирующие насосы и pH/EC"
+  ],
+  "optionGroups": [
+    {
+      "id": "water-prep",
+      "stateKey": "includeWaterPrep",
+      "label": "Подготовка воды и осмос",
+      "note": "Осмос, мембрана, предфильтры и ёмкость под осмос",
+      "includes": [
+        "Осмос",
+        "Мембрана",
+        "Предфильтр и запас фильтров грубой очистки",
+        "Емкости для осмоса"
+      ],
+      "type": "fixed",
+      "unitLabel": "комплект",
+      "unitPrice": 64000,
+      "includedByDefault": false
+    },
+    {
+      "id": "fertilizers",
+      "stateKey": "includeFertilizers",
+      "label": "Удобрения на 6 месяцев",
+      "note": "Считаем от количества растений",
+      "includes": [
+        "Удобрения по мешку"
+      ],
+      "type": "perPlant",
+      "unitLabel": "растений",
+      "unitPrice": 25,
+      "minTotal": 10000,
+      "includedByDefault": false
+    },
+    {
+      "id": "automation",
+      "stateKey": "includeAutomation",
+      "label": "Автоматика",
+      "note": "Умный дом для базы и полива",
+      "includes": [
+        "Умный дом (база)",
+        "Умный дом (полив)"
+      ],
+      "type": "fixed",
+      "unitLabel": "комплект",
+      "unitPrice": 50000,
+      "includedByDefault": false
+    },
+    {
+      "id": "mixing-inventory",
+      "stateKey": "includeMixingInventory",
+      "label": "Инвентарь и малые ёмкости",
+      "note": "Весы, стаканы, ведра и ёмкости под маточник",
+      "includes": [
+        "Весы, стаканчики, ведра",
+        "Емкости для маточника"
+      ],
+      "type": "fixed",
+      "unitLabel": "комплект",
+      "unitPrice": 17000,
+      "includedByDefault": false
+    },
+    {
+      "id": "electrical",
+      "stateKey": "includeElectrical",
+      "label": "Электрика и щит",
+      "note": "Щит, автоматы, контакторы и кабель по расчёту",
+      "includes": [
+        "Провода, щиток, автоматы"
+      ],
+      "type": "electricalAuto",
+      "unitLabel": "ориентир",
+      "unitPrice": 0,
+      "pricingModel": {
+        "shieldBase": 12000,
+        "inputBreakerUnitPrice": 1500,
+        "lightLineBreakerUnitPrice": 250,
+        "contactorUnitPrice": 1200,
+        "smartRelayUnitPrice": 2000,
+        "exhaustBreakerUnitPrice": 250,
+        "serviceBreakerUnitPrice": 250,
+        "splitBreakerUnitPrice": 350,
+        "lightCablePerMeter": 35,
+        "exhaustCablePerMeter": 25,
+        "serviceCablePerMeter": 30,
+        "splitCablePerMeter": 35,
+        "wagoPerFixture": 4,
+        "wagoUnitPrice": 15,
+        "junctionBoxPerRack": 1,
+        "junctionBoxUnitPrice": 250,
+        "roundTo": 5000,
+        "minTotal": 40000
+      },
+      "includedByDefault": false
+    },
+    {
+      "id": "climate-pack",
+      "stateKey": "includeClimatePack",
+      "label": "Климат-комплект",
+      "note": "3 000 ₽ за м² с округлением до 5 000 ₽",
+      "includes": [
+        "Климат: вытяжка и листы металла для вентканалов",
+        "Сплит-система",
+        "Увлажнитель"
+      ],
+      "type": "perAreaRounded",
+      "unitLabel": "м²",
+      "unitPrice": 3000,
+      "roundTo": 5000,
+      "includedByDefault": false
+    },
+    {
+      "id": "project-support-month",
+      "stateKey": "includeProjectSupportMonth",
+      "label": "Сопровождение проекта",
+      "note": "500 ₽ за м² с округлением вверх до 5 000 ₽",
+      "includes": [
+        "Сопровождение проекта 1 месяц"
+      ],
+      "type": "perAreaRounded",
+      "unitLabel": "м²",
+      "unitPrice": 500,
+      "roundTo": 5000,
+      "roundMode": "up",
+      "minTotal": 25000,
+      "includedByDefault": false
+    },
+    {
+      "id": "seedlings",
+      "stateKey": "includeSeedlings",
+      "label": "Рассада",
+      "note": "Посадочный материал",
+      "includes": [
+        "Рассада frigo / посадочный материал"
+      ],
+      "type": "perPlant",
+      "unitLabel": "растений",
+      "unitPrice": 80,
+      "includedByDefault": false
+    }
+  ],
+  "inputs": {
+    "a0": 4,
+    "a1": 8,
+    "a2": 3,
+    "a3": 6,
+    "a4": 150,
+    "a5": 1600
+  },
+  "presets": [
+    {
+      "id": "2x2",
+      "label": "Стартовый формат",
+      "width": 2,
+      "length": 2,
+      "note": "Размер 2 × 2 м · ориентир ~125 000 ₽ без допов."
+    },
+    {
+      "id": "2x8",
+      "label": "Базовый шаг",
+      "width": 2,
+      "length": 8,
+      "note": "Размер 2 × 8 м · ориентир ~250 000 ₽ без допов."
+    },
+    {
+      "id": "3x8",
+      "label": "Усиленный формат",
+      "width": 3,
+      "length": 8,
+      "note": "Размер 3 × 8 м · ориентир ~500 000 ₽ без допов."
+    },
+    {
+      "id": "4x8",
+      "label": "Рабочий формат",
+      "width": 4,
+      "length": 8,
+      "note": "Размер 4 × 8 м · ориентир ~750 000 ₽ без допов."
+    },
+    {
+      "id": "5x10",
+      "label": "Расширенный формат",
+      "width": 5,
+      "length": 10,
+      "note": "Размер 5 × 10 м · ориентир ~1 250 000 ₽ без допов."
+    },
+    {
+      "id": "6x10",
+      "label": "Верхний типовой формат",
+      "width": 6,
+      "length": 10,
+      "note": "Размер 6 × 10 м · ориентир ~1 560 000 ₽ без допов.",
+      "discountPercent": 2
+    },
+    {
+      "id": "7x12",
+      "label": "Большая ферма",
+      "width": 7,
+      "length": 12,
+      "note": "Размер 7 × 12 м · ориентир ~2 100 000 ₽ без допов.",
+      "discountPercent": 3
+    },
+    {
+      "id": "8x14",
+      "label": "Большая ферма + скидка",
+      "width": 8,
+      "length": 14,
+      "note": "Размер 8 × 14 м · ориентир с проектной скидкой.",
+      "discountPercent": 5
+    }
+  ]
+}
