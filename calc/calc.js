@@ -152,8 +152,8 @@ async function init() {
   pricing = await loadPricing(currentCrop);
   setDebugAppPhase("build-state");
   state = buildInitialState();
-  setDebugAppPhase("auth-check");
-  summaryUnlocked = await checkCabinetSession();
+  setDebugAppPhase("public-access");
+  summaryUnlocked = true;
   setDebugAppPhase("render-presets");
   renderPresetCards();
   renderFeatureToggles();
