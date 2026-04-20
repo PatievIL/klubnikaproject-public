@@ -2116,6 +2116,13 @@
 }
 
 .summary-reveal-shell.is-locked .summary-reveal-zone {
+  filter: none;
+  opacity: 1;
+  pointer-events: auto;
+  user-select: auto;
+}
+
+.calc-lock-disabled {
   filter: blur(5px);
   opacity: 0.75;
   pointer-events: none;
@@ -2140,6 +2147,10 @@
 }
 
 .summary-reveal-shell.is-locked .summary-reveal-overlay {
+  display: none;
+}
+
+.calc-lock-disabled {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -2162,6 +2173,13 @@
 }
 
 .calc-details-reveal-shell.is-locked .calc-details-reveal-zone {
+  filter: none;
+  opacity: 1;
+  pointer-events: auto;
+  user-select: auto;
+}
+
+.calc-lock-disabled {
   filter: blur(6px);
   opacity: 0.72;
   pointer-events: none;
@@ -2179,6 +2197,10 @@
 }
 
 .calc-details-reveal-shell.is-locked .calc-details-reveal-overlay {
+  display: none;
+}
+
+.calc-lock-disabled {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -2194,10 +2216,10 @@ body.calc-auth-locked #room-size-panel .room-size-hint,
 body.calc-auth-locked #room-size-panel .reset-inline-link,
 body.calc-auth-locked #feature-step,
 body.calc-auth-locked #electrical-step {
-  filter: blur(5px);
-  opacity: 0.45;
-  pointer-events: none;
-  user-select: none;
+  filter: none;
+  opacity: 1;
+  pointer-events: auto;
+  user-select: auto;
 }
 
 .summary-progress {
