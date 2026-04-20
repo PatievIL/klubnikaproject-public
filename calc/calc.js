@@ -519,6 +519,7 @@ function buildCalculationReportHtml(calc) {
   });
   const inputRows = [
     { label: "Размер", value: `${formatSmart(calc.width)} × ${formatSmart(calc.length)} × ${formatSmart(calc.height)} м` },
+    { label: "Площадь фермы", value: `${formatSmart(calc.width * calc.length)} м²` },
     { label: "Конфигурация", value: `${formatSmart(calc.rackCount)} ${pluralize(calc.rackCount, "стеллаж", "стеллажа", "стеллажей")} · ${formatSmart(calc.heightProfile.tiers)} ${pluralize(calc.heightProfile.tiers, "этаж", "этажа", "этажей")}` },
     { label: "Растений", value: formatSmart(calc.plantCount) },
     { label: "Питание и нагрузка", value: `${calc.electrical.phaseLabel} · ${formatSmart(calc.electrical.totalPowerKw)} кВт` },
@@ -956,6 +957,7 @@ function renderSummary(calc) {
 
   elements.summaryGrid.innerHTML = [
     { label: "Размер", value: sizeLabel },
+    { label: "Площадь фермы", value: `${formatSmart(calc.width * calc.length)} м²` },
     { label: "Конфигурация", value: `${formatSmart(calc.rackCount)} ${pluralize(calc.rackCount, "стеллаж", "стеллажа", "стеллажей")} · ${formatSmart(calc.heightProfile.tiers)} ${pluralize(calc.heightProfile.tiers, "этаж", "этажа", "этажей")}` },
     { label: "Растений", value: formatSmart(calc.plantCount) },
     { label: "Ежемесячные расходы", value: formatRub(calc.monthlyOperatingCost) },
