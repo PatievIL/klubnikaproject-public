@@ -1,8 +1,8 @@
 import { catalogLegacyOverrides } from "./catalog-legacy-overrides.mjs";
 import { catalogUfarmsOverrides } from "./catalog-ufarms-overrides.generated.mjs";
 
-const SITE_ORIGIN = "https://klubnikaproject.ru";
-const CATALOG_BASE_PATH = "/klubnikaproject-public/catalog/";
+const SITE_ORIGIN = "https://patievil.github.io/klubnikaproject-public";
+const CATALOG_BASE_PATH = "/catalog/";
 const DEFAULT_PAGE_SIZE = 12;
 
 export const CATALOG_META = {
@@ -34,22 +34,22 @@ export const CATALOG_META = {
     },
     {
       title: "Расчёт фермы",
-      href: "/klubnikaproject-public/farm/",
+      href: "/farm/",
       summary: "Понять состав фермы и рамку бюджета до закупки оборудования.",
     },
     {
       title: "Калькулятор",
-      href: "/klubnikaproject-public/calc/",
+      href: "/calc/",
       summary: "Быстрый ориентир по модулю, полке и базовой смете.",
     },
     {
       title: "Консультации",
-      href: "/klubnikaproject-public/consultations/",
+      href: "/consultations/",
       summary: "Разбор действующей фермы, совместимости по системе и того, с чего лучше начать.",
     },
     {
       title: "Сопровождение",
-      href: "/klubnikaproject-public/study/",
+      href: "/study/",
       summary: "Длинная работа по действующему проекту и технологии выращивания.",
     },
   ],

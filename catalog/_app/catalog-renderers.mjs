@@ -1156,7 +1156,7 @@ function renderProductPage(ctx, state, data) {
                   : "Если меняете не один товар, а связку элементов, лучше заранее сверить совместимость."}</p>
                 <div class="catalog-product-brief__buy-meta">
                 <a class="catalog-link-button" href="${resolveHref(ctx, `/catalog/${data.category.slug}/`)}">Открыть раздел</a>
-                <a class="catalog-link-button" href="${resolveHref(ctx, "/klubnikaproject-public/farm/")}">Сверить в расчёте</a>
+                <a class="catalog-link-button" href="${resolveHref(ctx, "/farm/")}">Сверить в расчёте</a>
                 </div>
               </div>
           </div>
@@ -1202,7 +1202,7 @@ function renderProductPage(ctx, state, data) {
               : `<button type="button" class="catalog-primary-button" disabled>Нет в наличии</button>`
           }
           <button type="button" class="catalog-secondary-button" data-action="open-assistant" data-intent="question">Задать короткий вопрос</button>
-          <a class="catalog-link-button" href="${resolveHref(ctx, "/klubnikaproject-public/farm/")}">Открыть расчёт фермы</a>
+          <a class="catalog-link-button" href="${resolveHref(ctx, "/farm/")}">Открыть расчёт фермы</a>
         </div>
       </section>
     </section>
@@ -1246,9 +1246,9 @@ function renderHowBuy(ctx) {
           <p>Сначала коротко сверьте состав, сделайте быстрый расчёт или задайте вопрос, чтобы не собирать закупку вслепую.</p>
         </div>
         <div class="catalog-how-buy-note__actions">
-          <a class="catalog-link-button" href="/klubnikaproject-public/farm/">Сверить состав</a>
-          <a class="catalog-link-button" href="/klubnikaproject-public/calc/">Быстрый расчёт</a>
-          <a class="catalog-link-button" href="/klubnikaproject-public/consultations/">Короткий вопрос</a>
+          <a class="catalog-link-button" href="/farm/">Сверить состав</a>
+          <a class="catalog-link-button" href="/calc/">Быстрый расчёт</a>
+          <a class="catalog-link-button" href="/consultations/">Короткий вопрос</a>
         </div>
       </div>
     </section>
@@ -1501,11 +1501,11 @@ function renderMobileMenu(ctx, state) {
         </div>
         <nav class="catalog-mobile-nav">
           <a href="${resolveHref(ctx, "/")}">Главная</a>
-          <a href="${resolveHref(ctx, "/klubnikaproject-public/farm/")}">Расчёт фермы</a>
-          <a href="${resolveHref(ctx, "/klubnikaproject-public/consultations/")}">Консультации</a>
-          <a href="${resolveHref(ctx, "/klubnikaproject-public/study/")}">Сопровождение</a>
-          <a href="${resolveHref(ctx, "/klubnikaproject-public/calc/")}">Калькулятор</a>
-          <a href="${resolveHref(ctx, "/klubnikaproject-public/catalog/")}">Магазин</a>
+          <a href="${resolveHref(ctx, "/farm/")}">Расчёт фермы</a>
+          <a href="${resolveHref(ctx, "/consultations/")}">Консультации</a>
+          <a href="${resolveHref(ctx, "/study/")}">Сопровождение</a>
+          <a href="${resolveHref(ctx, "/calc/")}">Калькулятор</a>
+          <a href="${resolveHref(ctx, "/catalog/")}">Магазин</a>
           <a href="#catalog-how-buy">Как купить</a>
           <a href="#catalog-contacts">Контакты</a>
           <a class="catalog-mobile-nav__link" href="${resolveHref(ctx, "/cabinet/login/")}">Личный кабинет</a>
@@ -1593,8 +1593,8 @@ function renderHeader(ctx, state) {
         </button>
         <nav class="catalog-main-nav nav" aria-label="Основная навигация">
           <a class="nav-link" href="${resolveHref(ctx, "/")}">Сайт</a>
-          <a class="nav-link" href="${resolveHref(ctx, "/klubnikaproject-public/catalog/")}">Каталог</a>
-          <a class="nav-link" href="${resolveHref(ctx, "/klubnikaproject-public/calc/")}">Калькулятор</a>
+          <a class="nav-link" href="${resolveHref(ctx, "/catalog/")}">Каталог</a>
+          <a class="nav-link" href="${resolveHref(ctx, "/calc/")}">Калькулятор</a>
           <a class="nav-link" href="${resolveHref(ctx, "/cabinet/login/")}">Кабинет</a>
         </nav>
         <div class="catalog-header-contactbar">

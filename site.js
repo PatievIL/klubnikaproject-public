@@ -584,7 +584,7 @@ function injectLegacyCatalogBanner(root) {
 function normalizeSitePath(pathname) {
   return (pathname || "/")
     .replace(/\/index\.html$/, "")
-    .replace(/^\/(?:klubnikaproject-next|klubnikaproject-public)/, "")
+    .replace(/^\/klubnikaproject-next/, "")
     .replace(/\/+$/, "") || "/";
 }
 
@@ -1399,16 +1399,16 @@ function markActiveCompactNav() {
     const currentPath = path.replace(/index\.html$/, "");
 
     if (
-      targetPath === "/klubnikaproject-public/study/" &&
-      ["/klubnikaproject-public/farm/", "/klubnikaproject-public/study/", "/klubnikaproject-public/consultations/", "/klubnikaproject-public/klubhack/"].some((prefix) => currentPath.startsWith(prefix))
+      targetPath === "/study/" &&
+      ["/farm/", "/study/", "/consultations/", "/klubhack/"].some((prefix) => currentPath.startsWith(prefix))
     ) {
       link.setAttribute("aria-current", "page");
       return;
     }
 
     if (
-      targetPath === "/klubnikaproject-public/catalog/" &&
-      ["/klubnikaproject-public/catalog/", "/klubnikaproject-public/shop/", "/klubnikaproject-public/seeds/"].some((prefix) => currentPath.startsWith(prefix))
+      targetPath === "/catalog/" &&
+      ["/catalog/", "/shop/", "/seeds/"].some((prefix) => currentPath.startsWith(prefix))
     ) {
       link.setAttribute("aria-current", "page");
       return;
