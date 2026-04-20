@@ -1204,7 +1204,7 @@
   margin: 0;
 }
 
-.control-number[type="number"] {
+.control-number {
   -moz-appearance: textfield;
 }
 

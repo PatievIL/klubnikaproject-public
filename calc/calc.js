@@ -274,8 +274,9 @@ function bindEvents() {
 
   document.querySelectorAll("[data-input-type='number'][data-key]").forEach((input) => {
     input.addEventListener("input", handleNumericInput);
-    input.addEventListener("change", handleNumericInput);
+    input.addEventListener("change", handleNumericAccept);
     input.addEventListener("blur", handleNumericAccept);
+    input.addEventListener("keydown", handleNumericKeydown);
   });
 
   document.querySelectorAll("[data-toggle-key]").forEach((input) => {
@@ -352,20 +353,35 @@ function handleNumericInput(event) {
     return;
   }
 
-  state[control.key] = normalizeInputValue(input.value, control);
+  const draftValue = parseNumericDraft(input.value);
+  if (!Number.isFinite(draftValue)) {
+    return;
+  }
+
+  state[control.key] = clampNumericValue(draftValue, control);
   acceptedFields.add(control.key);
-  input.value = state[control.key];
   render();
 }
 
 function handleNumericAccept(event) {
-  const key = event.currentTarget.dataset.key;
-  if (!key) {
+  const input = event.currentTarget;
+  const control = CONTROL_CONFIG.find((item) => item.key === input.dataset.key);
+  if (!control) {
     return;
   }
 
-  acceptedFields.add(key);
+  state[control.key] = normalizeInputValue(input.value, control);
+  input.value = formatInputValue(state[control.key]);
+  acceptedFields.add(control.key);
   render();
+}
+
+function handleNumericKeydown(event) {
+  if (event.key !== "Enter") {
+    return;
+  }
+
+  event.currentTarget.blur();
 }
 
 function handleToggleChange(event) {
@@ -395,7 +411,7 @@ function handleStepControlClick(event) {
 
   const input = document.querySelector(`[data-input-type='number'][data-key='${key}']`);
   if (input) {
-    input.value = nextValue;
+    input.value = formatInputValue(nextValue);
   }
 
   render();
@@ -498,7 +514,7 @@ function renderSummaryReveal() {
 }
 
 function syncSummaryLoginLink() {
-  const next = encodeURIComponent(window.location.pathname || "/klubnikaproject-public/calc/");
+  const next = encodeURIComponent(window.location.pathname || "/calc/");
   if (elements.summaryLoginLink) {
     elements.summaryLoginLink.href = `../cabinet/login/?next=${next}`;
   }
@@ -635,9 +651,30 @@ function renderConditionalSteps() {
 function renderInputs() {
   CONTROL_CONFIG.forEach((control) => {
     document.querySelectorAll(`[data-key="${control.key}"]`).forEach((input) => {
-      input.value = state[control.key];
+      if (input === document.activeElement) {
+        return;
+      }
+
+      input.value = formatInputValue(state[control.key]);
     });
   });
+}
+
+function parseNumericDraft(rawValue) {
+  const normalized = String(rawValue ?? "").trim().replace(",", ".");
+  if (!normalized || normalized === "." || normalized === "-" || normalized === "-.") {
+    return NaN;
+  }
+
+  return Number.parseFloat(normalized);
+}
+
+function clampNumericValue(value, control) {
+  return Math.min(control.max, Math.max(control.min, value));
+}
+
+function formatInputValue(value) {
+  return String(value).replace(".", ",");
 }
 
 function renderAcceptedFields() {
