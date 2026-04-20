@@ -58,6 +58,7 @@ let totalDisplayValue = null;
 let totalDisplayAnimationFrame = null;
 let totalFlashTimeout = null;
 let summaryUnlocked = false;
+let latestCalculation = null;
 
 const elements = {
   cropSelectorGrid: document.getElementById("crop-selector-grid"),
@@ -90,6 +91,7 @@ const elements = {
   summaryLoginLink: document.getElementById("summary-login-link"),
   calcDetailsRevealShell: document.getElementById("calc-details-reveal-shell"),
   calcDetailsLoginLink: document.getElementById("calc-details-login-link"),
+  downloadCalculationButton: document.getElementById("download-calculation-button"),
   briefChipList: document.getElementById("brief-chip-list"),
   nextStepTitle: document.getElementById("next-step-title"),
   nextStepText: document.getElementById("next-step-text"),
@@ -291,6 +293,10 @@ function bindEvents() {
     elements.resetDefaultsButton.addEventListener("click", handleResetDefaultsClick);
   }
 
+  if (elements.downloadCalculationButton) {
+    elements.downloadCalculationButton.addEventListener("click", handleDownloadCalculationClick);
+  }
+
   elements.roomQuickPresets.forEach((button) => {
     button.addEventListener("click", handleQuickPresetClick);
   });
@@ -465,6 +471,7 @@ function render() {
   saveState();
 
   const calc = calculateFarm(state, pricing);
+  latestCalculation = calc;
   renderCropSpecificText(calc);
   renderChoiceStates();
   renderPanels();
@@ -478,6 +485,184 @@ function render() {
   renderSummaryReveal();
   renderDetails(calc);
   renderDebug(calc);
+}
+
+function handleDownloadCalculationClick() {
+  const calc = latestCalculation || calculateFarm(state, pricing);
+  downloadCalculationReport(calc);
+}
+
+function downloadCalculationReport(calc) {
+  const filename = `klubnika-project-raschet-${new Date().toISOString().slice(0, 10)}.html`;
+  const html = buildCalculationReportHtml(calc);
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function buildCalculationReportHtml(calc) {
+  const cropCopy = getCropCopy(calc);
+  const economy = resolveEconomyReport(calc);
+  const generatedAt = new Date().toLocaleString("ru-RU", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+  const inputRows = [
+    { label: "Размер", value: `${formatSmart(calc.width)} × ${formatSmart(calc.length)} × ${formatSmart(calc.height)} м` },
+    { label: "Конфигурация", value: `${formatSmart(calc.rackCount)} ${pluralize(calc.rackCount, "стеллаж", "стеллажа", "стеллажей")} · ${formatSmart(calc.heightProfile.tiers)} ${pluralize(calc.heightProfile.tiers, "этаж", "этажа", "этажей")}` },
+    { label: "Растений", value: formatSmart(calc.plantCount) },
+    { label: "Питание и нагрузка", value: `${calc.electrical.phaseLabel} · ${formatSmart(calc.electrical.totalPowerKw)} кВт` },
+    { label: "Ежемесячные расходы", value: formatRub(calc.monthlyOperatingCost) },
+    { label: cropCopy.monthlyYieldLabel, value: `${formatSmart(economy.produceKgPerMonth)} кг` },
+    { label: cropCopy.salePriceLabel, value: `${formatRub(calc.salePricePerKg)} / кг` }
+  ];
+  const selectedLineItems = calc.lineItems.filter((item) => item.included);
+  const assemblyRows = selectedLineItems
+    .map((item) => ({ label: item.label, value: formatRub(item.total) }))
+    .concat({ label: "Итого", value: formatRub(calc.totalEquipmentCost) });
+  const economyRows = [
+    { label: "Инвестиции в запуск", value: formatRub(calc.totalEquipmentCost) },
+    { label: "Операционные расходы / мес", value: formatRub(calc.monthlyOperatingCost) },
+    { label: "Электроэнергия / мес", value: formatRub(calc.electrical.monthlyPowerCost) },
+    { label: "Вода / мес", value: formatRub(calc.water.monthlyWaterCost) },
+    { label: "Аренда / мес", value: formatRub(calc.monthlyRentCost) },
+    { label: `${cropCopy.produceLabel} / мес`, value: `${formatSmart(economy.produceKgPerMonth)} кг` },
+    { label: "Выручка / мес", value: formatRub(economy.revenueMonthReal) },
+    { label: "Выручка / год", value: formatRub(economy.revenueYearReal) },
+    { label: "Чистый поток / мес", value: formatRub(economy.netMonthReal) },
+    { label: "Окупаемость", value: economy.paybackText }
+  ];
+
+  return `<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Расчет Klubnika Project</title>
+  <style>
+    :root {
+      color: #173f2a;
+      background: #fbf7ec;
+      font-family: "Aptos", "Segoe UI", sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 36px;
+      background: #fbf7ec;
+    }
+    .page {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 34px;
+      background: #fffaf0;
+      border: 1px solid #ded7c8;
+      border-radius: 24px;
+    }
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+    h1 {
+      font-size: 34px;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+    h2 {
+      margin-top: 30px;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+    }
+    h3 {
+      margin-top: 24px;
+      font-size: 16px;
+    }
+    .meta,
+    .note {
+      margin-top: 10px;
+      color: #657168;
+      line-height: 1.5;
+    }
+    table {
+      width: 100%;
+      margin-top: 14px;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+    td,
+    th {
+      padding: 11px 0;
+      border-bottom: 1px solid #e6dfd0;
+      text-align: left;
+      vertical-align: top;
+    }
+    td:last-child,
+    th:last-child {
+      text-align: right;
+      font-weight: 700;
+      color: #0e5d31;
+    }
+    tr.total td {
+      border-top: 2px solid #173f2a;
+      border-bottom: 0;
+      font-weight: 800;
+    }
+    .scenario th {
+      color: #657168;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .scenario td,
+    .scenario th {
+      text-align: right;
+    }
+    .scenario td:first-child,
+    .scenario th:first-child {
+      text-align: left;
+    }
+    @media print {
+      body {
+        padding: 0;
+        background: #fff;
+      }
+      .page {
+        border: 0;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1>Расчет Klubnika Project</h1>
+    <p class="meta">Сформировано: ${escapeHtml(generatedAt)}</p>
+
+    <h2>Что получилось по вашим вводным</h2>
+    ${renderReportTable(inputRows)}
+
+    <h3>Состав сборки</h3>
+    ${renderReportTable(assemblyRows, true)}
+
+    <h2>Разбивка экономики</h2>
+    ${renderReportTable(economyRows)}
+    ${renderReportScenarioTable(economy.scenarios, cropCopy)}
+
+    <p class="note">Это ориентир по сборке и экономике. Расчет не заменяет обследование объекта, проверку логистики, строительных работ, юридических ограничений и фактической урожайности.</p>
+  </main>
+</body>
+</html>`;
 }
 
 function getCropCopy(calc) {
@@ -1033,6 +1218,89 @@ function renderDetails(calc) {
   }
 }
 
+function resolveEconomyReport(calc) {
+  const fallbackProduceKgPerMonth = Number.isFinite(calc.monthlyProduceKg)
+    ? calc.monthlyProduceKg
+    : roundToStep((Number(calc.plantCount || 0) * 80) / 1000, 0.1, "nearest");
+  const economy = calc.economy || {};
+  const produceKgPerMonth = Number.isFinite(economy.monthlyYieldKgReal)
+    ? economy.monthlyYieldKgReal
+    : fallbackProduceKgPerMonth;
+  const revenueMonthReal = Number.isFinite(economy.revenueMonthReal)
+    ? economy.revenueMonthReal
+    : roundToStep(produceKgPerMonth * (calc.salePricePerKg || 1600), 1, "nearest");
+  const revenueYearReal = Number.isFinite(economy.revenueYearReal)
+    ? economy.revenueYearReal
+    : roundToStep(revenueMonthReal * 12, 1, "nearest");
+  const netMonthReal = Number.isFinite(economy.netMonthReal)
+    ? economy.netMonthReal
+    : roundToStep(revenueMonthReal - (calc.monthlyOperatingCost || 0), 1, "nearest");
+  const paybackText = Number.isFinite(economy.paybackMonthsReal)
+    ? `${formatSmart(economy.paybackMonthsReal)} мес`
+    : "Не рассчитывается";
+
+  return {
+    produceKgPerMonth,
+    revenueMonthReal,
+    revenueYearReal,
+    netMonthReal,
+    paybackText,
+    scenarios: Array.isArray(economy.scenarios) ? economy.scenarios : []
+  };
+}
+
+function renderReportTable(rows, markLastAsTotal = false) {
+  return `
+    <table>
+      <tbody>
+        ${rows.map((row, index) => `
+          <tr class="${markLastAsTotal && index === rows.length - 1 ? "total" : ""}">
+            <td>${escapeHtml(row.label)}</td>
+            <td>${escapeHtml(row.value)}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderReportScenarioTable(scenarios, cropCopy) {
+  if (!scenarios.length) {
+    return "";
+  }
+
+  return `
+    <h3>Сценарии</h3>
+    <table class="scenario">
+      <thead>
+        <tr>
+          <th>Сценарий</th>
+          <th>${escapeHtml(cropCopy.produceLabel)} / мес</th>
+          <th>Выручка / мес</th>
+          <th>Чистый поток / мес</th>
+          <th>Окупаемость</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${scenarios.map((scenario) => {
+          const paybackText = Number.isFinite(scenario.paybackMonths)
+            ? `${formatSmart(scenario.paybackMonths)} мес`
+            : "Не рассчитывается";
+          return `
+            <tr>
+              <td>${escapeHtml(scenario.label)}</td>
+              <td>${escapeHtml(`${formatSmart(scenario.monthlyYieldKg)} кг`)}</td>
+              <td>${escapeHtml(formatRub(scenario.revenueMonth))}</td>
+              <td>${escapeHtml(formatRub(scenario.netMonth))}</td>
+              <td>${escapeHtml(paybackText)}</td>
+            </tr>
+          `;
+        }).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
 function renderDebug(calc) {
   if (elements.debugBuildId) {
     elements.debugBuildId.textContent = BUILD_ID;
@@ -1106,6 +1374,15 @@ function formatLineMeta(item) {
   }
 
   return `${formatSmart(item.qty)} ${item.unit} × ${formatRub(item.unitPrice)}`;
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
 function formatOptionPrice(group) {

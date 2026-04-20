@@ -2476,6 +2476,7 @@ body.calc-auth-locked #electrical-step {
 .summary-utility .btn {
   width: 100%;
   justify-content: center;
+  cursor: pointer;
 }
 
 .summary-utility .btn-primary,
