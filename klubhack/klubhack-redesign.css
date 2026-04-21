@@ -64,15 +64,17 @@ html {
   gap: 24px;
 }
 
-.klubhack-page .nav-link,
+.klubhack-page .topbar .nav-link,
+.klubhack-page .topbar .nav > a:not(.nav-cta),
 .klubhack-page .site-header-link,
 .klubhack-page .nav-trigger {
-  color: color-mix(in srgb, var(--green) 78%, var(--muted));
+  color: var(--green);
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 850;
 }
 
-.klubhack-page .nav-link:hover,
+.klubhack-page .topbar .nav-link:hover,
+.klubhack-page .topbar .nav > a:not(.nav-cta):hover,
 .klubhack-page .site-header-link:hover {
   color: var(--green);
 }
@@ -219,6 +221,24 @@ html {
   box-shadow: none;
 }
 
+.klubhack-page #intro-video .section-frame,
+.klubhack-page #who .section-frame,
+.klubhack-page #program .section-frame,
+.klubhack-page #faq .section-frame,
+.klubhack-page #request .section-frame,
+.klubhack-page #value .metric-row > .section-frame {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.klubhack-page #who .section-head,
+.klubhack-page #program .section-head,
+.klubhack-page #faq .section-head {
+  max-width: 860px;
+}
+
 .klubhack-page .section-head h2,
 .klubhack-page .metric-row h2 {
   max-width: 820px;
@@ -240,6 +260,18 @@ html {
   border-radius: 28px;
   background: rgba(253, 246, 234, 0.78);
   box-shadow: none;
+}
+
+.klubhack-page .media-embed-section {
+  grid-template-columns: minmax(280px, 0.76fr) minmax(0, 1.24fr);
+  align-items: center;
+}
+
+.klubhack-page .media-embed-copy h2 {
+  max-width: 520px;
+  color: var(--green);
+  font-size: clamp(32px, 4vw, 56px);
+  line-height: 0.98;
 }
 
 .klubhack-page .metric-wall {
@@ -272,6 +304,49 @@ html {
 .klubhack-page .course-price-block {
   border-radius: 18px;
   background: rgba(253, 246, 234, 0.82);
+}
+
+.klubhack-page .route-card h3,
+.klubhack-page .result-card h3 {
+  color: var(--green);
+  letter-spacing: 0;
+}
+
+.klubhack-page .route-card ul {
+  gap: 8px;
+}
+
+.klubhack-page .route-card li {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.klubhack-page .route-card-note {
+  color: var(--muted);
+}
+
+.klubhack-page #terms .route-card:first-child {
+  background:
+    radial-gradient(circle at 12% 12%, rgba(229, 199, 148, 0.16), transparent 28%),
+    linear-gradient(135deg, rgba(0, 77, 43, 0.98), rgba(9, 63, 39, 0.94));
+  color: var(--white);
+}
+
+.klubhack-page #terms .route-card:first-child h3,
+.klubhack-page #terms .route-card:first-child .route-card-label,
+.klubhack-page #terms .route-card:first-child li,
+.klubhack-page #terms .route-card:first-child .sublead {
+  color: var(--white);
+}
+
+.klubhack-page #terms .route-card:first-child li::before {
+  background: var(--accent);
+}
+
+.klubhack-page #request .result-card {
+  min-height: 190px;
+  background: rgba(253, 246, 234, 0.74);
 }
 
 .klubhack-page .form-card {
@@ -504,6 +579,10 @@ html {
   }
 
   .klubhack-page .metric-wall {
+    grid-template-columns: 1fr;
+  }
+
+  .klubhack-page .media-embed-section {
     grid-template-columns: 1fr;
   }
 
