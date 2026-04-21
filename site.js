@@ -220,8 +220,29 @@ document.addEventListener("DOMContentLoaded", () => {
   bindChoiceGroups();
   bindDraftForms(siteAdminConfig);
   applyGlobalContactLayer(siteAdminConfig);
+  bindLazyVideoEmbeds();
   refreshBackendSettings().catch(() => {});
 });
+
+function bindLazyVideoEmbeds() {
+  document.querySelectorAll("[data-video-loader]").forEach((loader) => {
+    if (loader.dataset.videoBound === "true") return;
+
+    const src = loader.dataset.videoSrc;
+    if (!src) return;
+
+    loader.dataset.videoBound = "true";
+    loader.addEventListener("click", () => {
+      const iframe = document.createElement("iframe");
+      iframe.src = src;
+      iframe.title = loader.dataset.videoTitle || "Видео";
+      iframe.loading = "lazy";
+      iframe.allow = "clipboard-write; autoplay; fullscreen; picture-in-picture";
+      iframe.allowFullscreen = true;
+      loader.replaceWith(iframe);
+    });
+  });
+}
 
 function loadSiteAdminConfig() {
   try {

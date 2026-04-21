@@ -9,7 +9,7 @@
   <title>Клубничный Хак — курс по клубнике в контролируемой среде — Klubnika Project</title>
   <meta name="description" content="Клубничный Хак: практический курс по клубнике в контролируемой среде. 5 модулей, 6 месяцев прохождения, 1 год доступа к занятиям и закрытый чат." />
   <link rel="stylesheet" href="../styles.css?v=20260405h" />
-  <link rel="stylesheet" href="./klubhack-redesign.css?v=20260421a" />
+  <link rel="stylesheet" href="./klubhack-redesign.css?v=20260421b" />
   <!-- SEO:START -->
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <link rel="canonical" href="https://klubnikaproject.ru/klubhack/" />
@@ -142,13 +142,17 @@
           </div>
           <div class="media-embed-shell">
             <div class="media-embed-frame">
-              <iframe
-                src="https://rutube.ru/play/embed/4b27c6f893f532488354643c3ed7fe0d/?autoplay=0"
-                title="Клубничный Хак — вводное видео курса"
-                loading="lazy"
-                allow="clipboard-write; autoplay; fullscreen; picture-in-picture"
-                allowfullscreen
-              ></iframe>
+              <button
+                class="video-load-card"
+                type="button"
+                data-video-loader
+                data-video-src="https://rutube.ru/play/embed/4b27c6f893f532488354643c3ed7fe0d/?autoplay=0"
+                data-video-title="Клубничный Хак — вводное видео курса"
+              >
+                <span class="video-load-eyebrow">Вводный разбор</span>
+                <span class="video-load-title">Смотреть видео</span>
+                <span class="video-load-note">Плеер загрузится после клика</span>
+              </button>
             </div>
           </div>
         </div>
@@ -533,6 +537,6 @@
       </div>
     </div>
   </section>
-<script src="../site.js?v=20260405m" defer></script>
+<script src="../site.js?v=20260421b" defer></script>
 </body>
 </html>
