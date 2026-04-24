@@ -66,7 +66,7 @@ const smartFormatter = new Intl.NumberFormat("ru-RU", {
 });
 
 export function normalizeInputValue(rawValue, control) {
-  const parsed = Number.parseFloat(rawValue);
+  const parsed = Number.parseFloat(String(rawValue ?? "").replace(",", "."));
   const fallback = Number.isFinite(control.min) ? control.min : 0;
   const safeValue = Number.isFinite(parsed) ? parsed : fallback;
   const clamped = Math.min(control.max, Math.max(control.min, safeValue));

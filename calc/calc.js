@@ -15,6 +15,18 @@ const ADMIN_SESSION_STORAGE_KEY = "klubnikaproject.admin.session.v1";
 const MEMBER_SESSION_STORAGE_KEY = "klubnikaproject.member.session.v1";
 const API_OVERRIDE_STORAGE_KEY = "klubnikaproject.runtime.api.v1";
 
+const OPTION_UI_LABELS = {
+  "water-prep": "Вода и осмос",
+  fertilizers: "Удобрения",
+  automation: "Автоматика",
+  "mixing-inventory": "Инвентарь",
+  electrical: "Электрика",
+  "climate-pack": "Климат",
+  "project-support-month": "Проект",
+  "project-support": "Проект",
+  seedlings: "Рассада"
+};
+
 const GOAL_COPY = {
   entry: {
     title: "Уже видно, где начинается рабочий вход в проект",
@@ -128,7 +140,10 @@ const elements = {
   debugRoom: document.getElementById("debug-room"),
   debugSize: document.getElementById("debug-size"),
   debugAppError: document.getElementById("debug-app-error"),
-  debugGlobalError: document.getElementById("debug-global-error")
+  debugGlobalError: document.getElementById("debug-global-error"),
+  methodDialog: document.getElementById("calc-method-dialog"),
+  methodDialogOpen: document.querySelector("[data-method-dialog-open]"),
+  methodDialogClose: document.querySelector("[data-method-dialog-close]")
 };
 
 setDebugAppPhase("module");
@@ -258,7 +273,7 @@ function renderFeatureToggles() {
     <label class="feature-toggle">
       <input type="checkbox" data-toggle-key="${group.stateKey}" />
       <span>
-        <strong>${group.label}</strong>
+        <strong>${OPTION_UI_LABELS[group.id] || group.label}</strong>
         <small data-option-note="${group.id}">${formatOptionPrice(group)}</small>
       </span>
     </label>
@@ -300,6 +315,10 @@ function bindEvents() {
   elements.roomQuickPresets.forEach((button) => {
     button.addEventListener("click", handleQuickPresetClick);
   });
+
+  elements.methodDialogOpen?.addEventListener("click", handleMethodDialogOpen);
+  elements.methodDialogClose?.addEventListener("click", handleMethodDialogClose);
+  elements.methodDialog?.addEventListener("click", handleMethodDialogBackdropClick);
 }
 
 function bindDynamicRenderedEvents() {
@@ -310,6 +329,38 @@ function bindDynamicRenderedEvents() {
   elements.featureGrid?.querySelectorAll("[data-toggle-key]").forEach((input) => {
     input.addEventListener("change", handleToggleChange);
   });
+}
+
+function handleMethodDialogOpen() {
+  if (!elements.methodDialog) {
+    return;
+  }
+
+  if (typeof elements.methodDialog.showModal === "function") {
+    elements.methodDialog.showModal();
+    return;
+  }
+
+  elements.methodDialog.setAttribute("open", "");
+}
+
+function handleMethodDialogClose() {
+  if (!elements.methodDialog) {
+    return;
+  }
+
+  if (typeof elements.methodDialog.close === "function") {
+    elements.methodDialog.close();
+    return;
+  }
+
+  elements.methodDialog.removeAttribute("open");
+}
+
+function handleMethodDialogBackdropClick(event) {
+  if (event.target === elements.methodDialog) {
+    handleMethodDialogClose();
+  }
 }
 
 async function handleCropChoiceClick(event) {
@@ -520,7 +571,7 @@ function buildCalculationReportHtml(calc) {
   const inputRows = [
     { label: "Размер", value: `${formatSmart(calc.width)} × ${formatSmart(calc.length)} × ${formatSmart(calc.height)} м` },
     { label: "Площадь фермы", value: `${formatSmart(calc.width * calc.length)} м²` },
-    { label: "Конфигурация", value: `${formatSmart(calc.rackCount)} ${pluralize(calc.rackCount, "стеллаж", "стеллажа", "стеллажей")} · ${formatSmart(calc.heightProfile.tiers)} ${pluralize(calc.heightProfile.tiers, "этаж", "этажа", "этажей")}` },
+    { label: "Конфигурация", value: formatRackConfiguration(calc) },
     { label: "Растений", value: formatSmart(calc.plantCount) },
     { label: "Питание и нагрузка", value: `${calc.electrical.phaseLabel} · ${formatSmart(calc.electrical.totalPowerKw)} кВт` },
     { label: "Ежемесячные расходы", value: formatRub(calc.monthlyOperatingCost) },
@@ -941,6 +992,10 @@ function renderMicroResult(calc) {
   ].map((item) => `<span class="chip">${item}</span>`).join("");
 }
 
+function formatRackConfiguration(calc) {
+  return `${formatSmart(calc.rackCount)} ${pluralize(calc.rackCount, "ряд", "ряда", "рядов")} × ${formatSmart(calc.growLengthPerLane)} м · ${formatSmart(calc.heightProfile.tiers)} ${pluralize(calc.heightProfile.tiers, "ярус", "яруса", "ярусов")}`;
+}
+
 function renderSummary(calc) {
   const sizeLabel = `${formatSmart(calc.width)} × ${formatSmart(calc.length)} м`;
 
@@ -956,13 +1011,10 @@ function renderSummary(calc) {
   elements.summaryMeaningNote.textContent = "";
 
   elements.summaryGrid.innerHTML = [
-    { label: "Размер", value: sizeLabel },
-    { label: "Площадь фермы", value: `${formatSmart(calc.width * calc.length)} м²` },
-    { label: "Конфигурация", value: `${formatSmart(calc.rackCount)} ${pluralize(calc.rackCount, "стеллаж", "стеллажа", "стеллажей")} · ${formatSmart(calc.heightProfile.tiers)} ${pluralize(calc.heightProfile.tiers, "этаж", "этажа", "этажей")}` },
+    { label: "Формат", value: `${sizeLabel} · ${formatSmart(calc.width * calc.length)} м²` },
+    { label: "Конфигурация", value: formatRackConfiguration(calc) },
     { label: "Растений", value: formatSmart(calc.plantCount) },
-    { label: "Ежемесячные расходы", value: formatRub(calc.monthlyOperatingCost) },
-    { label: "Питание и нагрузка", value: `${calc.electrical.phaseLabel} · ${formatSmart(calc.electrical.totalPowerKw)} кВт` },
-    { label: getCropCopy(calc).monthlyYieldLabel, value: `${formatSmart(calc.monthlyProduceKg)} кг` }
+    { label: getCropCopy(calc).monthlyYieldLabel, value: `${formatSmart(calc.monthlyProduceKg)} кг/мес` }
   ].map(renderSummaryItem).join("");
 
   const selectedLineItems = calc.lineItems.filter((item) => item.included);
@@ -1387,28 +1439,73 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
-function formatOptionPrice(group) {
-  if (group.id === "project-support-month") {
-    return "Ежемесячный блок сопровождения";
-  }
-
-  if (group.id === "fertilizers") {
-    return "По числу растений, но не меньше 10 000 ₽";
+function formatOptionPrice(group, calc = latestCalculation) {
+  const total = resolveOptionPreviewTotal(group, calc);
+  if (Number.isFinite(total) && total > 0) {
+    return `+${formatRub(total)}`;
   }
 
   if (group.type === "electricalAuto") {
-    return "Расчёт по нагрузке и линиям";
+    return "по нагрузке";
   }
 
   if (group.type === "perAreaRounded") {
-    return "Расчёт по площади";
+    return "по площади";
   }
 
   if (group.type === "perPlant") {
-    return "Расчёт по количеству растений";
+    return "по растениям";
   }
 
-  return "Параметр учитывается в расчёте";
+  return "в расчете";
+}
+
+function resolveOptionPreviewTotal(group, calc) {
+  if (!group) {
+    return 0;
+  }
+
+  if (group.type === "fixed") {
+    return Math.max(group.unitPrice || 0, group.minTotal || 0);
+  }
+
+  if (!calc) {
+    return group.unitPrice || 0;
+  }
+
+  if (group.type === "perPlant") {
+    const rawTotal = (calc.plantCount || 0) * (group.unitPrice || 0);
+    return Math.max(rawTotal, group.minTotal || 0);
+  }
+
+  if (group.type === "perAreaRounded") {
+    const rawTotal = (calc.area || 0) * (group.unitPrice || 0);
+    const roundedTotal = roundToStep(rawTotal, group.roundTo || 1, group.roundMode || "nearest");
+    return Math.max(roundedTotal, group.minTotal || 0);
+  }
+
+  if (group.type === "electricalAuto") {
+    const electrical = calc.electrical || {};
+    const pricingModel = group.pricingModel || {};
+    const rawElectricalTotal = (pricingModel.shieldBase || 0)
+      + (pricingModel.inputBreakerUnitPrice || 0)
+      + (electrical.totalLightLines || 0) * (pricingModel.lightLineBreakerUnitPrice || 0)
+      + (electrical.contactorCount || 0) * (pricingModel.contactorUnitPrice || 0)
+      + (electrical.smartRelayCount || 0) * (pricingModel.smartRelayUnitPrice || 0)
+      + (electrical.exhaustPowerW ? (pricingModel.exhaustBreakerUnitPrice || 0) : 0)
+      + (electrical.serviceSocketPoints ? (pricingModel.serviceBreakerUnitPrice || 0) : 0)
+      + (electrical.splitInputW ? (pricingModel.splitBreakerUnitPrice || 0) : 0)
+      + (electrical.allLightLinesM || 0) * (pricingModel.lightCablePerMeter || 0)
+      + (electrical.exhaustLineM || 0) * (pricingModel.exhaustCablePerMeter || 0)
+      + (electrical.serviceLineM || 0) * (pricingModel.serviceCablePerMeter || 0)
+      + (electrical.splitLineM || 0) * (pricingModel.splitCablePerMeter || 0)
+      + (electrical.wagoCount || 0) * (pricingModel.wagoUnitPrice || 0)
+      + (electrical.junctionBoxCount || 0) * (pricingModel.junctionBoxUnitPrice || 0);
+    const roundedTotal = roundToStep(rawElectricalTotal, pricingModel.roundTo || 5000, "up");
+    return Math.max(roundedTotal, pricingModel.minTotal || 0);
+  }
+
+  return Math.max(group.unitPrice || 0, group.minTotal || 0);
 }
 
 function isBaseAssemblyItem(id) {
@@ -1430,7 +1527,7 @@ function renderFeatureToggleNotes(calc) {
     if (!group) {
       return;
     }
-    node.textContent = formatOptionPrice(group);
+    node.textContent = formatOptionPrice(group, calc);
   });
 }
 

@@ -1,5 +1,4 @@
 const SITE_ADMIN_STORAGE_KEY = "klubnikaproject.site.admin.draft.v1";
-const SITE_ADMIN_BACKEND_CACHE_KEY = "klubnikaproject.site.backend.settings.v1";
 
 function withStaticIndexPath(path) {
   if (!path) return path;
@@ -221,7 +220,6 @@ document.addEventListener("DOMContentLoaded", () => {
   bindDraftForms(siteAdminConfig);
   applyGlobalContactLayer(siteAdminConfig);
   bindLazyVideoEmbeds();
-  refreshBackendSettings().catch(() => {});
 });
 
 function bindLazyVideoEmbeds() {
@@ -246,11 +244,6 @@ function bindLazyVideoEmbeds() {
 
 function loadSiteAdminConfig() {
   try {
-    const backendRaw = window.localStorage.getItem(SITE_ADMIN_BACKEND_CACHE_KEY);
-    if (backendRaw) {
-      const parsedBackend = JSON.parse(backendRaw);
-      return mergeConfig(cloneConfig(SITE_ADMIN_DEFAULTS), parsedBackend);
-    }
     const raw = window.localStorage.getItem(SITE_ADMIN_STORAGE_KEY);
     if (!raw) return cloneConfig(SITE_ADMIN_DEFAULTS);
     const parsed = JSON.parse(raw);
@@ -258,23 +251,6 @@ function loadSiteAdminConfig() {
   } catch (error) {
     return cloneConfig(SITE_ADMIN_DEFAULTS);
   }
-}
-
-async function refreshBackendSettings() {
-  const current = loadSiteAdminConfig();
-  const apiBase = detectRuntimeApiBase(current.integrations?.apiBase || "");
-  if (!apiBase) return;
-
-  const response = await fetch(`${apiBase}/public/settings`, {
-    headers: { Accept: "application/json" },
-  });
-  if (!response.ok) return;
-  const payload = await response.json();
-  if (!payload?.settings) return;
-  window.localStorage.setItem(SITE_ADMIN_BACKEND_CACHE_KEY, JSON.stringify(payload.settings));
-  siteAdminConfig = mergeConfig(cloneConfig(SITE_ADMIN_DEFAULTS), payload.settings);
-  applyBriefFormPresentation(siteAdminConfig, document.documentElement.lang === "en" ? "en" : "ru");
-  applyGlobalContactLayer(siteAdminConfig);
 }
 
 function mergeConfig(base, patch) {
