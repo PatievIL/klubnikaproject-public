@@ -2,7 +2,8 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /account/
+Disallow: /cabinet/
 Disallow: /calc/admin/
-Disallow: /calc/klubnika/
+Disallow: /shop/
 
 Sitemap: https://patievil.github.io/klubnikaproject-public/sitemap.xml
