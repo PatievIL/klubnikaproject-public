@@ -62,7 +62,7 @@
           `).join("")}
         </nav>
         <div class="kp-site-header__actions">
-          <a class="kp-site-header__cta" href="${resolveHref(root, "consultations/")}">Обсудить ферму</a>
+          <a class="kp-site-header__cta" href="${root}#contact">Обсудить ферму</a>
           <button class="kp-site-header__toggle" type="button" aria-label="Открыть меню" aria-expanded="false">
             <span></span>
           </button>
@@ -72,7 +72,7 @@
         ${NAV_ITEMS.map((item) => `
           <a class="kp-site-header__link${isActive(pagePath, item.href) ? " is-active" : ""}" href="${resolveHref(root, item.href)}">${item.label}</a>
         `).join("")}
-        <a class="kp-site-header__cta" href="${resolveHref(root, "consultations/")}">Обсудить ферму</a>
+        <a class="kp-site-header__cta" href="${root}#contact">Обсудить ферму</a>
       </nav>
     `;
     return header;

@@ -219,6 +219,14 @@
       color: var(--muted);
     }
 
+    body.consult-page #request .choice-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    body.consult-page #request .textarea {
+      min-height: 128px;
+    }
+
     body.consult-page .consult-brief-list {
       display: grid;
       gap: 10px;
@@ -519,29 +527,29 @@
       <div class="section-frame">
         <div class="grid grid-2">
           <div>
-            <span class="eyebrow">Передать вопрос</span>
-            <h2>Оставить вопрос на разбор</h2>
-            <p class="sublead">Коротко опишите объект, узел или симптом. Если по вводным видно, что нужен другой формат, скажу сразу.</p>
+            <span class="eyebrow">Вводные</span>
+            <h2>Оставить вопрос</h2>
+            <p class="sublead">Достаточно контакта, стадии и одного вопроса. Если нужен другой формат, станет понятно после первого ответа.</p>
 
             <ul class="consult-brief-list">
               <li>
-                <strong>Что за ситуация</strong>
-                <span>Запуск, действующая ферма, закупка, симптом или пересборка узла.</span>
+                <strong>Контакт</strong>
+                <span>Telegram или WhatsApp для ответа.</span>
               </li>
               <li>
-                <strong>Что нужно решить</strong>
-                <span>Покупать, менять режим, искать причину, пересчитать или выбрать формат.</span>
+                <strong>Стадия</strong>
+                <span>Запуск, покупка оборудования или действующая ферма.</span>
               </li>
               <li>
-                <strong>Что уже есть</strong>
-                <span>Фото, параметры, выбранные позиции, площадь, ограничения и контакт.</span>
+                <strong>Вопрос</strong>
+                <span>Один узел, симптом или решение, которое нужно проверить.</span>
               </li>
             </ul>
           </div>
 
           <div class="card form-card">
             <h3>Контакт и вопрос</h3>
-            <p class="sublead">Этого достаточно для первичного ответа и выбора формата.</p>
+            <p class="sublead">Пишите коротко. Подробности можно уточнить уже в переписке.</p>
             <form class="form-grid" data-brief-form="Консультации — задача на разбор" data-brief-button-label="Оставить вопрос" data-brief-done-label="Вопрос передан" data-brief-link-label="Написать в Telegram">
               <input class="input" type="text" placeholder="Telegram / WhatsApp для связи" data-field-role="contact" data-field-label="Контакт для связи" />
               <div class="field-group">
@@ -549,23 +557,20 @@
                 <div class="choice-grid" data-choice-group>
                   <input type="hidden" value="" data-field-role="stage" data-field-label="Стадия" />
                   <button class="choice-chip" type="button" data-choice-value="Планирую запуск">Запуск</button>
-                  <button class="choice-chip" type="button" data-choice-value="Ферма уже работает">Работает</button>
-                  <button class="choice-chip" type="button" data-choice-value="Перед покупкой">Перед покупкой</button>
-                  <button class="choice-chip" type="button" data-choice-value="Пересборка узла">Пересборка</button>
+                  <button class="choice-chip" type="button" data-choice-value="Перед покупкой оборудования">Перед покупкой</button>
+                  <button class="choice-chip" type="button" data-choice-value="Ферма уже работает">Ферма работает</button>
                 </div>
               </div>
               <div class="field-group">
                 <span class="field-label">Что разобрать</span>
                 <div class="choice-grid" data-choice-group>
                   <input type="hidden" value="" data-field-role="request" data-field-label="Что разобрать" />
-                  <button class="choice-chip" type="button" data-choice-value="Свет и размещение">Свет</button>
-                  <button class="choice-chip" type="button" data-choice-value="Полив и корневая зона">Полив</button>
-                  <button class="choice-chip" type="button" data-choice-value="Симптом по растению или ягоде">Ягода</button>
-                  <button class="choice-chip" type="button" data-choice-value="Выбор формата работы">Формат</button>
+                  <button class="choice-chip" type="button" data-choice-value="Проверить выбранный узел">Проверить узел</button>
+                  <button class="choice-chip" type="button" data-choice-value="Разобрать симптом по растению или ягоде">Разобрать симптом</button>
+                  <button class="choice-chip" type="button" data-choice-value="Понять следующий шаг">Следующий шаг</button>
                 </div>
               </div>
-              <input class="input" type="text" placeholder="Что уже выбрано / куплено / менять нельзя" data-field-label="Что уже есть" />
-              <textarea class="textarea" placeholder="Опишите один вопрос: где сомнение, что нужно решить, какие вводные уже есть" data-field-role="summary" data-field-label="Вопрос"></textarea>
+              <textarea class="textarea" placeholder="Опишите один вопрос: что хотите проверить, какие вводные уже есть и что нельзя менять" data-field-role="summary" data-field-label="Вопрос"></textarea>
               <div class="brief-form-actions">
                 <button class="btn btn-primary" data-brief-button type="button">Оставить вопрос</button>
                 <a class="brief-telegram-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Написать в Telegram</a>

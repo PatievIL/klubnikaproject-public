@@ -1022,11 +1022,11 @@ a {
 
 .calc-final-cta {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
   gap: 24px;
-  align-items: center;
+  align-items: stretch;
   margin-bottom: 64px;
-  padding: 22px;
+  padding: 24px;
   background: var(--green);
   color: var(--white);
 }
@@ -1043,9 +1043,100 @@ a {
   color: color-mix(in srgb, var(--white) 74%, transparent);
 }
 
-.calc-final-cta .btn {
+.calc-final-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 0.76fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.calc-final-telegram,
+.calc-final-form {
+  border: 1px solid rgba(245, 236, 223, 0.16);
+  border-radius: var(--radius-control);
+  padding: 18px;
+}
+
+.calc-final-telegram {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  background: rgba(245, 236, 223, 0.08);
+}
+
+.calc-final-telegram span,
+.calc-final-field span {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.calc-final-telegram strong {
+  color: var(--white);
+  font-size: clamp(24px, 2.5vw, 34px);
+  line-height: 1.02;
+}
+
+.calc-final-telegram p {
+  margin: 0;
+  color: color-mix(in srgb, var(--white) 78%, transparent);
+}
+
+.calc-final-cta .btn,
+.calc-final-form .btn {
   background: var(--surface-3);
   color: var(--green);
+}
+
+.calc-final-form {
+  display: grid;
+  gap: 12px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.calc-final-field {
+  display: grid;
+  gap: 10px;
+}
+
+.calc-final-field span {
+  color: var(--green);
+}
+
+.calc-final-field textarea {
+  width: 100%;
+  min-height: 142px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  padding: 14px;
+  background: var(--surface-3);
+  color: var(--text);
+  font: inherit;
+  line-height: 1.45;
+}
+
+.calc-final-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.calc-final-link {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--green);
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 77, 43, 0.24);
+  text-underline-offset: 5px;
+}
+
+.calc-final-form .brief-form-status {
+  color: var(--muted);
 }
 
 
@@ -1083,6 +1174,10 @@ a {
   .calc-final-cta {
     grid-template-columns: 1fr;
     align-items: start;
+  }
+
+  .calc-final-actions {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1248,6 +1343,15 @@ a {
 
   .calc-final-cta {
     padding: 16px;
+  }
+
+  .calc-final-form-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .calc-final-link {
+    justify-content: center;
   }
 
   .calc-method-grid {

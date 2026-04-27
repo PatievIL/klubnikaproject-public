@@ -289,12 +289,43 @@
     </section>
 
     <section class="calc-final-cta" aria-labelledby="calc-final-title">
-      <div>
+      <div class="calc-final-copy">
         <p class="eyebrow">Разбор объекта</p>
-        <h2 id="calc-final-title">Проверьте расчёт на реальном помещении</h2>
-        <p>Калькулятор даёт быстрый ориентир. Для запуска нужно проверить объект, расстановку и комплект под ваши условия.</p>
+        <h2 id="calc-final-title">Обсудить расчёт</h2>
+        <p>Калькулятор даёт быстрый ориентир. Следующий шаг — сверить помещение, ограничения и комплект под ваши условия.</p>
       </div>
-      <a class="btn btn-primary" href="../farm/#brief">Получить разбор под мой объект</a>
+
+      <div class="calc-final-actions">
+        <article class="calc-final-telegram">
+          <span>Быстрее всего</span>
+          <strong>Написать в Telegram</strong>
+          <p>Так проще отправить размеры, скрин расчёта и сразу уточнить следующий шаг.</p>
+          <a class="btn btn-primary" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Написать в Telegram</a>
+        </article>
+
+        <form
+          class="calc-final-form"
+          data-brief-form="Калькулятор — обсудить расчёт"
+          data-brief-button-label="Отправить вводные"
+          data-brief-done-label="Вводные переданы"
+          data-brief-link-label="Написать в Telegram"
+        >
+          <input type="hidden" value="Проверить расчёт калькулятора" data-field-role="request" data-field-label="Что нужно сейчас" />
+          <label class="calc-final-field">
+            <span>Оставить вводные на сайте</span>
+            <textarea
+              data-field-role="contact"
+              data-field-label="Контакт и вводные"
+              placeholder="Город, площадь, что получилось в расчёте и контакт для ответа"
+            ></textarea>
+          </label>
+          <div class="calc-final-form-actions">
+            <button class="btn btn-primary" data-brief-button type="button">Отправить вводные</button>
+            <a class="calc-final-link brief-telegram-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Написать в Telegram</a>
+          </div>
+          <p class="brief-form-status" data-brief-status aria-live="polite"></p>
+        </form>
+      </div>
     </section>
   </main>
 
@@ -371,6 +402,7 @@
     </div>
   </footer>
 
+  <script src="../site.js?v=20260427footer" defer></script>
   <script type="module" src="./calc.js?v=20260425-deploy1"></script>
 </body>
 </html>

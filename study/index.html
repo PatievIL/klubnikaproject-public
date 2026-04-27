@@ -216,6 +216,14 @@
       color: var(--muted);
     }
 
+    body.study-page #request .choice-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    body.study-page #request .textarea {
+      min-height: 128px;
+    }
+
     body.study-page .study-brief-list {
       display: grid;
       gap: 10px;
@@ -516,29 +524,29 @@
       <div class="section-frame">
         <div class="grid grid-2">
           <div>
-            <span class="eyebrow">Передать задачу</span>
-            <h2>Оставить вводные по ферме</h2>
-            <p class="sublead">Нужны факты: стадия проекта, масштаб, главный затык и что уже пробовали.</p>
+            <span class="eyebrow">Вводные</span>
+            <h2>Оставить задачу</h2>
+            <p class="sublead">Достаточно контакта, стадии и короткого описания ситуации. Дальше станет понятно, нужен разбор или сопровождение.</p>
 
             <ul class="study-brief-list">
               <li>
-                <strong>Стадия и масштаб</strong>
-                <span>Запуск, действующая ферма, пересборка, площадь, город и команда.</span>
+                <strong>Контакт</strong>
+                <span>Telegram или WhatsApp для ответа.</span>
               </li>
               <li>
-                <strong>Главная проблема</strong>
-                <span>Ягода, свет, полив, корневая зона, запуск, закупка или порядок действий.</span>
+                <strong>Стадия</strong>
+                <span>Запуск, работающая ферма или пересборка системы.</span>
               </li>
               <li>
-                <strong>Что уже есть</strong>
-                <span>Фото, параметры, таблицы, выбранные узлы, ограничения и контакт.</span>
+                <strong>Ситуация</strong>
+                <span>Что происходит, что уже проверяли и где нужен следующий шаг.</span>
               </li>
             </ul>
           </div>
 
           <div class="card form-card">
             <h3>Контакт и ситуация</h3>
-            <p class="sublead">По вводным будет понятно: нужна консультация, сопровождение или сначала расчёт.</p>
+            <p class="sublead">Пишите коротко. Подробности лучше уточнять уже по фактам.</p>
             <form class="form-grid" data-brief-form="Сопровождение — задача на разбор" data-brief-button-label="Оставить вводные" data-brief-done-label="Вводные переданы" data-brief-link-label="Написать в Telegram">
               <input class="input" type="text" placeholder="Telegram / WhatsApp для связи" data-field-role="contact" data-field-label="Контакт для связи" />
               <div class="field-group">
@@ -548,21 +556,18 @@
                   <button class="choice-chip" type="button" data-choice-value="Запуск фермы">Запуск</button>
                   <button class="choice-chip" type="button" data-choice-value="Ферма уже работает">Работает</button>
                   <button class="choice-chip" type="button" data-choice-value="Пересборка технологии">Пересборка</button>
-                  <button class="choice-chip" type="button" data-choice-value="Масштабирование">Рост</button>
                 </div>
               </div>
               <div class="field-group">
                 <span class="field-label">Главный вопрос</span>
                 <div class="choice-grid" data-choice-group>
                   <input type="hidden" value="" data-field-role="request" data-field-label="Главный вопрос" />
-                  <button class="choice-chip" type="button" data-choice-value="Качество ягоды">Ягода</button>
-                  <button class="choice-chip" type="button" data-choice-value="Свет и климат">Среда</button>
-                  <button class="choice-chip" type="button" data-choice-value="Полив и корень">Полив</button>
-                  <button class="choice-chip" type="button" data-choice-value="Порядок запуска">Запуск</button>
+                  <button class="choice-chip" type="button" data-choice-value="Разобрать растение или ягоду">Растение</button>
+                  <button class="choice-chip" type="button" data-choice-value="Проверить среду, свет или полив">Среда</button>
+                  <button class="choice-chip" type="button" data-choice-value="Собрать план действий">План действий</button>
                 </div>
               </div>
-              <input class="input" type="text" placeholder="Город, площадь, стадия или масштаб" data-field-label="Масштаб" />
-              <textarea class="textarea" placeholder="Опишите ситуацию: что происходит, что уже проверяли, где нужен следующий шаг" data-field-role="summary" data-field-label="Ситуация"></textarea>
+              <textarea class="textarea" placeholder="Город, площадь, что происходит, что уже проверяли и что менять нельзя" data-field-role="summary" data-field-label="Ситуация"></textarea>
               <div class="brief-form-actions">
                 <button class="btn btn-primary" data-brief-button type="button">Оставить вводные</button>
                 <a class="brief-telegram-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Написать в Telegram</a>
