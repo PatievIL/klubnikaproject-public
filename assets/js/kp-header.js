@@ -4,7 +4,6 @@
     { label: "Курс", href: "klubhack/" },
     { label: "Калькулятор", href: "calc/" },
     { label: "Оборудование", href: "catalog/" },
-    { label: "Кейсы", href: "objects/cucumber/", tabletHidden: true },
     { label: "Контакты", href: "consultations/" },
   ];
 
