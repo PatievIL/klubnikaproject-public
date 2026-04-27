@@ -38,10 +38,11 @@ function setupScrollMotion() {
 
   const groups = [
     ['.idea-section', ['.idea-copy', '.idea-step']],
-    ['.author-section', ['.author-media', '.author-copy > .eyebrow', '.author-copy h2', '.author-copy p', '.author-facts li', '.section-actions']],
+    ['.author-section', ['.author-media', '.author-copy > .eyebrow', '.author-copy h2', '.author-copy p', '.author-facts li', '.section-actions', '.video-proof-head > *', '.video-topic-card']],
     ['.video-section', ['.video-head > *', '.video-feature', '.video-topic-card']],
     ['.calculator-preview', ['.calculator-copy > *', '.calc-card-head', '.calc-result-grid article', '.calc-card-note']],
     ['.system-section', ['.system-head > *', '.system-media', '.system-grid article', '.system-actions']],
+    ['.result-section', ['.result-head > *', '.result-grid article']],
     ['.launch-section', ['.launch-head', '.launch-visual', '.process-roadmap article', '.launch-actions']],
     ['.support-section', ['.support-media', '.support-copy > .eyebrow', '.support-copy h2', '.support-copy p', '.support-list article', '.support-actions']],
     ['.course-section', ['.course-copy > .eyebrow', '.course-copy h2', '.course-copy p', '.course-metrics article', '.course-actions', '.course-media']],
@@ -73,7 +74,7 @@ function setupScrollMotion() {
           child.classList.add('motion-from-right');
         }
 
-        if (child.matches('.idea-step, .video-topic-card, .system-grid article, .process-roadmap article, .support-list article, .course-metrics article, .final-telegram-card, .final-brief-form, .calc-result-grid article')) {
+        if (child.matches('.idea-step, .video-topic-card, .system-grid article, .result-grid article, .process-roadmap article, .support-list article, .course-metrics article, .final-telegram-card, .final-brief-form, .calc-result-grid article')) {
           child.classList.add('motion-card');
         }
 

@@ -192,30 +192,19 @@ let siteAdminConfig = cloneConfig(SITE_ADMIN_DEFAULTS);
 document.addEventListener("DOMContentLoaded", () => {
   const siteScript = document.querySelector('script[src*="site.js"]');
   const root = (siteScript?.getAttribute("src") || "./site.js").replace(/site\.js(?:\?.*)?$/, "") || "./";
-  const hasTopbar = Boolean(document.querySelector(".topbar"));
-  const hasFooter = Boolean(document.querySelector(".footer-main"));
+  const hasKpHeader = Boolean(document.querySelector('script[src*="kp-header.js"], link[href*="kp-header.css"]'));
+  const hasFooter = Boolean(document.querySelector(".home-footer, .catalog-footer, footer"));
   siteAdminConfig = loadSiteAdminConfig();
 
-  classifyPage(hasTopbar);
-
-  if (!hasTopbar) {
-    injectCompactShell(root);
-  }
+  classifyPage(hasKpHeader);
 
   if (!hasFooter) {
     injectSharedFooter(root);
-  } else {
-    normalizeExistingFooter(root);
   }
 
   normalizeSecondaryCtas();
   injectProductRail(root);
   injectLegacyCatalogBanner(root);
-  injectUiControls();
-  markActiveCompactNav();
-  bindTopbarMenus();
-  bindUiControls();
-  applyStoredUi();
   bindChoiceGroups();
   bindDraftForms(siteAdminConfig);
   applyGlobalContactLayer(siteAdminConfig);
@@ -277,39 +266,19 @@ function cloneConfig(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-function classifyPage(hasTopbar) {
-  if (!hasTopbar) document.body.classList.add("secondary-page");
+function classifyPage(hasHeader) {
+  if (!hasHeader) document.body.classList.add("secondary-page");
   if (document.querySelector(".page-hero")) document.body.classList.add("category-page");
   if (document.querySelector(".product-layout")) document.body.classList.add("product-page");
 }
 
-function injectCompactShell(root) {
-  const shell = document.createElement("header");
-  shell.className = "compact-shell";
-  shell.innerHTML = `
-    <div class="container">
-      <div class="compact-shell-inner">
-        <div class="compact-topbar">
-          <a class="compact-brand" href="${root}">
-            <img class="compact-brand-logo" src="${root}documents/logo/header-lockup-v1-close-compact-dark.svg?v=20260403aa" alt="KLUBNIKA PROJECT" />
-          </a>
-          <nav class="compact-nav" aria-label="Основная навигация">
-            <a href="${root}">Главная</a>
-            <a href="${root}study/">Решения</a>
-            <a href="${root}${withStaticIndexPath("catalog/")}">Каталог</a>
-            <a href="${root}calc/">Калькулятор</a>
-          </nav>
-        </div>
-      </div>
-    </div>
-  `;
-
-  document.body.insertBefore(shell, document.body.firstChild);
-}
-
 function injectSharedFooter(root) {
+  ensureSharedFooterStyles(root);
+
   const footer = document.createElement("footer");
-  footer.className = "footer-main";
+  footer.className = "home-footer";
+  footer.id = "footer";
+  footer.setAttribute("aria-label", "Подвал сайта");
   footer.innerHTML = buildSharedFooterMarkup(root);
 
   document.body.appendChild(footer);
@@ -317,76 +286,59 @@ function injectSharedFooter(root) {
 
 function buildSharedFooterMarkup(root) {
   return `
-    <div class="container">
-      <div class="footer-shell">
-        <div class="footer-topline">
-          <div class="footer-copy-block">
-            <span class="footer-kicker">Klubnika Project</span>
-            <div class="footer-copy">Собранная система для запуска и развития клубничной фермы</div>
-            <p>Расчёт, каталог, подбор узлов и сопровождение в одной рабочей логике, без лишней суеты и случайных решений.</p>
-            <div class="footer-badges" aria-label="Ключевые направления">
-              <span>Расчёт</span>
-              <span>Каталог</span>
-              <span>Сопровождение</span>
-              <span>Посадочный материал</span>
-            </div>
-          </div>
-          <div class="footer-top-actions">
-            <a class="btn btn-primary footer-top-cta" href="${root}farm/">Разобрать объект под запуск</a>
-            <a class="footer-top-link" href="${root}${withStaticIndexPath("catalog/")}">Открыть каталог решений</a>
-          </div>
+    <div class="home-footer-inner">
+      <div class="home-footer-lead">
+        <a class="home-footer-logo" href="${root}" aria-label="Klubnika Project">
+          <img src="${root}assets/logo/klubnika-project-logo-green.svg" alt="Klubnika Project" />
+        </a>
+      </div>
+
+      <nav class="home-footer-columns" aria-label="Навигация подвала">
+        <div>
+          <span>Маршруты</span>
+          <a href="${root}calc/">Калькулятор</a>
+          <a href="${root}${withStaticIndexPath("catalog/")}">Каталог решений</a>
+          <a href="${root}klubhack/">Клубничный Хак</a>
+          <a href="${root}consultations/">Консультации</a>
+          <a href="${root}cabinet/">Кабинет</a>
         </div>
-
-        <div class="footer-grid">
-          <div class="footer-column footer-column--routes">
-            <div class="footer-column-title">Маршруты</div>
-            <div class="footer-links footer-links-main">
-              <a href="${root}farm/">Расчёт фермы</a>
-              <a href="${root}${withStaticIndexPath("catalog/")}">Каталог решений</a>
-              <a href="${root}study/">Сопровождение</a>
-              <a href="${root}klubhack/">Клубничный Хак</a>
-            </div>
-          </div>
-
-          <div class="footer-column footer-column--docs">
-            <div class="footer-column-title">Документы</div>
-            <div class="footer-links footer-service-links">
-              <a href="${root}docs/policy/">Политика конфиденциальности</a>
-              <a href="${root}docs/offero/">Оферта</a>
-              <a href="${root}docs/warrenty/">Гарантия</a>
-              <a href="${root}docs/consent/">Согласие на обработку ПД</a>
-            </div>
-          </div>
-
-          <div class="footer-column footer-column--contacts">
-            <div class="footer-column-title">Связь</div>
-            <div class="footer-links footer-contacts footer-contacts-main">
-              <a data-site-contact="phone" href="tel:+79255831669">+7 925 583-16-69</a>
-              <a data-site-contact="email" href="mailto:info@klubnikaproject.ru">info@klubnikaproject.ru</a>
-            </div>
-            <div class="footer-contact-chips">
-              <a data-site-contact="telegram" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Telegram</a>
-              <a data-site-contact="whatsapp" href="https://wa.me/79891250150" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-              <a data-site-contact="instagram" href="https://www.instagram.com/ilya_patiev/" target="_blank" rel="noopener noreferrer">Instagram</a>
-              <a data-site-contact="youtube" href="https://www.youtube.com/@Ilya_patiev" target="_blank" rel="noopener noreferrer">YouTube</a>
-            </div>
-          </div>
+        <div>
+          <span>Система фермы</span>
+          <a href="${root}catalog/led/index.html">Свет</a>
+          <a href="${root}catalog/irrigation/index.html">Полив</a>
+          <a href="${root}catalog/racks/index.html">Стеллажи</a>
+          <a href="${root}seeds/">Посадочный материал</a>
         </div>
-
-        <div class="footer-bottomline">
-          <span>© Klubnika Project, 2026</span>
-          <span>Работаем по всей России и СНГ</span>
-          <span>Свет, полив, стеллажи, посадка и запуск</span>
+        <div>
+          <span>Связь</span>
+          <a data-site-contact="phone" href="tel:+79255831669">+7 925 583-16-69</a>
+          <a data-site-contact="email" href="mailto:info@klubnikaproject.ru">info@klubnikaproject.ru</a>
+          <a data-site-contact="whatsapp" href="https://wa.me/79891250150" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+          <a data-site-contact="youtube" href="https://www.youtube.com/@Ilya_patiev" target="_blank" rel="noopener noreferrer">YouTube</a>
         </div>
+        <div>
+          <span>Документы</span>
+          <a href="${root}docs/policy/">Политика конфиденциальности</a>
+          <a href="${root}docs/offero/">Оферта</a>
+          <a href="${root}docs/warrenty/">Гарантия</a>
+          <a href="${root}docs/consent/">Согласие на обработку ПД</a>
+        </div>
+      </nav>
+
+      <div class="home-footer-bottom">
+        <span>Klubnika Project, 2026</span>
+        <span>Работаем по России и СНГ</span>
       </div>
     </div>
   `;
 }
 
-function normalizeExistingFooter(root) {
-  const footer = document.querySelector(".footer-main");
-  if (!footer) return;
-  footer.innerHTML = buildSharedFooterMarkup(root);
+function ensureSharedFooterStyles(root) {
+  if (document.querySelector('link[href*="kp-footer.css"]')) return;
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = `${root}assets/css/kp-footer.css?v=20260427a`;
+  document.head.appendChild(link);
 }
 
 function applyGlobalContactLayer(config) {
@@ -585,149 +537,6 @@ function normalizeSitePath(pathname) {
     .replace(/\/+$/, "") || "/";
 }
 
-function injectUiControls() {
-  const topbar = document.querySelector(".topbar");
-  if (topbar && !topbar.querySelector(".topbar-tools")) {
-    const tools = document.createElement("div");
-    tools.className = "topbar-tools";
-    tools.innerHTML = buildUiControlsMarkup();
-    const actionZone = topbar.querySelector(".site-header-actions");
-    if (actionZone) {
-      const cta = actionZone.querySelector(".nav-cta");
-      if (cta) {
-        actionZone.insertBefore(tools, cta);
-      } else {
-        actionZone.appendChild(tools);
-      }
-    } else {
-      const toggle = topbar.querySelector(".nav-toggle");
-      if (toggle) {
-        topbar.insertBefore(tools, toggle);
-      } else {
-        topbar.appendChild(tools);
-      }
-    }
-  }
-
-  const compactTopbar = document.querySelector(".compact-topbar");
-  if (compactTopbar && !compactTopbar.querySelector(".compact-tools")) {
-    const tools = document.createElement("div");
-    tools.className = "compact-tools";
-    tools.innerHTML = buildUiControlsMarkup();
-    const nav = compactTopbar.querySelector(".compact-nav");
-    if (nav) {
-      compactTopbar.insertBefore(tools, nav);
-    } else {
-      compactTopbar.appendChild(tools);
-    }
-  }
-}
-
-function buildUiControlsMarkup() {
-  return `
-    <button class="site-utility-toggle" type="button" aria-label="Настройки интерфейса" aria-expanded="false">
-      <span class="site-utility-toggle__dot"></span>
-      <span class="site-utility-toggle__dot"></span>
-      <span class="site-utility-toggle__dot"></span>
-    </button>
-    <div class="site-utility-panel" hidden>
-      <div class="site-utility-row">
-        <span class="site-utility-label">Язык</span>
-        <div class="ui-switch" role="group" aria-label="Language switch">
-          <button class="ui-switch-btn" type="button" data-site-lang="ru">RU</button>
-          <button class="ui-switch-btn" type="button" data-site-lang="en">EN</button>
-        </div>
-      </div>
-      <div class="site-utility-row">
-        <span class="site-utility-label">Тема</span>
-        <div class="ui-switch" role="group" aria-label="Theme switch">
-          <button class="ui-switch-btn ui-switch-btn-theme" type="button" data-site-theme="light" title="Light theme" aria-label="Light theme">◐</button>
-          <button class="ui-switch-btn ui-switch-btn-theme" type="button" data-site-theme="dark" title="Dark theme" aria-label="Dark theme">◼</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function bindUiControls() {
-  document.querySelectorAll(".site-utility-toggle").forEach((button) => {
-    button.addEventListener("click", (event) => {
-      event.stopPropagation();
-      const tools = button.closest(".topbar-tools, .compact-tools");
-      if (!tools) return;
-      const expanded = button.getAttribute("aria-expanded") === "true";
-      document.querySelectorAll(".topbar-tools.is-open, .compact-tools.is-open").forEach((openTools) => {
-        if (openTools !== tools) {
-          openTools.classList.remove("is-open");
-          const toggle = openTools.querySelector(".site-utility-toggle");
-          const panel = openTools.querySelector(".site-utility-panel");
-          if (toggle) toggle.setAttribute("aria-expanded", "false");
-          if (panel) panel.hidden = true;
-        }
-      });
-      tools.classList.toggle("is-open", !expanded);
-      button.setAttribute("aria-expanded", expanded ? "false" : "true");
-      const panel = tools.querySelector(".site-utility-panel");
-      if (panel) panel.hidden = expanded;
-    });
-  });
-
-  document.querySelectorAll("[data-site-lang]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const lang = button.dataset.siteLang || "ru";
-      window.localStorage.setItem("kp-lang", lang);
-      applyLanguage(lang);
-      closeUtilityPanels();
-    });
-  });
-
-  document.querySelectorAll("[data-site-theme]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const theme = button.dataset.siteTheme || "light";
-      window.localStorage.setItem("kp-theme", theme);
-      applyTheme(theme);
-      closeUtilityPanels();
-    });
-  });
-
-  document.addEventListener("click", (event) => {
-    document.querySelectorAll(".topbar-tools.is-open, .compact-tools.is-open").forEach((tools) => {
-      if (tools.contains(event.target)) return;
-      closeUtilityPanel(tools);
-    });
-  });
-}
-
-function closeUtilityPanels() {
-  document.querySelectorAll(".topbar-tools.is-open, .compact-tools.is-open").forEach((tools) => {
-    closeUtilityPanel(tools);
-  });
-}
-
-function closeUtilityPanel(tools) {
-  if (!tools) return;
-  tools.classList.remove("is-open");
-  const toggle = tools.querySelector(".site-utility-toggle");
-  const panel = tools.querySelector(".site-utility-panel");
-  if (toggle) toggle.setAttribute("aria-expanded", "false");
-  if (panel) panel.hidden = true;
-}
-
-function applyStoredUi() {
-  const storedTheme = window.localStorage.getItem("kp-theme");
-  const storedLang = window.localStorage.getItem("kp-lang");
-  applyTheme(storedTheme || "light");
-  applyLanguage(storedLang || "ru");
-}
-
-function applyTheme(theme) {
-  const normalizedTheme = theme === "dark" ? "dark" : "light";
-  document.documentElement.dataset.theme = normalizedTheme;
-  document.querySelectorAll("[data-site-theme]").forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.siteTheme === normalizedTheme);
-  });
-}
-
 function applyLanguage(lang) {
   const normalizedLang = lang === "en" ? "en" : "ru";
   document.documentElement.lang = normalizedLang;
@@ -822,10 +631,6 @@ function translateDocumentTitle(lang) {
 }
 
 function updateAriaLabels(lang) {
-  document.querySelectorAll(".nav-toggle").forEach((toggle) => {
-    toggle.setAttribute("aria-label", lang === "en" ? "Open menu" : "Открыть меню");
-  });
-
   document.querySelectorAll('[data-site-theme="light"]').forEach((button) => {
     const label = lang === "en" ? "Light theme" : "Светлая тема";
     button.setAttribute("aria-label", label);
@@ -1378,48 +1183,6 @@ function presentBriefSuccess(form, routeMeta, config) {
   success.hidden = false;
 }
 
-function markActiveCompactNav() {
-  const path = window.location.pathname || "/";
-  const links = document.querySelectorAll(".compact-nav a");
-
-  links.forEach((link) => {
-    const href = link.getAttribute("href") || "";
-    if (!href || href.startsWith("http")) return;
-
-    let targetPath = "";
-    try {
-      targetPath = new URL(href, window.location.href).pathname.replace(/index\.html$/, "");
-    } catch {
-      return;
-    }
-
-    const currentPath = path.replace(/index\.html$/, "");
-
-    if (
-      targetPath === "/study/" &&
-      ["/farm/", "/study/", "/consultations/", "/klubhack/"].some((prefix) => currentPath.startsWith(prefix))
-    ) {
-      link.setAttribute("aria-current", "page");
-      return;
-    }
-
-    if (
-      targetPath === "/catalog/" &&
-      ["/catalog/", "/shop/", "/seeds/"].some((prefix) => currentPath.startsWith(prefix))
-    ) {
-      link.setAttribute("aria-current", "page");
-      return;
-    }
-
-    if (
-      (targetPath === "/" && currentPath === "/") ||
-      (targetPath !== "/" && currentPath.startsWith(targetPath))
-    ) {
-      link.setAttribute("aria-current", "page");
-    }
-  });
-}
-
 function buildBriefLines(form) {
   return Array.from(form.querySelectorAll("input, select, textarea")).reduce((rows, field) => {
     const value = getBriefFieldValue(field);
@@ -1450,83 +1213,6 @@ async function copyText(text) {
   const copied = document.execCommand("copy");
   document.body.removeChild(textarea);
   return copied;
-}
-
-function bindTopbarMenus() {
-  const topbars = document.querySelectorAll(".topbar");
-
-  topbars.forEach((topbar) => {
-    const toggle = topbar.querySelector(".nav-toggle");
-    const nav = topbar.querySelector(".nav");
-    const groups = topbar.querySelectorAll(".nav-group");
-
-    if (!toggle || !nav) return;
-
-    const isMobile = () => window.matchMedia("(max-width: 1100px)").matches;
-
-    const closeGroups = () => {
-      groups.forEach((group) => {
-        group.classList.remove("is-open");
-        const trigger = group.querySelector(".nav-trigger");
-        if (trigger) trigger.setAttribute("aria-expanded", "false");
-      });
-    };
-
-    const closeMenu = () => {
-      topbar.classList.remove("menu-open");
-      toggle.setAttribute("aria-expanded", "false");
-      closeGroups();
-    };
-
-    const openMenu = () => {
-      topbar.classList.add("menu-open");
-      toggle.setAttribute("aria-expanded", "true");
-    };
-
-    toggle.addEventListener("click", () => {
-      if (topbar.classList.contains("menu-open")) {
-        closeMenu();
-      } else {
-        openMenu();
-      }
-    });
-
-    groups.forEach((group) => {
-      const trigger = group.querySelector(".nav-trigger");
-      if (!trigger) return;
-
-      trigger.setAttribute("aria-expanded", "false");
-
-      trigger.addEventListener("click", (event) => {
-        if (!isMobile()) return;
-        event.preventDefault();
-        const willOpen = !group.classList.contains("is-open");
-        closeGroups();
-        if (willOpen) {
-          group.classList.add("is-open");
-          trigger.setAttribute("aria-expanded", "true");
-        }
-      });
-    });
-
-    document.addEventListener("click", (event) => {
-      if (!topbar.contains(event.target)) {
-        closeMenu();
-      }
-    });
-
-    window.addEventListener("resize", () => {
-      if (!isMobile()) {
-        closeMenu();
-      }
-    });
-
-    nav.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("click", () => {
-        if (isMobile()) closeMenu();
-      });
-    });
-  });
 }
 
 const TRANSLATIONS_EN = {

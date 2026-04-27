@@ -1218,13 +1218,17 @@ function renderLandingPage(ctx) {
       ${renderBreadcrumbs(ctx, data.breadcrumbs)}
       <div class="catalog-page-head__toolbar">
         <div class="catalog-page-head__titleblock">
-          <h1>Каталог для клубничной фермы</h1>
-          <p>Разделы, готовые позиции и рабочие узлы без лишнего обхода по сайту.</p>
+          <h1>Система фермы по узлам</h1>
+          <p>Свет, стеллажи, полив, климат, питание и посадочный материал собраны как рабочая схема, а не как витрина отдельных товаров.</p>
         </div>
         <div class="catalog-page-head__meta catalog-page-head__meta--toolbar">
           <span>${topCategoryCount} разделов</span>
           <span>${totalProductCount} товаров</span>
         </div>
+      </div>
+      <div class="catalog-page-head__actions">
+        <a class="catalog-primary-button" href="${resolveHref(ctx, "/calc/")}">Сначала посчитать ферму</a>
+        <a class="catalog-link-button" href="#catalog-categories">Смотреть узлы системы</a>
       </div>
     </section>
     <section class="catalog-category-layout catalog-category-layout--landing" id="catalog-categories">
@@ -1242,13 +1246,13 @@ function renderHowBuy(ctx) {
     <section class="catalog-info-strip" id="catalog-how-buy">
       <div class="catalog-how-buy-note">
         <div class="catalog-how-buy-note__copy">
-          <strong>Если схема ещё не собрана</strong>
-          <p>Сначала коротко сверьте состав, сделайте быстрый расчёт или задайте вопрос, чтобы не собирать закупку вслепую.</p>
+          <strong>Каталог лучше читать после расчёта</strong>
+          <p>Сначала понятно фиксируем площадь, ряды и базовую нагрузку. После этого разделы каталога становятся списком узлов, а не случайной закупкой.</p>
         </div>
         <div class="catalog-how-buy-note__actions">
-          <a class="catalog-link-button" href="/farm/">Сверить состав</a>
-          <a class="catalog-link-button" href="/calc/">Быстрый расчёт</a>
-          <a class="catalog-link-button" href="/consultations/">Короткий вопрос</a>
+          <a class="catalog-link-button" href="${resolveHref(ctx, "/calc/")}">Быстрый расчёт</a>
+          <a class="catalog-link-button" href="${resolveHref(ctx, "/farm/")}">Разбор объекта</a>
+          <a class="catalog-link-button" href="${resolveHref(ctx, "/consultations/")}">Короткий вопрос</a>
         </div>
       </div>
     </section>
@@ -1262,9 +1266,9 @@ function renderFooter(ctx, state) {
         <div class="catalog-footer__meta">
           <div class="catalog-footer__copy">© ${escapeHtml(CATALOG_META.brandName)}</div>
           <div class="catalog-footer__links">
-            <a href="https://patievil.github.io/klubnikaproject-public/docs/policy">Политика</a>
-            <a href="https://patievil.github.io/klubnikaproject-public/docs/offero">Оферта</a>
-            <a href="https://patievil.github.io/klubnikaproject-public/docs/warrenty">Гарантия</a>
+          <a href="${resolveHref(ctx, "/docs/policy/")}">Политика</a>
+          <a href="${resolveHref(ctx, "/docs/offero/")}">Оферта</a>
+          <a href="${resolveHref(ctx, "/docs/warrenty/")}">Гарантия</a>
           </div>
         </div>
         <div class="catalog-footer__contacts">
@@ -1505,11 +1509,9 @@ function renderMobileMenu(ctx, state) {
           <a href="${resolveHref(ctx, "/consultations/")}">Консультации</a>
           <a href="${resolveHref(ctx, "/study/")}">Сопровождение</a>
           <a href="${resolveHref(ctx, "/calc/")}">Калькулятор</a>
-          <a href="${resolveHref(ctx, "/catalog/")}">Магазин</a>
-          <a href="#catalog-how-buy">Как купить</a>
+          <a href="${resolveHref(ctx, "/catalog/")}">Каталог</a>
+          <a href="#catalog-how-buy">Как собрать систему</a>
           <a href="#catalog-contacts">Контакты</a>
-          <a class="catalog-mobile-nav__link" href="${resolveHref(ctx, "/cabinet/login/")}">Личный кабинет</a>
-          <button type="button" class="catalog-mobile-nav__link" data-action="open-cart">Корзина</button>
         </nav>
         <div class="catalog-mobile-category-tree">
           <h3>Категории</h3>
@@ -1572,40 +1574,6 @@ function renderMobileFilters(ctx, state, data) {
   `;
 }
 
-function renderHeader(ctx, state) {
-  return `
-    <header class="catalog-header">
-      <div class="catalog-header__top catalog-topbar">
-        <div class="catalog-brand brand">
-          <a class="brand-home" href="${resolveHref(ctx, "/")}">
-            <img class="brand-lockup brand-lockup-primary" src="${resolveAsset(ctx, "documents/logo/header-lockup-v1-close-compact-dark.svg?v=20260403aa")}" alt="KLUBNIKA PROJECT" />
-            <img class="brand-lockup brand-lockup-compact" src="${resolveAsset(ctx, "documents/logo/header-lockup-v1-close-compact-dark.svg?v=20260403aa")}" alt="KLUBNIKA PROJECT" />
-          </a>
-        </div>
-        <button
-          class="nav-toggle catalog-nav-toggle"
-          type="button"
-          data-action="open-menu"
-          aria-label="Открыть меню"
-          aria-expanded="false"
-        >
-          <span></span>
-        </button>
-        <nav class="catalog-main-nav nav" aria-label="Основная навигация">
-          <a class="nav-link" href="${resolveHref(ctx, "/")}">Сайт</a>
-          <a class="nav-link" href="${resolveHref(ctx, "/catalog/")}">Каталог</a>
-          <a class="nav-link" href="${resolveHref(ctx, "/calc/")}">Калькулятор</a>
-          <a class="nav-link" href="${resolveHref(ctx, "/cabinet/login/")}">Кабинет</a>
-        </nav>
-        <div class="catalog-header-contactbar">
-          <a class="catalog-header-phone" href="${CATALOG_META.phones[0].href}">${CATALOG_META.phones[0].value}</a>
-          <a class="catalog-icon-pill catalog-header-anchor" href="#catalog-contacts">Связь</a>
-        </div>
-      </div>
-    </header>
-  `;
-}
-
 function renderFloatingAssistant() {
   return `
     <button type="button" class="catalog-floating-assistant" data-action="open-assistant" data-intent="chat">
@@ -1636,7 +1604,6 @@ export function renderCatalogApp(ctx, rawState = {}) {
 
   return `
     <div class="catalog-app-shell">
-      ${renderHeader(ctx, state)}
       <main class="catalog-main">
         ${state.flashMessage ? `<div class="catalog-flash">${escapeHtml(state.flashMessage)}</div>` : ""}
         ${pageMarkup}

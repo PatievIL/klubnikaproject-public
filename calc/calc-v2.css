@@ -49,26 +49,6 @@ a {
   text-decoration: none;
 }
 
-.calc-site-header {
-  position: fixed;
-  z-index: 20;
-  top: 20px;
-  left: 50%;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 28px;
-  align-items: center;
-  width: min(1240px, calc(100% - 48px));
-  min-height: 68px;
-  padding: 10px 12px 10px 18px;
-  border: 1px solid rgba(253, 246, 234, 0.62);
-  border-radius: var(--radius-control);
-  background: rgba(253, 246, 234, 0.84);
-  box-shadow: 0 16px 48px rgba(20, 52, 37, 0.14);
-  backdrop-filter: blur(18px);
-  transform: translateX(-50%);
-}
-
 .calc-site-brand img {
   display: block;
   width: 164px;
@@ -115,9 +95,9 @@ a {
   position: relative;
   display: grid;
   align-items: end;
-  min-height: 640px;
+  min-height: 84svh;
   overflow: hidden;
-  padding: 132px 24px 64px;
+  padding: 132px 24px 76px;
   color: var(--white);
 }
 
@@ -183,20 +163,20 @@ a {
 }
 
 .calc-intro h1 {
-  max-width: 840px;
-  margin: 16px 0 18px;
-  font-size: clamp(44px, 6.1vw, 82px);
-  line-height: 0.96;
+  max-width: 720px;
+  margin: 16px 0 22px;
+  font-size: clamp(42px, 5.55vw, 78px);
+  line-height: 1.08;
   letter-spacing: 0;
 }
 
 .calc-intro p:not(.eyebrow) {
   max-width: 620px;
-  margin: 0 0 26px;
-  color: color-mix(in srgb, var(--white) 86%, transparent);
-  font-size: clamp(17px, 1.7vw, 21px);
-  font-weight: 450;
-  line-height: 1.42;
+  margin: 0 0 34px;
+  color: color-mix(in srgb, var(--white) 93%, transparent);
+  font-size: clamp(19px, 1.75vw, 25px);
+  font-weight: 520;
+  line-height: 1.48;
 }
 
 .calc-intro-actions {
@@ -1068,93 +1048,6 @@ a {
   color: var(--green);
 }
 
-.home-footer {
-  width: min(1240px, calc(100% - 48px));
-  margin: 0 auto 34px;
-  color: var(--green);
-}
-
-.home-footer-inner {
-  display: grid;
-  gap: 26px;
-  padding: 30px 0 0;
-  border-top: 1px solid color-mix(in srgb, var(--green) 16%, var(--line));
-}
-
-.home-footer-lead {
-  display: flex;
-  align-items: center;
-}
-
-.home-footer-logo {
-  display: inline-flex;
-  width: fit-content;
-}
-
-.home-footer-logo img {
-  width: 154px;
-  height: auto;
-}
-
-.home-footer-columns {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 20px;
-  padding-top: 2px;
-}
-
-.home-footer-columns div {
-  display: grid;
-  align-content: start;
-  gap: 10px;
-  min-height: 156px;
-  padding: 16px 18px 0 0;
-  border-top: 1px solid color-mix(in srgb, var(--green) 12%, var(--line));
-}
-
-.home-footer-columns span {
-  color: color-mix(in srgb, var(--green) 70%, var(--muted));
-  font-size: 12px;
-  font-weight: 850;
-  letter-spacing: 0.07em;
-  line-height: 1.15;
-  text-transform: uppercase;
-}
-
-.home-footer-columns a {
-  color: var(--green);
-  font-size: 15px;
-  font-weight: 650;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
-}
-
-.home-footer-bottom {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 18px;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 16px;
-  border-top: 1px solid color-mix(in srgb, var(--green) 12%, var(--line));
-  color: color-mix(in srgb, var(--green) 58%, var(--muted));
-  font-size: 13px;
-  line-height: 1.35;
-}
-
-.home-footer a {
-  transition:
-    color 180ms ease,
-    background 180ms ease,
-    border-color 180ms ease,
-    transform 180ms ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .home-footer-columns a:hover {
-    color: color-mix(in srgb, var(--green) 84%, black);
-  }
-}
 
 @media (max-width: 1040px) {
   .calc-shell {
@@ -1194,10 +1087,6 @@ a {
 }
 
 @media (max-width: 820px) {
-  .calc-site-header {
-    grid-template-columns: 1fr auto;
-    width: calc(100% - 28px);
-  }
 
   .calc-site-nav {
     display: none;
@@ -1208,8 +1097,8 @@ a {
   }
 
   .calc-intro {
-    min-height: 520px;
-    padding: 118px 16px 50px;
+    min-height: 78svh;
+    padding: 120px 16px 56px;
   }
 
   .calc-intro-media img {
@@ -1227,7 +1116,7 @@ a {
 
   .calc-intro h1 {
     max-width: 700px;
-    font-size: clamp(38px, 9vw, 62px);
+    font-size: clamp(42px, 11vw, 74px);
   }
 
   .calc-intro p:not(.eyebrow) {
@@ -1295,11 +1184,6 @@ a {
 }
 
 @media (max-width: 520px) {
-  .calc-site-header {
-    top: 12px;
-    width: calc(100% - 24px);
-    min-height: 58px;
-  }
 
   .calc-site-brand img {
     width: 132px;
@@ -1311,8 +1195,8 @@ a {
   }
 
   .calc-intro {
-    min-height: 360px;
-    padding: 96px 16px 34px;
+    min-height: 62svh;
+    padding: 112px 16px 42px;
   }
 
   .calc-intro::after {
@@ -1429,27 +1313,4 @@ a {
     width: 100%;
   }
 
-  .home-footer {
-    width: calc(100% - 32px);
-    margin-bottom: 22px;
-  }
-
-  .home-footer-inner {
-    gap: 18px;
-    padding: 22px 0 0;
-  }
-
-  .home-footer-logo img {
-    width: 138px;
-  }
-
-  .home-footer-columns {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .home-footer-columns div {
-    min-height: auto;
-    padding: 14px 0 0;
-  }
 }

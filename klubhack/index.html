@@ -9,7 +9,7 @@
   <title>Клубничный Хак — курс по клубнике в контролируемой среде — Klubnika Project</title>
   <meta name="description" content="Клубничный Хак: практический курс по клубнике в контролируемой среде. 5 модулей, 6 месяцев прохождения, 1 год доступа к занятиям и закрытый чат." />
   <link rel="stylesheet" href="../styles.css?v=20260405h" />
-  <link rel="stylesheet" href="./klubhack-redesign.css?v=20260421b" />
+  <link rel="stylesheet" href="./klubhack-redesign.css?v=20260428hero" />
   <!-- SEO:START -->
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <link rel="canonical" href="https://klubnikaproject.ru/klubhack/" />
@@ -28,54 +28,26 @@
   }
   </script>
   <!-- SEO:END -->
+  <link rel="stylesheet" href="../assets/css/kp-header.css?v=20260425h1" />
+  <link rel="stylesheet" href="../assets/css/kp-footer.css?v=20260427a" />
 </head>
 <body class="klubhack-page">
+  <header class="kp-site-header" data-kp-header data-root="../"></header>
+  <script src="../assets/js/kp-header.js?v=20260425h1"></script>
   <header class="hero">
     <div class="container">
       <div class="hero-shell">
-        <div class="topbar">
-          <div class="brand">
-            <a class="brand-home" href="../">
-              <img class="brand-lockup brand-lockup-primary" src="../documents/logo/header-lockup-v1-close-compact-light.svg?v=20260403aa" alt="KLUBNIKA PROJECT" />
-              <img class="brand-lockup brand-lockup-compact" src="../documents/logo/header-lockup-v1-close-compact-light.svg?v=20260403aa" alt="KLUBNIKA PROJECT" />
-            </a>
-          </div>
-
-          <nav class="nav">
-            <a class="nav-link" href="../">Главная</a>
-            <a class="nav-link" href="../#system">Ферма</a>
-            <a class="nav-link" href="../#practice">Практика</a>
-            <a class="nav-link" href="../catalog/index.html">Каталог</a>
-            <a class="nav-link" href="#program">Программа</a>
-            <div class="nav-mobile-utility">
-              <a class="site-header-link" href="../calc/">Рассчитать ферму</a>
-              <a class="site-header-link" href="../study/">Разбор объекта</a>
-              <a class="site-header-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Telegram</a>
-              <a class="nav-cta" href="#request">Записаться</a>
-            </div>
-          </nav>
-
-          <div class="site-header-actions">
-            <a class="nav-cta" href="#request">Записаться</a>
-          </div>
-
-          <a class="site-mobile-quick" href="#request">Запись</a>
-          <button class="nav-toggle" type="button" aria-label="Открыть меню" aria-expanded="false">
-            <span></span>
-          </button>
-        </div>
 
         <div class="hero-grid">
           <div class="hero-copy">
             <span class="eyebrow">Клубничный Хак</span>
             <h1>Клубничный Хак</h1>
             <p class="lead">
-              Практический курс по выращиванию клубники в контролируемой среде:
-              растение, свет, климат, полив, питание, качество ягоды и логика запуска.
+              Практический курс по клубнике в контролируемой среде:
+              растение, свет, климат, полив, питание и качество ягоды.
             </p>
             <p class="sublead">
-              Это образовательный маршрут, а не проектная смета. Если сначала нужно собрать
-              системную базу по ферме, начинать лучше отсюда.
+              5 модулей, 6 месяцев на прохождение, 1 год доступа к материалам и закрытый чат.
             </p>
 
             <div class="btn-row hero-cta">
@@ -90,15 +62,15 @@
             <div class="hero-stats">
               <div class="hero-stat">
                 <strong>5 модулей</strong>
-                <span>от базы фермы до качества ягоды</span>
+                <span>технология без хаоса</span>
               </div>
               <div class="hero-stat">
                 <strong>6 месяцев</strong>
-                <span>спокойное прохождение</span>
+                <span>спокойный темп</span>
               </div>
               <div class="hero-stat">
                 <strong>1 год доступа</strong>
-                <span>к урокам и материалам</span>
+                <span>уроки и материалы</span>
               </div>
             </div>
           </div>
@@ -506,30 +478,25 @@
             </div>
           </div>
 
-          <div class="card form-card">
-            <h3>Собрать запрос по курсу</h3>
-            <p class="sublead">Короткая форма для записи на курс.</p>
+          <div class="card form-card course-request-card">
+            <h3>Записаться или уточнить формат</h3>
+            <p class="sublead">Напишите в свободной форме: кто вы, зачем нужен курс и куда ответить.</p>
             <form class="form-grid" data-brief-form="Клубничный Хак — запрос по курсу" data-brief-button-label="Передать запрос" data-brief-done-label="Запрос передан">
-              <input class="input" type="text" placeholder="Имя" />
-              <input class="input" type="text" placeholder="Email или Telegram" />
-              <select class="select">
-                <option>Кто вы</option>
-                <option>Новичок</option>
-                <option>Действующая ферма</option>
-                <option>Инвестор / предприниматель</option>
-              </select>
-              <select class="select">
-                <option>Что нужно сейчас</option>
-                <option>Программа курса</option>
-                <option>Условия участия</option>
-                <option>Понять, подходит ли мне курс</option>
-              </select>
-              <textarea class="textarea" placeholder="Коротко: что хотите получить от курса и на каком этапе сейчас находитесь"></textarea>
+              <input type="hidden" data-course-brief-copy data-field-role="contact" data-field-label="Контакт и вводные" />
+              <input type="hidden" data-course-brief-copy data-field-role="summary" data-field-label="Запрос по курсу" />
+              <label class="course-one-field">
+                <span>Один короткий запрос</span>
+                <textarea
+                  class="textarea"
+                  data-course-brief-textarea
+                  placeholder="Например: новичок, хочу понять технологию до покупки оборудования. Нужна программа курса. Telegram @username"
+                ></textarea>
+              </label>
               <div class="brief-form-actions">
                 <button class="btn btn-primary" data-brief-button type="button">Передать запрос</button>
-                <a class="brief-telegram-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Открыть Telegram</a>
+                <a class="brief-telegram-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Написать в Telegram</a>
               </div>
-              <p class="brief-form-note">Кнопка соберёт вводные, скопирует их и сразу откроет рабочий Telegram. Рабочий Telegram: <a href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">@patiev_admin</a>.</p>
+              <p class="brief-form-note">Если удобнее быстрее, напишите сразу в Telegram: <a href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">@patiev_admin</a>.</p>
               <p class="brief-form-status" data-brief-status aria-live="polite"></p>
             </form>
           </div>
@@ -537,6 +504,67 @@
       </div>
     </div>
   </section>
-<script src="../site.js?v=20260421b" defer></script>
+  <footer class="home-footer" id="footer" aria-label="Подвал сайта">
+    <div class="home-footer-inner">
+      <div class="home-footer-lead">
+        <a class="home-footer-logo" href="../" aria-label="Klubnika Project">
+          <img src="../assets/logo/klubnika-project-logo-green.svg" alt="Klubnika Project" />
+        </a>
+      </div>
+
+      <nav class="home-footer-columns" aria-label="Навигация подвала">
+        <div>
+          <span>Маршруты</span>
+          <a href="../calc/">Калькулятор</a>
+          <a href="../catalog/index.html">Каталог решений</a>
+          <a href="../klubhack/">Клубничный Хак</a>
+          <a href="../consultations/">Консультации</a>
+          <a href="../cabinet/">Кабинет</a>
+        </div>
+        <div>
+          <span>Система фермы</span>
+          <a href="../catalog/led/index.html">Свет</a>
+          <a href="../catalog/irrigation/index.html">Полив</a>
+          <a href="../catalog/racks/index.html">Стеллажи</a>
+          <a href="../seeds/">Посадочный материал</a>
+        </div>
+        <div>
+          <span>Связь</span>
+          <a href="tel:+79255831669">+7 925 583-16-69</a>
+          <a href="mailto:info@klubnikaproject.ru">info@klubnikaproject.ru</a>
+          <a href="https://wa.me/79891250150" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+          <a href="https://www.youtube.com/@Ilya_patiev" target="_blank" rel="noopener noreferrer">YouTube</a>
+        </div>
+        <div>
+          <span>Документы</span>
+          <a href="../docs/policy/">Политика конфиденциальности</a>
+          <a href="../docs/offero/">Оферта</a>
+          <a href="../docs/warrenty/">Гарантия</a>
+          <a href="../docs/consent/">Согласие на обработку ПД</a>
+        </div>
+      </nav>
+
+      <div class="home-footer-bottom">
+        <span>Klubnika Project, 2026</span>
+        <span>Работаем по России и СНГ</span>
+      </div>
+    </div>
+  </footer>
+<script>
+  document.querySelectorAll("[data-course-brief-textarea]").forEach((textarea) => {
+    const form = textarea.closest("form");
+    const copies = form ? [...form.querySelectorAll("[data-course-brief-copy]")] : [];
+    const sync = () => {
+      copies.forEach((field) => {
+        field.value = textarea.value.trim();
+      });
+    };
+
+    textarea.addEventListener("input", sync);
+    form?.querySelector("[data-brief-button]")?.addEventListener("click", sync, { capture: true });
+    sync();
+  });
+</script>
+<script src="../site.js?v=20260427footer" defer></script>
 </body>
 </html>

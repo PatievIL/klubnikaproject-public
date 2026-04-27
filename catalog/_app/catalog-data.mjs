@@ -1,7 +1,7 @@
 import { catalogLegacyOverrides } from "./catalog-legacy-overrides.mjs";
 import { catalogUfarmsOverrides } from "./catalog-ufarms-overrides.generated.mjs";
 
-const SITE_ORIGIN = "https://patievil.github.io/klubnikaproject-public";
+const SITE_ORIGIN = "https://klubnikaproject.ru";
 const CATALOG_BASE_PATH = "/catalog/";
 const DEFAULT_PAGE_SIZE = 12;
 

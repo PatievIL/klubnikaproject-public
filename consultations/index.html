@@ -6,394 +6,472 @@
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
   <link rel="manifest" href="../site.webmanifest" />
-  <title>Консультации и аудит для клубничных ферм — Klubnika Project</title>
+  <title>Консультация по клубничной ферме — Klubnika Project</title>
   <meta
     name="description"
-    content="Разовые консультации и аудит для клубничных ферм: запуск, диагностика проблем, корректировка решений и понимание, что делать дальше по проекту."
+    content="Точечная консультация по клубничной ферме: проверить один вопрос, совместимость узлов, проблему по ягоде или следующий шаг без полного расчёта проекта."
   />
   <link rel="stylesheet" href="../styles.css?v=20260405h" />
+  <style>
+    body.consult-page {
+      --consult-surface: #f3eadb;
+      --consult-surface-soft: #f7efe4;
+      --consult-line: rgba(30, 48, 34, 0.08);
+    }
+
+    body.consult-page .hero {
+      padding: 0;
+    }
+
+    body.consult-page .hero > .container {
+      width: 100%;
+      max-width: none;
+    }
+
+    body.consult-page .hero-shell-consultations {
+      min-height: 84svh;
+      display: grid;
+      align-items: end;
+      padding: 132px 32px 76px;
+      border-radius: 0;
+      background: #042f1d;
+      box-shadow: none;
+      overflow: hidden;
+    }
+
+    body.consult-page .hero-shell-consultations::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: url("../assets/site-drive/for-site/selected/for-site-41-proof.jpg") center 58% / cover no-repeat;
+    }
+
+    body.consult-page .hero-shell-consultations::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background:
+        linear-gradient(90deg, rgba(0, 53, 31, 0.94) 0%, rgba(0, 65, 40, 0.78) 48%, rgba(0, 36, 24, 0.24) 100%),
+        linear-gradient(180deg, rgba(10, 20, 14, 0.08) 0%, rgba(10, 20, 14, 0.44) 100%);
+    }
+
+    body.consult-page .consult-hero-grid {
+      position: relative;
+      z-index: 2;
+      width: min(1240px, 100%);
+      margin: 0 auto;
+      display: block;
+      padding: 0;
+    }
+
+    body.consult-page .consult-hero-grid .hero-copy {
+      max-width: 760px;
+    }
+
+    body.consult-page .consult-hero-grid .hero-copy .eyebrow {
+      display: block;
+      width: auto;
+      min-height: 0;
+      margin: 0 0 18px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 850;
+      line-height: normal;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    body.consult-page .consult-hero-grid h1 {
+      max-width: 760px;
+      margin-top: 0;
+      margin-bottom: 22px;
+      font-size: clamp(42px, 5.55vw, 78px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    body.consult-page .consult-hero-grid .lead {
+      max-width: 660px;
+      margin-top: 0;
+      margin-bottom: 34px;
+      font-size: clamp(19px, 1.75vw, 25px);
+      font-weight: 520;
+      line-height: 1.48;
+    }
+
+    body.consult-page .consult-hero-grid .sublead {
+      display: none;
+    }
+
+    body.consult-page .hero-cta .btn-primary {
+      background: var(--bg);
+      color: var(--green);
+      border-color: var(--bg);
+    }
+
+    body.consult-page .hero-cta {
+      margin-top: 0;
+    }
+
+    body.consult-page .hero-cta .btn {
+      min-height: 46px;
+      padding: 0 20px;
+      font-size: 15px;
+      font-weight: 750;
+      line-height: 1;
+    }
+
+    body.consult-page .hero-cta .btn-secondary {
+      min-height: 46px;
+      padding: 0;
+      border-color: transparent;
+      background: transparent;
+      color: rgba(255, 250, 242, 0.84);
+      font-size: 14px;
+      font-weight: 680;
+      text-decoration: underline;
+      text-decoration-color: rgba(253, 246, 234, 0.32);
+      text-underline-offset: 5px;
+    }
+
+    body.consult-page .consult-route-strip,
+    body.consult-page .consult-decision-strip {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    body.consult-page .consult-route-strip__item,
+    body.consult-page .consult-decision-strip {
+      padding: 20px 22px;
+      border: 1px solid var(--consult-line);
+      border-radius: 26px;
+      background: var(--consult-surface);
+      box-shadow: none;
+    }
+
+    body.consult-page .consult-route-strip__item strong,
+    body.consult-page .consult-decision-strip strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--green);
+      font-size: 20px;
+      line-height: 1.15;
+    }
+
+    body.consult-page .consult-route-strip__item p,
+    body.consult-page .consult-decision-strip p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    body.consult-page .consult-scope-grid,
+    body.consult-page .consult-process-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    body.consult-page .consult-scope-grid .card,
+    body.consult-page .consult-process-grid .card,
+    body.consult-page .result-card,
+    body.consult-page .form-card {
+      background: var(--consult-surface);
+      border: 1px solid var(--consult-line);
+      box-shadow: none;
+    }
+
+    body.consult-page .path-card::after {
+      display: none;
+    }
+
+    body.consult-page #request .section-frame {
+      background: var(--green);
+      border: 1px solid rgba(245, 236, 223, 0.12);
+      box-shadow: 0 20px 38px rgba(6, 38, 24, 0.14);
+      color: var(--bg);
+    }
+
+    body.consult-page #request .eyebrow {
+      background: rgba(255, 250, 242, 0.12);
+      border-color: rgba(245, 236, 223, 0.14);
+      color: var(--bg);
+    }
+
+    body.consult-page #request h2,
+    body.consult-page #request .sublead {
+      color: rgba(245, 236, 223, 0.92);
+    }
+
+    body.consult-page #request .form-card h3,
+    body.consult-page #request .form-card .sublead {
+      color: var(--green);
+    }
+
+    body.consult-page #request .form-card .sublead {
+      color: var(--muted);
+    }
+
+    body.consult-page .consult-brief-list {
+      display: grid;
+      gap: 10px;
+      margin: 22px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    body.consult-page .consult-brief-list li {
+      padding: 16px;
+      border: 1px solid rgba(245, 236, 223, 0.12);
+      border-radius: 20px;
+      background: rgba(245, 236, 223, 0.08);
+    }
+
+    body.consult-page .consult-brief-list strong,
+    body.consult-page .consult-brief-list span {
+      display: block;
+    }
+
+    body.consult-page .consult-brief-list strong {
+      margin-bottom: 4px;
+      color: var(--bg);
+      font-size: 18px;
+      line-height: 1.15;
+    }
+
+    body.consult-page .consult-brief-list span {
+      color: rgba(245, 236, 223, 0.82);
+      line-height: 1.45;
+    }
+
+    @media (max-width: 980px) {
+      body.consult-page .hero-shell-consultations {
+        min-height: auto;
+        padding: 112px 16px 42px;
+      }
+
+      body.consult-page .consult-hero-grid h1 {
+        max-width: 336px;
+        margin-bottom: 18px;
+        font-size: clamp(34px, 8.6vw, 38px);
+        line-height: 1.02;
+      }
+
+      body.consult-page .hero-cta .btn {
+        flex: 0 0 auto;
+        width: 100%;
+        min-height: 48px;
+        padding: 0 16px;
+      }
+
+      body.consult-page .hero-cta .btn-secondary {
+        min-height: 46px;
+        padding: 0;
+      }
+
+      body.consult-page .consult-route-strip,
+      body.consult-page .consult-decision-strip,
+      body.consult-page .consult-scope-grid,
+      body.consult-page .consult-process-grid {
+        grid-template-columns: 1fr;
+      }
+
+      body.consult-page .consult-scope-grid,
+      body.consult-page .consult-process-grid {
+        gap: 10px;
+      }
+    }
+
+    @media (min-width: 641px) and (max-width: 980px) {
+      body.consult-page .hero-shell-consultations {
+        min-height: min(76svh, 720px);
+        padding: 120px 22px 56px;
+      }
+
+      body.consult-page .consult-hero-grid h1 {
+        max-width: 660px;
+        margin-bottom: 22px;
+        font-size: clamp(48px, 7.2vw, 64px);
+        line-height: 1.08;
+      }
+
+      body.consult-page .hero-cta .btn {
+        width: auto;
+        min-height: 46px;
+        padding: 0 20px;
+      }
+
+      body.consult-page .hero-cta .btn-secondary {
+        padding: 0;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body.consult-page .hero-cta {
+        width: 100%;
+        display: grid;
+        gap: 12px;
+      }
+
+      body.consult-page .consult-hero-grid .hero-copy .eyebrow {
+        margin-bottom: 14px;
+        font-size: 11px;
+      }
+
+      body.consult-page .consult-hero-grid .lead {
+        margin-bottom: 24px;
+        font-size: 16px;
+      }
+
+      body.consult-page .consult-hero-grid .sublead {
+        display: none;
+      }
+    }
+  </style>
   <!-- SEO:START -->
   <meta name="robots" content="index, follow, max-image-preview:large" />
-  <link rel="canonical" href="https://patievil.github.io/klubnikaproject-public/consultations/" />
+  <link rel="canonical" href="https://klubnikaproject.ru/consultations/" />
   <script type="application/ld+json">
-  [
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "@id": "https://patievil.github.io/klubnikaproject-public/consultations/#webpage",
-      "url": "https://patievil.github.io/klubnikaproject-public/consultations/",
-      "name": "Консультации по клубничной ферме: когда нужен точный разбор без длинного сопровождения",
-      "description": "Разовые консультации и аудит для клубничных ферм: запуск, диагностика проблем, корректировка решений и понимание, что делать дальше по проекту.",
-      "inLanguage": "ru-RU",
-      "isPartOf": {
-        "@id": "https://patievil.github.io/klubnikaproject-public/#website"
-      }
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "@id": "https://patievil.github.io/klubnikaproject-public/consultations/#faq",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "Когда нужна консультация, а когда сопровождение?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Консультация подходит для одной конкретной задачи. Сопровождение нужно, когда решений несколько и их надо вести последовательно."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Можно ли обратиться с действующей фермой?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Да. Это один из самых частых запросов: нестабильное качество, реактивное управление параметрами или пересборка части схемы."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Нужен ли сначала расчёт фермы?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Если вопрос в составе проекта или комплекта, да. Если проблема уже в текущей логике фермы, лучше сразу идти сюда."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Что подготовить перед началом?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Описание проекта, фотографии, текущие параметры, масштаб, ограничения и формулировку главной проблемы."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Можно ли потом перейти в магазин?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Да. Если после разбора становится понятно, какие позиции нужны, их потом можно спокойно добрать через магазин или расчёт комплекта."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Что происходит после заявки?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Понять, достаточно ли одной консультации, или задаче нужен более длинный формат сопровождения."
-          }
-        }
-      ]
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": "https://klubnikaproject.ru/consultations/#webpage",
+    "url": "https://klubnikaproject.ru/consultations/",
+    "name": "Консультация по клубничной ферме: точечный разбор одного вопроса",
+    "description": "Точечная консультация по клубничной ферме: проверить один вопрос, совместимость узлов, проблему по ягоде или следующий шаг без полного расчёта проекта.",
+    "inLanguage": "ru-RU",
+    "isPartOf": {
+      "@id": "https://klubnikaproject.ru/#website"
     }
-  ]
+  }
   </script>
   <!-- SEO:END -->
+  <link rel="stylesheet" href="../assets/css/kp-header.css?v=20260425h1" />
+  <link rel="stylesheet" href="../assets/css/kp-footer.css?v=20260427a" />
 </head>
-<body>
+<body class="consult-page">
+  <header class="kp-site-header" data-kp-header data-root="../"></header>
+  <script src="../assets/js/kp-header.js?v=20260425h1"></script>
   <header class="hero">
     <div class="container">
       <div class="hero-shell hero-shell-service hero-shell-consultations">
-        <div class="topbar">
-          <div class="brand">
-            <a class="brand-home" href="../">
-              <img class="brand-lockup brand-lockup-primary" src="../documents/logo/header-lockup-v1-close-compact-dark.svg?v=20260403aa" alt="KLUBNIKA PROJECT" />
-              <img class="brand-lockup brand-lockup-compact" src="../documents/logo/header-lockup-v1-close-compact-dark.svg?v=20260403aa" alt="KLUBNIKA PROJECT" />
-            </a>
-          </div>
 
-          <nav class="nav">
-            <a class="nav-link" href="../">Главная</a>
-            <div class="nav-group">
-              <button class="nav-trigger" type="button">Решения</button>
-              <div class="nav-menu">
-                <a href="../farm/"><strong>Расчёт фермы</strong><span>Состав комплекта, рамка бюджета и что делать дальше.</span></a>
-                <a href="../study/"><strong>Сопровождение</strong><span>Разбор действующей фермы, критических узлов и технологии.</span></a>
-                <a href="../consultations/"><strong>Консультации</strong><span>Точечный разбор задачи, совместимости и того, как лучше действовать дальше.</span></a>
-                <a href="../klubhack/"><strong>Клубничный Хак</strong><span>База по клубнике без проектной сметы.</span></a>
-              </div>
-            </div>
-            <div class="nav-group">
-              <button class="nav-trigger" type="button">Каталог</button>
-              <div class="nav-menu nav-menu-wide">
-                <a href="../catalog/index.html"><strong>Магазин</strong><span>Весь каталог решений для клубничной фермы.</span></a>
-                <a href="../catalog/led/index.html"><strong>LED</strong><span>Светильники M23 и тепличные модели.</span></a>
-                <a href="../catalog/irrigation/index.html"><strong>Полив</strong><span>Комплектующие, узлы и типовые комплекты.</span></a>
-                <a href="../catalog/racks/index.html"><strong>Стеллажи</strong><span>Модули, каркасы и конструктив фермы.</span></a>
-                <a href="../catalog/substrates/index.html"><strong>Субстрат</strong><span>Grodan и корневая зона под controlled environment.</span></a>
-                <a href="../seeds/"><strong>Семена и Frigo</strong><span>Посадочный материал под фермерский запуск.</span></a>
-              </div>
-            </div>
-            <a class="nav-link" href="../calc/">Калькулятор</a>
-            <div class="nav-mobile-utility">
-              <a class="site-header-link" href="../catalog/index.html">Поиск в каталоге</a>
-              <a class="site-header-link site-phone-link" href="tel:+79255831669">+7 925 583-16-69</a>
-              <a class="site-header-link" href="../cabinet/login/">Кабинет</a>
-              <a class="site-header-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Telegram</a>
-              <a class="nav-cta" href="#request">Разобрать задачу</a>
-            </div>
-          </nav>
-
-          <div class="site-header-actions">
-            <a class="site-header-link" href="../cabinet/login/">Кабинет</a>
-            <a class="nav-cta" href="#request">Разобрать задачу</a>
-          </div>
-
-          <a class="site-mobile-quick" href="tel:+79255831669">Связь</a>
-          <button class="nav-toggle" type="button" aria-label="Открыть меню" aria-expanded="false">
-            <span></span>
-          </button>
-        </div>
-
-        <div class="hero-grid">
+        <div class="hero-grid consult-hero-grid">
           <div class="hero-copy hero-copy-lean">
-            <span class="eyebrow">Консультации и аудит</span>
-            <h1>Консультации по клубничной ферме: когда нужен точный разбор без длинного сопровождения</h1>
+            <span class="eyebrow">Консультация</span>
+            <h1>Разбор одного вопроса по ферме</h1>
             <p class="lead">
-              Эта страница для запусков, действующих ферм и точечных проблем, где нужен не общий совет,
-              а профессиональный разбор ситуации и ясность по тому, что делать дальше.
+              Проверяем решение, симптом или следующий шаг без полного расчёта проекта.
             </p>
             <p class="sublead">
-              Если вопрос упирается в качество ягоды, свет, полив, корневую зону, запуск или выбор решения,
-              консультация помогает быстро увидеть приоритеты и понять, что имеет смысл делать дальше: покупать, пересчитывать или идти в сопровождение.
+              Формат нужен, когда вопрос уже можно сузить: совместимость узла, поведение растения, ошибка в режиме, покупка оборудования или выбор маршрута.
             </p>
 
             <div class="btn-row hero-cta">
-              <a class="btn btn-primary" href="#request">Записаться на консультацию</a>
-              <a class="btn btn-secondary" href="../farm/">Рассчитать ферму</a>
-            </div>
-            <div class="text-link-row">
-              <a href="../shop/">Я уже понимаю, что нужно купить</a>
-              <a href="../study/">Нужно сопровождение, а не разовый разбор</a>
+              <a class="btn btn-primary" href="#request">Оставить вопрос</a>
+              <a class="btn btn-secondary" href="../farm/">Нужен расчёт</a>
             </div>
           </div>
-
-          <aside class="visual-panel visual-panel-service visual-panel-consultations">
-            <div class="visual-grid">
-              <img
-                class="visual-main"
-                src="../assets/catalog/catalog-context/berry-close-context.webp"
-                alt="Точечный аудит по состоянию клубничной фермы"
-              />
-              <div class="visual-stack">
-                <img class="visual-top" src="../assets/catalog/catalog-context/irrigation-context-01.webp" alt="Качество ягоды" />
-                <img class="visual-bottom" src="../assets/catalog/catalog-context/berry-reference-main.webp" alt="Клубника и решение по проекту" />
-              </div>
-            </div>
-            <div class="visual-note">
-              Если задача шире одной покупки, консультация обычно экономит больше, чем цепочка случайных решений.
-            </div>
-            <div class="service-hero-meta">
-              <div class="service-hero-meta-card">
-                <strong>Один острый вопрос</strong>
-                <span>Быстро разбираем конкретный узел, совместимость, качество ягоды или критичную развилку по решению.</span>
-              </div>
-              <div class="service-hero-meta-card">
-                <strong>Что прояснится</strong>
-                <span>После разговора становится понятно, нужна покупка, перерасчёт, сопровождение или дополнительная диагностика по объекту.</span>
-              </div>
-            </div>
-          </aside>
         </div>
       </div>
     </div>
   </header>
 
-  <section class="section" id="who">
+  <section class="section" id="fit">
     <div class="container">
       <div class="section-frame">
         <div class="section-head">
-          <span class="eyebrow">Когда нужна консультация</span>
-          <h2>Разовая консультация нужна там, где вопрос уже острый, но ещё не требует длинного сопровождения</h2>
-          <p class="sublead">
-            Если задачу можно сузить до одного узла, одного решения или одного критичного вопроса, консультация помогает быстро снять неопределённость без длинного процесса.
-          </p>
+          <span class="eyebrow">Когда сюда</span>
+          <h2>Когда вопрос уже конкретный</h2>
+          <p class="sublead">Консультация закрывает одну развилку. Если нужно собрать всю ферму с нуля, лучше идти в расчёт.</p>
         </div>
 
         <div class="grid grid-3">
           <article class="path-card">
-            <div class="kicker">Ситуация 01</div>
-            <h3>Нужно быстро проверить решение</h3>
-            <ul>
-              <li>Есть один узел, конфигурация или развилка, где не хочется ошибиться.</li>
-              <li>Нужно быстро понять, что делать сначала и что не покупать вслепую.</li>
-            </ul>
+            <div class="kicker">Покупка</div>
+            <h3>Нужно проверить узел</h3>
+            <p>Есть свет, полив, стеллаж, субстрат или комплект, но непонятно, подходит ли он к вашей схеме.</p>
+            <a class="path-card-note" href="#request">Оставить вопрос</a>
           </article>
 
           <article class="path-card">
-            <div class="kicker">Ситуация 02</div>
-            <h3>Действующая ферма</h3>
-            <ul>
-              <li>Есть проблема по ягоде, свету, поливу или корневой зоне.</li>
-              <li>Нужно понять вероятную причину и порядок проверки.</li>
-            </ul>
+            <div class="kicker">Симптом</div>
+            <h3>Нужно найти причину</h3>
+            <p>Ягода, корневая зона, полив или свет ведут себя не так, как ожидалось. Нужно понять, что проверять первым.</p>
+            <a class="path-card-note" href="#request">Описать симптом</a>
           </article>
 
           <article class="path-card">
-            <div class="kicker">Ситуация 03</div>
-            <h3>Нужно понять, хватит ли консультации</h3>
-            <ul>
-              <li>Пока неясно, это точечный вопрос или уже системная задача.</li>
-              <li>Нужно быстро решить, идти дальше в сопровождение или нет.</li>
-            </ul>
+            <div class="kicker">Маршрут</div>
+            <h3>Нужно выбрать следующий шаг</h3>
+            <p>Неясно, хватит ли разового разбора, нужен расчёт фермы или уже сопровождение действующего объекта.</p>
+            <a class="path-card-note" href="#request">Уточнить формат</a>
           </article>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <section class="section-tight" id="trust">
-    <div class="container">
-      <div class="metric-row">
-        <div class="section-frame">
-          <span class="eyebrow">Что даёт консультация</span>
-          <h2>Консультация нужна, когда один точный разбор уже может сэкономить деньги и время</h2>
-          <p class="sublead">
-            Здесь быстро выясняют, где реальная причина, что проверять первым и нужен ли дальше более длинный формат работы.
-          </p>
-
-          <div class="metric-wall">
-            <div class="metric">
-              <strong>Свет</strong>
-              <span>влияет на генерацию, стабильность цикла и реакцию растения</span>
-            </div>
-            <div class="metric">
-              <strong>Полив</strong>
-              <span>связан с управляемостью корневой зоны и стрессом растения</span>
-            </div>
-            <div class="metric">
-              <strong>Фазы</strong>
-              <span>определяют, как именно сказывается ошибка на ягоде и результате</span>
-            </div>
-            <div class="metric">
-              <strong>Проект</strong>
-              <span>требует приоритетов, а не хаотичных действий по симптомам</span>
-            </div>
+        <div class="consult-route-strip">
+          <div class="consult-route-strip__item">
+            <strong>Есть только идея?</strong>
+            <p>Сначала откройте калькулятор и получите первую рамку по площади и бюджету.</p>
+          </div>
+          <div class="consult-route-strip__item">
+            <strong>Нужно вести ферму дальше?</strong>
+            <p>Если решений несколько и они связаны между собой, лучше идти в сопровождение.</p>
           </div>
         </div>
-
-        <aside class="side-copy">
-          <div class="badge badge-solid">На выходе</div>
-          <h3 class="section-card-title">Не общий совет, а ясность по задаче</h3>
-          <ul class="content-list">
-            <li class="content-list-item">Понимание, где первопричина, а где только следствие.</li>
-            <li class="content-list-item">Порядок действий без распыления на второстепенное.</li>
-            <li class="content-list-item">Понимание, покупать ли, пересчитывать ли или переводить вопрос в сопровождение.</li>
-            <li class="content-list-item">План действий, который можно применить сразу после разговора.</li>
-          </ul>
-        </aside>
       </div>
     </div>
   </section>
 
-  <section class="section" id="work">
+  <section class="section-tight" id="scope">
     <div class="container">
-      <div class="section-photo-rail">
-        <article class="photo-card">
-          <img src="../assets/catalog/catalog-context/irrigation-context-01.webp" alt="Качество ягоды и точечный разбор" />
-          <div class="photo-card-caption">Частый запрос на консультацию начинается с ягоды, но быстро упирается в свет, полив или корневую зону.</div>
-        </article>
-        <article class="photo-card">
-          <img src="../assets/catalog/catalog-context/irrigation-detail-01.webp" alt="Работа на действующей ферме" />
-          <div class="photo-card-caption">Разовый разбор нужен там, где уже можно сузить вопрос до одного узла, одной ошибки или одного решения.</div>
-        </article>
-        <article class="photo-card">
-          <img src="../assets/catalog/catalog-context/berry-reference-main.webp" alt="Клубника и решение по проекту" />
-          <div class="photo-card-caption">Хорошая консультация заканчивается не общими словами, а ясностью по тому, что делать дальше.</div>
-        </article>
-      </div>
-
       <div class="section-frame">
         <div class="section-head">
           <span class="eyebrow">Что разбираем</span>
-          <h2>Разбираем один узкий вопрос, а не всю ферму сразу</h2>
+          <h2>Берём один узел и смотрим его связи</h2>
+          <p class="sublead">Даже точечный вопрос редко живёт отдельно. Смотрим только то, что влияет на решение.</p>
         </div>
 
-        <div class="grid grid-2">
+        <div class="consult-scope-grid">
           <article class="card card-pad">
-            <div class="tag">Среда</div>
-            <h3>Свет, климат, VPD</h3>
-            <p class="sublead">Параметры среды и их влияние на цикл, генерацию и стабильность результата.</p>
+            <div class="tag">Свет</div>
+            <h3>Мощность и размещение</h3>
+            <p>Проверяем расстояния, равномерность, нагрев и связь со стеллажной схемой.</p>
           </article>
           <article class="card card-pad">
-            <div class="tag">Корневая зона</div>
-            <h3>Полив и субстрат</h3>
-            <p class="sublead">Режим полива, схема подачи раствора, дефициты и управляемость корня.</p>
+            <div class="tag">Полив</div>
+            <h3>Раствор и дренаж</h3>
+            <p>Смотрим подачу, частоту, субстрат и управляемость корневой зоны.</p>
           </article>
           <article class="card card-pad">
-            <div class="tag">Фенология</div>
-            <h3>Фазы растения и ягода</h3>
-            <p class="sublead">Размер, вкус, плотность и то, как отклонения бьют по конечному результату.</p>
+            <div class="tag">Растение</div>
+            <h3>Фаза и ягода</h3>
+            <p>Связываем симптом с фазой растения, а не меняем всё подряд.</p>
           </article>
           <article class="card card-pad">
-            <div class="tag">Решение</div>
-            <h3>Что лучше делать дальше</h3>
-            <p class="sublead">Проверка решения, fit по узлу и понимание, стоит ли считать, покупать или идти в сопровождение.</p>
+            <div class="tag">Маршрут</div>
+            <h3>Покупать или считать</h3>
+            <p>Фиксируем, что делать дальше: купить, пересчитать, собрать данные или идти в сопровождение.</p>
           </article>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <section class="section-tight" id="formats">
-    <div class="container">
-      <div class="grid grid-2">
-        <article class="card route-card">
-          <div class="badge">Разовая консультация</div>
-          <h3>Когда нужен точный разбор одной задачи</h3>
-          <ul>
-            <li>Одна конкретная проблема или блок решений.</li>
-            <li>Нужно быстро понять, что делать сначала и что не трогать.</li>
-            <li>Разовая консультация от 15 000 ₽ за час.</li>
-          </ul>
-        </article>
-
-        <article class="card route-card">
-          <div class="badge">Сопровождение</div>
-          <h3>Когда проект нужно вести не один день</h3>
-          <ul>
-            <li>Несколько взаимосвязанных проблем или критический этап проекта.</li>
-            <li>Нужна регулярная связь по решениям и отклонениям.</li>
-            <li>Сопровождение от 35 000 ₽ в месяц.</li>
-          </ul>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="section-tight" id="hack">
-    <div class="container">
-      <div class="action-panel">
-        <div class="split-hero">
+        <div class="consult-decision-strip">
           <div>
-            <span class="eyebrow">Если нужна база</span>
-            <h2>Если нужна база по технологии, а не разбор проекта, для этого есть Клубничный Хак</h2>
-            <p class="sublead">
-              Это для тех, кому сначала хочется спокойно собрать основу по технологии, а не разбирать свой объект по узлам.
-            </p>
-            <div class="btn-row">
-              <a class="btn btn-primary" href="../klubhack/">Открыть страницу курса</a>
-              <a class="btn btn-secondary" href="#request">Если нужен именно разбор задачи</a>
-            </div>
+            <strong>На выходе нужен не список идей, а ближайшее действие.</strong>
+            <p>После разбора понятно, что проверить первым и где не тратить деньги до проверки.</p>
           </div>
-
-          <div class="card form-card">
-            <div class="tag">Когда идти туда</div>
-            <ul>
-              <li>Нужна понятная база по выращиванию, а не проектная работа по вашему объекту.</li>
-              <li>Хочется спокойно разобраться от старта фермы до качества ягоды и масштабирования.</li>
-              <li>Нужны обучение, закрытый чат и практические задания.</li>
-            </ul>
+          <div>
+            <strong>Если вопрос больше одного узла, формат меняется.</strong>
+            <p>Когда задача цепляет режимы, закупку и регулярные решения, её лучше вести как сопровождение.</p>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section-tight" id="result">
-    <div class="container">
-      <div class="note-panel product-next-panel">
-        <div class="badge">Результат</div>
-        <strong>После консультации у вас должно оставаться понятное понимание, что делать дальше по проекту.</strong>
-        <p>Если вопрос закрывается точечно, можно идти в закупку, расчёт или корректировку. Если нет, становится ясно, что задачу уже лучше вести в сопровождении.</p>
       </div>
     </div>
   </section>
@@ -403,112 +481,33 @@
       <div class="section-frame">
         <div class="section-head">
           <span class="eyebrow">Как идёт работа</span>
-          <h2>Разовая консультация должна быть понятна заранее</h2>
+          <h2>Короткий маршрут без лишних кругов</h2>
+          <p class="sublead">Сначала фиксируем вопрос, потом проверяем влияющие связи и выбираем действие.</p>
         </div>
 
-        <div class="grid grid-4">
+        <div class="consult-process-grid">
           <article class="card scenario-card">
             <div class="tag">Шаг 01</div>
-            <h3>Сбор вводных</h3>
-            <ul>
-              <li>Фиксируем стадию проекта, ограничения и цель.</li>
-            </ul>
+            <h3>Фиксируем вопрос</h3>
+            <p>Что именно нужно решить сейчас: покупка, симптом, режим или формат работы.</p>
           </article>
 
           <article class="card scenario-card">
             <div class="tag">Шаг 02</div>
-            <h3>Диагностика</h3>
-            <ul>
-              <li>Определяем узкие места и критические решения.</li>
-            </ul>
+            <h3>Собираем вводные</h3>
+            <p>Фотографии, параметры, площадь, выбранные позиции и ограничения по объекту.</p>
           </article>
 
           <article class="card scenario-card">
             <div class="tag">Шаг 03</div>
-            <h3>План действий</h3>
-            <ul>
-              <li>Понимаем, что менять сначала и что контролировать дальше.</li>
-            </ul>
+            <h3>Разбираем связи</h3>
+            <p>Отделяем главный риск от вторичных симптомов и случайных гипотез.</p>
           </article>
 
           <article class="card scenario-card">
             <div class="tag">Шаг 04</div>
-            <h3>Следующий шаг</h3>
-            <ul>
-              <li>Понимаем, идти дальше в закупку, расчёт или сопровождение.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="cases">
-    <div class="container">
-      <div class="section-frame">
-        <div class="section-head">
-          <span class="eyebrow">Проектные ситуации</span>
-          <h2>Где консультации уже достаточно</h2>
-        </div>
-
-        <div class="grid grid-3">
-          <article class="card case-card">
-            <div class="tag">Ситуация 01</div>
-            <h3>Нужно быстро проверить решение до покупки</h3>
-            <p><strong>Что происходит:</strong> вопрос уже сузился до одного узла, модели или развилки.</p>
-            <p><strong>Что даёт консультация:</strong> появляется понятный ответ, что брать, а что пока не трогать.</p>
-          </article>
-
-          <article class="card case-card">
-            <div class="tag">Ситуация 02</div>
-            <h3>Есть сбой в действующей ферме</h3>
-            <p><strong>Что происходит:</strong> команда видит симптом, но не понимает, с чего начинать проверку.</p>
-            <p><strong>Что даёт консультация:</strong> появляется приоритетный порядок действий без хаоса и лишних гипотез.</p>
-          </article>
-
-          <article class="card case-card">
-            <div class="tag">Ситуация 03</div>
-            <h3>Нужно понять, хватит ли консультации</h3>
-            <p><strong>Что происходит:</strong> пока неясно, это точечный вопрос или уже системная задача.</p>
-            <p><strong>Что даёт консультация:</strong> становится ясно, закрывается ли вопрос за один разбор или нужен другой формат.</p>
-          </article>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section-tight" id="faq">
-    <div class="container">
-      <div class="section-frame">
-        <div class="section-head">
-          <span class="eyebrow">FAQ</span>
-          <h2>Что важно понять до записи</h2>
-        </div>
-
-        <div class="faq-grid">
-          <article class="card faq-box">
-            <strong>Когда нужна консультация, а когда сопровождение?</strong>
-            <p>Консультация подходит для одной конкретной задачи. Сопровождение нужно, когда решений несколько и их надо вести последовательно.</p>
-          </article>
-          <article class="card faq-box">
-            <strong>Можно ли обратиться с действующей фермой?</strong>
-            <p>Да. Это один из самых частых запросов: нестабильное качество, реактивное управление параметрами или пересборка части схемы.</p>
-          </article>
-          <article class="card faq-box">
-            <strong>Нужен ли сначала расчёт фермы?</strong>
-            <p>Если вопрос в составе проекта или комплекта, да. Если проблема уже в текущей логике фермы, лучше сразу идти сюда.</p>
-          </article>
-          <article class="card faq-box">
-            <strong>Что подготовить перед началом?</strong>
-            <p>Описание проекта, фотографии, текущие параметры, масштаб, ограничения и формулировку главной проблемы.</p>
-          </article>
-          <article class="card faq-box">
-            <strong>Можно ли потом перейти в магазин?</strong>
-            <p>Да. Если после разбора становится понятно, какие позиции нужны, их потом можно спокойно добрать через магазин или расчёт комплекта.</p>
-          </article>
-          <article class="card faq-box">
-            <strong>Что происходит после заявки?</strong>
-            <p>Понять, достаточно ли одной консультации, или задаче нужен более длинный формат сопровождения.</p>
+            <h3>Фиксируем действие</h3>
+            <p>Покупать, пересчитать, замерить параметры, сменить режим или идти в сопровождение.</p>
           </article>
         </div>
       </div>
@@ -520,50 +519,58 @@
       <div class="section-frame">
         <div class="grid grid-2">
           <div>
-            <span class="eyebrow">Форма для сложных случаев</span>
-            <h2>Опишите ситуацию по ферме, а мы предложим формат работы</h2>
-            <p class="sublead">
-              Здесь важны не длинные описания, а факты: стадия проекта, масштаб, где сейчас главный затык и нужен ли точечный разбор или сопровождение.
-            </p>
+            <span class="eyebrow">Передать вопрос</span>
+            <h2>Оставить вопрос на разбор</h2>
+            <p class="sublead">Коротко опишите объект, узел или симптом. Если по вводным видно, что нужен другой формат, скажу сразу.</p>
 
-            <div class="grid grid-2 mt-24">
-              <div class="card result-card">
-                <div class="tag">Для консультации</div>
-                <h3>Один точный вопрос</h3>
-                <p class="sublead">Когда нужно быстро понять приоритеты и не растягивать работу на длинный процесс.</p>
-              </div>
-              <div class="card result-card">
-                <div class="tag">Для сопровождения</div>
-                <h3>Несколько связанных решений</h3>
-                <p class="sublead">Когда проект уже требует не одного созвона, а более системной работы.</p>
-              </div>
-            </div>
+            <ul class="consult-brief-list">
+              <li>
+                <strong>Что за ситуация</strong>
+                <span>Запуск, действующая ферма, закупка, симптом или пересборка узла.</span>
+              </li>
+              <li>
+                <strong>Что нужно решить</strong>
+                <span>Покупать, менять режим, искать причину, пересчитать или выбрать формат.</span>
+              </li>
+              <li>
+                <strong>Что уже есть</strong>
+                <span>Фото, параметры, выбранные позиции, площадь, ограничения и контакт.</span>
+              </li>
+            </ul>
           </div>
 
           <div class="card form-card">
-            <h3>Собрать задачу на разбор</h3>
-            <p class="sublead">Форма для консультации, аудита и сопровождения.</p>
-            <form class="form-grid" data-brief-form="Консультации — задача на разбор" data-brief-button-label="Передать задачу" data-brief-done-label="Задача передана">
-              <input class="input" type="text" placeholder="Имя / компания" />
-              <input class="input" type="text" placeholder="Контакт для связи" />
-              <select class="select">
-                <option>Стадия проекта</option>
-                <option>Планирую запуск</option>
-                <option>Ферма уже работает</option>
-                <option>Пересборка / масштабирование</option>
-              </select>
-              <select class="select">
-                <option>Формат интереса</option>
-                <option>Разовая консультация</option>
-                <option>Сопровождение</option>
-                <option>Нужна рекомендация по формату</option>
-              </select>
-              <textarea class="textarea" placeholder="Опишите ситуацию: качество ягоды, свет, полив, запуск, пересборка или другой критичный вопрос по проекту"></textarea>
-              <div class="brief-form-actions">
-                <button class="btn btn-primary" data-brief-button type="button">Передать задачу</button>
-                <a class="brief-telegram-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Открыть Telegram</a>
+            <h3>Контакт и вопрос</h3>
+            <p class="sublead">Этого достаточно для первичного ответа и выбора формата.</p>
+            <form class="form-grid" data-brief-form="Консультации — задача на разбор" data-brief-button-label="Оставить вопрос" data-brief-done-label="Вопрос передан" data-brief-link-label="Написать в Telegram">
+              <input class="input" type="text" placeholder="Telegram / WhatsApp для связи" data-field-role="contact" data-field-label="Контакт для связи" />
+              <div class="field-group">
+                <span class="field-label">Стадия</span>
+                <div class="choice-grid" data-choice-group>
+                  <input type="hidden" value="" data-field-role="stage" data-field-label="Стадия" />
+                  <button class="choice-chip" type="button" data-choice-value="Планирую запуск">Запуск</button>
+                  <button class="choice-chip" type="button" data-choice-value="Ферма уже работает">Работает</button>
+                  <button class="choice-chip" type="button" data-choice-value="Перед покупкой">Перед покупкой</button>
+                  <button class="choice-chip" type="button" data-choice-value="Пересборка узла">Пересборка</button>
+                </div>
               </div>
-              <p class="brief-form-note">Кнопка соберёт вводные, скопирует их и сразу откроет рабочий Telegram. Рабочий Telegram: <a href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">@patiev_admin</a>.</p>
+              <div class="field-group">
+                <span class="field-label">Что разобрать</span>
+                <div class="choice-grid" data-choice-group>
+                  <input type="hidden" value="" data-field-role="request" data-field-label="Что разобрать" />
+                  <button class="choice-chip" type="button" data-choice-value="Свет и размещение">Свет</button>
+                  <button class="choice-chip" type="button" data-choice-value="Полив и корневая зона">Полив</button>
+                  <button class="choice-chip" type="button" data-choice-value="Симптом по растению или ягоде">Ягода</button>
+                  <button class="choice-chip" type="button" data-choice-value="Выбор формата работы">Формат</button>
+                </div>
+              </div>
+              <input class="input" type="text" placeholder="Что уже выбрано / куплено / менять нельзя" data-field-label="Что уже есть" />
+              <textarea class="textarea" placeholder="Опишите один вопрос: где сомнение, что нужно решить, какие вводные уже есть" data-field-role="summary" data-field-label="Вопрос"></textarea>
+              <div class="brief-form-actions">
+                <button class="btn btn-primary" data-brief-button type="button">Оставить вопрос</button>
+                <a class="brief-telegram-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Написать в Telegram</a>
+              </div>
+              <p class="brief-form-note">Если удобнее, можно сразу написать в <a href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">@patiev_admin</a>.</p>
               <p class="brief-form-status" data-brief-status aria-live="polite"></p>
             </form>
           </div>
@@ -571,6 +578,54 @@
       </div>
     </div>
   </section>
-<script src="../site.js?v=20260405m" defer></script>
+
+  <footer class="home-footer" id="footer" aria-label="Подвал сайта">
+    <div class="home-footer-inner">
+      <div class="home-footer-lead">
+        <a class="home-footer-logo" href="../" aria-label="Klubnika Project">
+          <img src="../assets/logo/klubnika-project-logo-green.svg" alt="Klubnika Project" />
+        </a>
+      </div>
+
+      <nav class="home-footer-columns" aria-label="Навигация подвала">
+        <div>
+          <span>Маршруты</span>
+          <a href="../calc/">Калькулятор</a>
+          <a href="../catalog/index.html">Каталог решений</a>
+          <a href="../klubhack/">Клубничный Хак</a>
+          <a href="../consultations/">Консультации</a>
+          <a href="../cabinet/">Кабинет</a>
+        </div>
+        <div>
+          <span>Система фермы</span>
+          <a href="../catalog/led/index.html">Свет</a>
+          <a href="../catalog/irrigation/index.html">Полив</a>
+          <a href="../catalog/racks/index.html">Стеллажи</a>
+          <a href="../seeds/">Посадочный материал</a>
+        </div>
+        <div>
+          <span>Связь</span>
+          <a href="tel:+79255831669">+7 925 583-16-69</a>
+          <a href="mailto:info@klubnikaproject.ru">info@klubnikaproject.ru</a>
+          <a href="https://wa.me/79891250150" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+          <a href="https://www.youtube.com/@Ilya_patiev" target="_blank" rel="noopener noreferrer">YouTube</a>
+        </div>
+        <div>
+          <span>Документы</span>
+          <a href="../docs/policy/">Политика конфиденциальности</a>
+          <a href="../docs/offero/">Оферта</a>
+          <a href="../docs/warrenty/">Гарантия</a>
+          <a href="../docs/consent/">Согласие на обработку ПД</a>
+        </div>
+      </nav>
+
+      <div class="home-footer-bottom">
+        <span>Klubnika Project, 2026</span>
+        <span>Работаем по России и СНГ</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../site.js?v=20260427footer" defer></script>
 </body>
 </html>
