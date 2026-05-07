@@ -354,6 +354,10 @@ a {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.calc-segment-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .calc-preset-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -552,15 +556,59 @@ a {
 }
 
 #room-size-panel,
-.calc-economy-input {
+.calc-economy-input,
+.calc-labor-input {
   padding: 0;
   border: 0;
   background: transparent;
 }
 
 .calc-control-grid-geometry,
-.calc-control-grid-economy {
+.calc-control-grid-economy,
+.calc-control-grid-labor {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.calc-labor-input {
+  display: grid;
+  gap: 10px;
+}
+
+.calc-labor-input .calc-config-line p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+#labor-recommendation-text {
+  color: color-mix(in srgb, var(--green) 74%, var(--muted));
+  font-size: 0.72em;
+  font-weight: 700;
+  text-transform: none;
+}
+
+.labor-mode-grid .calc-segment {
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+  padding: 6px 12px;
+  align-content: center;
+  align-items: center;
+}
+
+.labor-mode-grid .calc-segment strong {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.labor-mode-grid .calc-segment span {
+  display: none;
+}
+
+.labor-input-panel {
+  display: grid;
+  gap: 8px;
 }
 
 .compact-control {
@@ -617,6 +665,12 @@ a {
   font-size: 15px;
   font-weight: 800;
   cursor: pointer;
+}
+
+.control-step-button:disabled,
+.control-number[readonly] {
+  cursor: default;
+  opacity: 0.55;
 }
 
 .control-number {
@@ -785,8 +839,21 @@ a {
 
 .summary-item strong {
   color: var(--green);
-  font-size: 17px;
-  line-height: 1.05;
+  font-size: 15px;
+  line-height: 1.15;
+}
+
+.summary-item.is-work-summary strong {
+  font-size: 14px;
+}
+
+.work-summary-lines {
+  display: grid;
+  gap: 4px;
+}
+
+.work-summary-lines em {
+  font-style: normal;
 }
 
 .calc-result-details {
@@ -1239,8 +1306,10 @@ a {
   }
 
   .calc-preset-grid,
+  .calc-segment-grid-3,
   .calc-control-grid-geometry,
   .calc-control-grid-economy,
+  .calc-control-grid-labor,
   .feature-grid,
   .calc-result-facts,
   .budget-structure-grid,
@@ -1248,8 +1317,18 @@ a {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .calc-control-grid-geometry,
+  .calc-control-grid-economy,
+  .calc-segment-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .calc-control-grid-geometry .compact-control:nth-child(3),
   .calc-control-grid-economy .compact-control:nth-child(3) {
+    grid-column: auto;
+  }
+
+  .calc-control-grid-labor .compact-control {
     grid-column: 1 / -1;
   }
 
@@ -1373,8 +1452,16 @@ a {
 
   .calc-control-grid-geometry,
   .calc-control-grid-economy,
+  .calc-control-grid-labor,
+  .calc-segment-grid-3,
   .feature-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .calc-control-grid-geometry,
+  .calc-control-grid-economy,
+  .calc-segment-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .compact-control {

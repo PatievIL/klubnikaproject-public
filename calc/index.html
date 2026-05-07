@@ -9,7 +9,7 @@
   <title>Калькулятор фермы — Klubnika Project</title>
   <meta name="description" content="Калькулятор фермы Klubnika Project: быстрый ориентир по размеру, комплекту, нагрузке и экономике до закупки оборудования." />
   <link rel="canonical" href="https://klubnikaproject.ru/calc/" />
-  <link rel="stylesheet" href="./calc-v2.css?v=20260425-deploy1" />
+  <link rel="stylesheet" href="./calc-v2.css?v=20260508-worktext1" />
   <link rel="stylesheet" href="../assets/css/kp-header.css?v=20260428nocases" />
   <link rel="stylesheet" href="../assets/css/kp-footer.css?v=20260427a" />
 </head>
@@ -184,6 +184,32 @@
                 </label>
               </div>
             </section>
+
+            <section class="calc-config-group calc-labor-input" aria-labelledby="calc-labor-input-title">
+              <div class="calc-config-line">
+                <div>
+                  <h4 id="calc-labor-input-title">Работа <span id="labor-recommendation-text"></span></h4>
+                </div>
+              </div>
+
+              <div class="calc-segment-grid calc-segment-grid-3 labor-mode-grid" aria-label="Работа на ферме">
+                <button class="calc-segment" type="button" data-choice-key="workMode" data-choice-value="self">
+                  <strong>Сам</strong>
+                  <span>Меньше расходов, больше личного участия.</span>
+                </button>
+                <button class="calc-segment" type="button" data-choice-key="workMode" data-choice-value="hybrid">
+                  <strong>Гибрид</strong>
+                  <span>Вы контролируете, помощник закрывает рутину.</span>
+                </button>
+                <button class="calc-segment" type="button" data-choice-key="workMode" data-choice-value="hire">
+                  <strong>Найм</strong>
+                  <span>Ферма меньше зависит от владельца.</span>
+                </button>
+              </div>
+
+              <div class="labor-input-panel" id="labor-input-panel">
+              </div>
+            </section>
           </div>
 
           <section class="calc-config-group calc-config-options" id="feature-step" aria-labelledby="calc-options-title">
@@ -234,9 +260,12 @@
                   <div class="summary-item"><span>Энергия / мес</span><strong id="economy-opex-energy">0 ₽</strong></div>
                   <div class="summary-item"><span>Вода / мес</span><strong id="economy-opex-water">0 ₽</strong></div>
                   <div class="summary-item"><span>Аренда / мес</span><strong id="economy-opex-rent">0 ₽</strong></div>
+                  <div class="summary-item"><span>ФОТ / мес</span><strong id="economy-opex-labor">0 ₽</strong></div>
                   <div class="summary-item"><span>Ягода / мес</span><strong id="economy-berry-kg">0 кг</strong></div>
+                  <div class="summary-item"><span>Безубыточность</span><strong id="economy-break-even-kg">0 кг/мес</strong></div>
                   <div class="summary-item"><span>Выручка / мес</span><strong id="economy-revenue-month-real">0 ₽</strong></div>
                   <div class="summary-item"><span>Чистый поток / мес</span><strong id="economy-net-month-real">0 ₽</strong></div>
+                  <div class="summary-item"><span>ROI / год</span><strong id="economy-roi-real">—</strong></div>
                   <div class="summary-item"><span>Окупаемость</span><strong id="economy-payback-real">—</strong></div>
                 </div>
                 <ul class="economy-scenarios-grid" id="economy-scenarios-grid"></ul>
@@ -403,6 +432,6 @@
   </footer>
 
   <script src="../site.js?v=20260427footer" defer></script>
-  <script type="module" src="./calc.js?v=20260425-deploy1"></script>
+  <script type="module" src="./calc.js?v=20260508-break-even1"></script>
 </body>
 </html>

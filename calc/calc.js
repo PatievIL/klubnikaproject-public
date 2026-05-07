@@ -5,7 +5,7 @@ import {
   formatRub,
   formatSmart,
   normalizeInputValue
-} from "./calc-core.js?v=20260414a";
+} from "./calc-core.js?v=20260508-break-even1";
 
 const STORAGE_KEY = "klubnikaproject.calc.state.v4";
 const CROP_STORAGE_KEY = "klubnikaproject.calc.crop.v1";
@@ -49,6 +49,8 @@ const UI_DEFAULTS = {
   goalType: "entry",
   roomMode: "have-room",
   presetSize: "4x8",
+  workMode: "hybrid",
+  workModeManual: false,
   phaseMode: "three-phase",
   cableLayoutMode: "tray"
 };
@@ -118,10 +120,13 @@ const elements = {
   economyOpexEnergy: document.getElementById("economy-opex-energy"),
   economyOpexWater: document.getElementById("economy-opex-water"),
   economyOpexRent: document.getElementById("economy-opex-rent"),
+  economyOpexLabor: document.getElementById("economy-opex-labor"),
   economyBerryKg: document.getElementById("economy-berry-kg"),
+  economyBreakEvenKg: document.getElementById("economy-break-even-kg"),
   economyRevenueMonthReal: document.getElementById("economy-revenue-month-real"),
   economyRevenueYearReal: document.getElementById("economy-revenue-year-real"),
   economyNetMonthReal: document.getElementById("economy-net-month-real"),
+  economyRoiReal: document.getElementById("economy-roi-real"),
   economyPaybackReal: document.getElementById("economy-payback-real"),
   economyScenariosGrid: document.getElementById("economy-scenarios-grid"),
   detailNotes: document.getElementById("detail-notes"),
@@ -132,6 +137,8 @@ const elements = {
   dimensionHelperTitle: document.getElementById("dimension-helper-title"),
   dimensionHelperText: document.getElementById("dimension-helper-text"),
   resetDefaultsButton: document.getElementById("reset-defaults-button"),
+  laborInputPanel: document.getElementById("labor-input-panel"),
+  laborRecommendationText: document.getElementById("labor-recommendation-text"),
   roomQuickPresets: Array.from(document.querySelectorAll("[data-quick-preset]")),
   debugBuildId: document.getElementById("debug-build-id"),
   debugAppPhase: document.getElementById("debug-app-phase"),
@@ -392,7 +399,12 @@ function handleChoiceClick(event) {
   const { choiceKey, choiceValue } = button.dataset;
   state[choiceKey] = choiceValue;
 
+  if (choiceKey === "workMode") {
+    state.workModeManual = true;
+  }
+
   if (choiceKey === "presetSize") {
+    state.workModeManual = false;
     syncPresetIntoState(state);
   }
 
@@ -416,6 +428,7 @@ function handleNumericInput(event) {
   }
 
   state[control.key] = clampNumericValue(draftValue, control);
+  resetLaborModeAutoForControl(control.key);
   acceptedFields.add(control.key);
   render();
 }
@@ -428,6 +441,7 @@ function handleNumericAccept(event) {
   }
 
   state[control.key] = normalizeInputValue(input.value, control);
+  resetLaborModeAutoForControl(control.key);
   input.value = formatInputValue(state[control.key]);
   acceptedFields.add(control.key);
   render();
@@ -464,6 +478,7 @@ function handleStepControlClick(event) {
   const currentValue = normalizeInputValue(state[key], control);
   const nextValue = normalizeInputValue(currentValue + direction * step, control);
   state[key] = nextValue;
+  resetLaborModeAutoForControl(key);
   acceptedFields.add(key);
 
   const input = document.querySelector(`[data-input-type='number'][data-key='${key}']`);
@@ -481,6 +496,8 @@ function handleResetDefaultsClick() {
     state[control.key] = defaults[control.key];
     acceptedFields.add(control.key);
   });
+  state.workMode = defaults.workMode || UI_DEFAULTS.workMode;
+  state.workModeManual = UI_DEFAULTS.workModeManual;
 
   if (state.roomMode === "need-room") {
     state.presetSize = UI_DEFAULTS.presetSize;
@@ -498,6 +515,7 @@ function handleQuickPresetClick(event) {
   }
 
   state.presetSize = presetId;
+  state.workModeManual = false;
   applyPresetSize(state, presetId);
   acceptedFields.add("a0");
   acceptedFields.add("a1");
@@ -518,16 +536,24 @@ function applyPresetSize(targetState, presetId) {
   targetState.a1 = normalizeInputValue(preset.length, CONTROL_CONFIG[1]);
 }
 
+function resetLaborModeAutoForControl(key) {
+  if (["a0", "a1", "a2"].includes(key)) {
+    state.workModeManual = false;
+  }
+}
+
 function render() {
   saveState();
 
   const calc = calculateFarm(state, pricing);
+  state.workMode = calc.labor?.mode || state.workMode;
   latestCalculation = calc;
   renderCropSpecificText(calc);
   renderChoiceStates();
   renderPanels();
   renderConditionalSteps();
   renderInputs();
+  renderLabor(calc);
   renderAcceptedFields();
   renderFeatureToggleNotes(calc);
   renderDimensionHelper(calc);
@@ -588,10 +614,13 @@ function buildCalculationReportHtml(calc) {
     { label: "Электроэнергия / мес", value: formatRub(calc.electrical.monthlyPowerCost) },
     { label: "Вода / мес", value: formatRub(calc.water.monthlyWaterCost) },
     { label: "Аренда / мес", value: formatRub(calc.monthlyRentCost) },
+    { label: "ФОТ / мес", value: formatRub(calc.monthlyLaborCost) },
     { label: `${cropCopy.produceLabel} / мес`, value: `${formatSmart(economy.produceKgPerMonth)} кг` },
     { label: "Выручка / мес", value: formatRub(economy.revenueMonthReal) },
     { label: "Выручка / год", value: formatRub(economy.revenueYearReal) },
     { label: "Чистый поток / мес", value: formatRub(economy.netMonthReal) },
+    { label: "Безубыточность", value: economy.breakEvenMonthlyText },
+    { label: "ROI / год", value: economy.roiYearText },
     { label: "Окупаемость", value: economy.paybackText }
   ];
 
@@ -897,6 +926,21 @@ function renderInputs() {
   });
 }
 
+function renderLabor(calc) {
+  const labor = calc.labor || {};
+  const mode = labor.mode || state.workMode || UI_DEFAULTS.workMode;
+  if (elements.laborInputPanel) {
+    elements.laborInputPanel.dataset.laborMode = mode;
+  }
+  document.querySelectorAll("[data-labor-field]").forEach((field) => {
+    const modes = String(field.dataset.laborField || "").split(/\s+/).filter(Boolean);
+    field.hidden = modes.length > 0 && !modes.includes(mode);
+  });
+  if (elements.laborRecommendationText) {
+    elements.laborRecommendationText.textContent = formatLaborRecommendation(calc);
+  }
+}
+
 function parseNumericDraft(rawValue) {
   const normalized = String(rawValue ?? "").trim().replace(",", ".");
   if (!normalized || normalized === "." || normalized === "-" || normalized === "-.") {
@@ -996,6 +1040,38 @@ function formatRackConfiguration(calc) {
   return `${formatSmart(calc.rackCount)} ${pluralize(calc.rackCount, "ряд", "ряда", "рядов")} × ${formatSmart(calc.growLengthPerLane)} м · ${formatSmart(calc.heightProfile.tiers)} ${pluralize(calc.heightProfile.tiers, "ярус", "яруса", "ярусов")}`;
 }
 
+function formatLaborSummary(calc) {
+  const labor = calc.labor || {};
+  if (labor.mode === "hire") {
+    return [
+      `Гровер: ${formatSmart(labor.growerHoursPerDay)} ч/день · ${formatSmart(labor.growerDaysPerWeek)} дн/нед`,
+      `Ухожер: ${formatSmart(labor.helperHoursPerDay)} ч/день · ${formatSmart(labor.helperDaysPerWeek)} дн/нед`
+    ];
+  }
+  if (labor.mode === "hybrid") {
+    return [
+      `Владелец: ${formatSmart(labor.ownerHoursPerDay)} ч/день · ${formatSmart(labor.ownerDaysPerWeek)} дн/нед`,
+      `Ухожер: ${formatSmart(labor.helperHoursPerDay)} ч/день · ${formatSmart(labor.helperDaysPerWeek)} дн/нед`
+    ];
+  }
+  return [`Самостоятельно: ${formatSmart(labor.ownerHoursPerDay)} ч/день · ${formatSmart(labor.ownerDaysPerWeek)} дн/нед`];
+}
+
+function formatLaborRecommendation(calc) {
+  const plantCount = Number(calc.plantCount || 0);
+  if (plantCount < 1000) {
+    return "(рекомендация: сам)";
+  }
+  if (plantCount <= 3000) {
+    return "(рекомендация: гибрид)";
+  }
+  return "(рекомендация: найм)";
+}
+
+function formatLaborSchedule(labor = {}) {
+  return `${formatSmart(labor.hoursPerDay)} ч/день · ${formatSmart(labor.daysPerWeek)} дн/нед · ${formatSmart(labor.workingDaysPerMonth)} раб.дн/мес`;
+}
+
 function renderSummary(calc) {
   const sizeLabel = `${formatSmart(calc.width)} × ${formatSmart(calc.length)} м`;
 
@@ -1014,7 +1090,8 @@ function renderSummary(calc) {
     { label: "Формат", value: `${sizeLabel} · ${formatSmart(calc.width * calc.length)} м²` },
     { label: "Конфигурация", value: formatRackConfiguration(calc) },
     { label: "Растений", value: formatSmart(calc.plantCount) },
-    { label: getCropCopy(calc).monthlyYieldLabel, value: `${formatSmart(calc.monthlyProduceKg)} кг/мес` }
+    { label: getCropCopy(calc).monthlyYieldLabel, value: `${formatSmart(calc.monthlyProduceKg)} кг/мес` },
+    { label: "Работа", value: formatLaborSummary(calc), className: "is-work-summary" }
   ].map(renderSummaryItem).join("");
 
   const selectedLineItems = calc.lineItems.filter((item) => item.included);
@@ -1143,6 +1220,23 @@ function renderDetails(calc) {
   const netMonthReal = Number.isFinite(economy.netMonthReal)
     ? economy.netMonthReal
     : roundToStep(revenueMonthReal - (calc.monthlyOperatingCost || 0), 1, "nearest");
+  const netYearReal = Number.isFinite(economy.netYearReal)
+    ? economy.netYearReal
+    : roundToStep(revenueYearReal - (calc.monthlyOperatingCost || 0) * 12, 1, "nearest");
+  const breakEvenMonthlyKg = Number.isFinite(economy.breakEvenMonthlyKg)
+    ? economy.breakEvenMonthlyKg
+    : calc.salePricePerKg > 0
+      ? roundToStep((calc.monthlyOperatingCost || 0) / calc.salePricePerKg, 0.1, "nearest")
+      : null;
+  const breakEvenMonthlyText = Number.isFinite(breakEvenMonthlyKg)
+    ? `${formatSmart(breakEvenMonthlyKg)} кг/мес`
+    : "Не считается";
+  const roiYearReal = calc.totalEquipmentCost > 0
+    ? roundToStep((netYearReal / calc.totalEquipmentCost) * 100, 0.1, "nearest")
+    : null;
+  const roiYearText = Number.isFinite(roiYearReal)
+    ? `${formatSmart(roiYearReal)}%`
+    : "Не считается";
   const paybackText = Number.isFinite(economy.paybackMonthsReal)
     ? `${formatSmart(economy.paybackMonthsReal)} мес`
     : "Не рассчитывается";
@@ -1167,8 +1261,14 @@ function renderDetails(calc) {
   if (elements.economyOpexRent) {
     elements.economyOpexRent.textContent = formatRub(calc.monthlyRentCost);
   }
+  if (elements.economyOpexLabor) {
+    elements.economyOpexLabor.textContent = formatRub(calc.monthlyLaborCost);
+  }
   if (elements.economyBerryKg) {
     elements.economyBerryKg.textContent = `${formatSmart(produceKgPerMonth)} кг`;
+  }
+  if (elements.economyBreakEvenKg) {
+    elements.economyBreakEvenKg.textContent = breakEvenMonthlyText;
   }
   if (elements.economyRevenueMonthReal) {
     elements.economyRevenueMonthReal.textContent = formatRub(revenueMonthReal);
@@ -1178,6 +1278,9 @@ function renderDetails(calc) {
   }
   if (elements.economyNetMonthReal) {
     elements.economyNetMonthReal.textContent = formatRub(netMonthReal);
+  }
+  if (elements.economyRoiReal) {
+    elements.economyRoiReal.textContent = roiYearText;
   }
   if (elements.economyPaybackReal) {
     elements.economyPaybackReal.textContent = paybackText;
@@ -1263,7 +1366,7 @@ function renderDetails(calc) {
       `Кабель до стеллажей: ${formatSmart(calc.electrical.totalLightLines)} линий по ${formatSmart(calc.electrical.oneLightLineM)} м. По схеме "${calc.electrical.cableLayoutLabel}" это даёт около ${formatSmart(calc.electrical.allLightLinesM)} м силового кабеля света${calc.rackRunCount > 1 ? ` с учётом проходов между прогонами по ${formatSmart(calc.serviceGapLength)} м` : ""}.`,
       `Вытяжка: до ${formatSmart(calc.electrical.exhaustPowerW / 1000)} кВт, кабель около ${formatSmart(calc.electrical.exhaustLineM)} м. Сервисная группа: ${formatSmart(calc.electrical.serviceSocketPoints)} точек, резерв ${formatSmart(calc.electrical.serviceReserveW / 1000)} кВт, кабель около ${formatSmart(calc.electrical.serviceLineM)} м.`
       ,
-      `Расход на месяц: ${formatSmart(calc.electrical.monthlyKwh)} кВт⋅ч · ${formatRub(calc.electrical.monthlyPowerCost)} (свет: ${formatSmart(energy.lightKwhPerDay || 0)} кВт⋅ч/день, кондер: ${formatSmart(energy.condenserKwhPerDay || 0)} кВт⋅ч/день, вытяжка: ${formatSmart(energy.exhaustKwhPerDay || 0)} кВт⋅ч/день, насос: ${formatSmart(energy.pumpKwhPerDay || 0)} кВт⋅ч/день, автоматика: ${formatSmart(energy.automationKwhPerDay || 0)} кВт⋅ч/день), вода: ${formatSmart(calc.water.monthlyM3)} м³ · ${formatRub(calc.water.monthlyWaterCost)}, аренда: ${formatRub(calc.monthlyRentCost)}, всего: ${formatRub(calc.monthlyOperatingCost)}.`
+      `Расход на месяц: ${formatSmart(calc.electrical.monthlyKwh)} кВт⋅ч · ${formatRub(calc.electrical.monthlyPowerCost)} (свет: ${formatSmart(energy.lightKwhPerDay || 0)} кВт⋅ч/день, кондер: ${formatSmart(energy.condenserKwhPerDay || 0)} кВт⋅ч/день, вытяжка: ${formatSmart(energy.exhaustKwhPerDay || 0)} кВт⋅ч/день, насос: ${formatSmart(energy.pumpKwhPerDay || 0)} кВт⋅ч/день, автоматика: ${formatSmart(energy.automationKwhPerDay || 0)} кВт⋅ч/день), вода: ${formatSmart(calc.water.monthlyM3)} м³ · ${formatRub(calc.water.monthlyWaterCost)}, аренда: ${formatRub(calc.monthlyRentCost)}, работа: ${formatRub(calc.monthlyLaborCost)}, всего: ${formatRub(calc.monthlyOperatingCost)}.`
     ].concat(
       calc.electrical.splitInputW
         ? [`Сплит: холодопроизводительность около ${formatSmart(calc.electrical.splitBtu)} BTU/h, потребление примерно ${formatSmart(calc.electrical.splitInputW / 1000)} кВт, кабель около ${formatSmart(calc.electrical.splitLineM)} м.`]
@@ -1289,6 +1392,23 @@ function resolveEconomyReport(calc) {
   const netMonthReal = Number.isFinite(economy.netMonthReal)
     ? economy.netMonthReal
     : roundToStep(revenueMonthReal - (calc.monthlyOperatingCost || 0), 1, "nearest");
+  const netYearReal = Number.isFinite(economy.netYearReal)
+    ? economy.netYearReal
+    : roundToStep(revenueYearReal - (calc.monthlyOperatingCost || 0) * 12, 1, "nearest");
+  const breakEvenMonthlyKg = Number.isFinite(economy.breakEvenMonthlyKg)
+    ? economy.breakEvenMonthlyKg
+    : calc.salePricePerKg > 0
+      ? roundToStep((calc.monthlyOperatingCost || 0) / calc.salePricePerKg, 0.1, "nearest")
+      : null;
+  const breakEvenMonthlyText = Number.isFinite(breakEvenMonthlyKg)
+    ? `${formatSmart(breakEvenMonthlyKg)} кг/мес`
+    : "Не считается";
+  const roiYearReal = calc.totalEquipmentCost > 0
+    ? roundToStep((netYearReal / calc.totalEquipmentCost) * 100, 0.1, "nearest")
+    : null;
+  const roiYearText = Number.isFinite(roiYearReal)
+    ? `${formatSmart(roiYearReal)}%`
+    : "Не считается";
   const paybackText = Number.isFinite(economy.paybackMonthsReal)
     ? `${formatSmart(economy.paybackMonthsReal)} мес`
     : "Не рассчитывается";
@@ -1298,6 +1418,11 @@ function resolveEconomyReport(calc) {
     revenueMonthReal,
     revenueYearReal,
     netMonthReal,
+    netYearReal,
+    breakEvenMonthlyKg,
+    breakEvenMonthlyText,
+    roiYearReal,
+    roiYearText,
     paybackText,
     scenarios: Array.isArray(economy.scenarios) ? economy.scenarios : []
   };
@@ -1392,10 +1517,14 @@ function setDebugGlobalError(value) {
 }
 
 function renderSummaryItem(item) {
+  const className = item.className ? ` ${item.className}` : "";
+  const value = Array.isArray(item.value)
+    ? `<span class="work-summary-lines">${item.value.map((line) => `<em>${line}</em>`).join("")}</span>`
+    : item.value;
   return `
-    <div class="summary-item">
+    <div class="summary-item${className}">
       <span>${item.label}</span>
-      <strong>${item.value}</strong>
+      <strong>${value}</strong>
     </div>
   `;
 }

@@ -52,6 +52,51 @@ export const CONTROL_CONFIG = [
     max: 100000,
     step: 50,
     note: "Цена реализации ягоды для расчёта выручки."
+  },
+  {
+    key: "a6",
+    label: "Ваше время",
+    unit: "ч/день",
+    min: 0,
+    max: 12,
+    step: 0.5,
+    note: "Личное участие владельца в ежедневных операциях."
+  },
+  {
+    key: "a7",
+    label: "Помощник",
+    unit: "ч/день",
+    min: 0,
+    max: 12,
+    step: 0.5,
+    note: "Время помощника на сбор, уборку, осмотр и обслуживание."
+  },
+  {
+    key: "a8",
+    label: "Ставка",
+    unit: "руб/час",
+    min: 0,
+    max: 5000,
+    step: 50,
+    note: "Почасовая ставка помощника."
+  },
+  {
+    key: "a9",
+    label: "Зарплата",
+    unit: "руб/мес",
+    min: 0,
+    max: 500000,
+    step: 5000,
+    note: "Месячный фонд оплаты при найме."
+  },
+  {
+    key: "a10",
+    label: "Дней",
+    unit: "дней/мес",
+    min: 0,
+    max: 31,
+    step: 1,
+    note: "Сколько дней в месяц требуется регулярная работа."
   }
 ];
 
@@ -99,6 +144,12 @@ export function createDefaultState(loadedPricing) {
     a3: normalizeInputValue(loadedPricing.inputs.a3, CONTROL_CONFIG[3]),
     a4: normalizeInputValue(loadedPricing.inputs.a4, CONTROL_CONFIG[4]),
     a5: normalizeInputValue(loadedPricing.inputs.a5, CONTROL_CONFIG[5]),
+    a6: normalizeInputValue(loadedPricing.inputs.a6 ?? 1.5, CONTROL_CONFIG[6]),
+    a7: normalizeInputValue(loadedPricing.inputs.a7 ?? 4, CONTROL_CONFIG[7]),
+    a8: normalizeInputValue(loadedPricing.inputs.a8 ?? 250, CONTROL_CONFIG[8]),
+    a9: normalizeInputValue(loadedPricing.inputs.a9 ?? 45000, CONTROL_CONFIG[9]),
+    a10: normalizeInputValue(loadedPricing.inputs.a10 ?? 30, CONTROL_CONFIG[10]),
+    workMode: "hybrid",
     phaseMode: "three-phase",
     cableLayoutMode: "tray",
     ...optionDefaults
@@ -158,6 +209,7 @@ export function calculateFarm(currentState, loadedPricing) {
   const plantCount = cropProfile.plantsPerMat > 0
     ? matCount * cropProfile.plantsPerMat
     : trayCount * trayKit.plantsPerTray;
+  const labor = calculateLaborModel(currentState, { plantCount });
   const cubeCount = plantCount * cropProfile.cubesPerPlant;
   const blindTubeCoils = Math.max(1, Math.ceil(blindTubeMeters / purchaseUnits.blindTubeCoilMeters));
   const blindTubeMetersForPurchase = blindTubeCoils * purchaseUnits.blindTubeCoilMeters;
@@ -192,7 +244,7 @@ export function calculateFarm(currentState, loadedPricing) {
     )
   );
   const monthlyRentCost = Math.max(0, roundToStep(area * rentRate, 1, "nearest"));
-  const monthlyOperatingCost = monthlyRentCost + electrical.monthlyPowerCost + water.monthlyWaterCost;
+  const monthlyOperatingCost = monthlyRentCost + electrical.monthlyPowerCost + water.monthlyWaterCost + labor.monthlyLaborCost;
 
   const baseAssemblyTotal = plantCount * loadedPricing.constants.assemblyPerPlant;
   const lineItems = buildBaseAssemblyLineItems({
@@ -297,7 +349,9 @@ export function calculateFarm(currentState, loadedPricing) {
     monthlyProduceKg,
     monthlyBerryKg: monthlyProduceKg,
     monthlyRentCost,
+    monthlyLaborCost: labor.monthlyLaborCost,
     monthlyOperatingCost,
+    labor,
     economy,
     baseAssemblyIncludes: loadedPricing.baseAssemblyIncludes || [],
     lineItems,
@@ -463,6 +517,94 @@ function calculateWaterModel(context) {
     monthlyLiters,
     monthlyM3,
     monthlyWaterCost
+  };
+}
+
+function calculateLaborModel(currentState, metrics = {}) {
+  const plantCount = Math.max(0, Number(metrics.plantCount || 0));
+  const recommendedMode = plantCount < 1000 ? "self" : plantCount <= 3000 ? "hybrid" : "hire";
+  const mode = currentState.workModeManual && ["self", "hybrid", "hire"].includes(currentState.workMode)
+    ? currentState.workMode
+    : recommendedMode;
+  const ownerWeeklyHours = plantCount < 1000 ? plantCount * 30 / 1000 : 15;
+  const ownerSchedule = {
+    hoursPerDay: roundToStep(ownerWeeklyHours / 5, 0.5, "nearest"),
+    daysPerWeek: ownerWeeklyHours > 0 ? 5 : 0,
+    workingDaysPerMonth: ownerWeeklyHours > 0 ? 22 : 0
+  };
+  const helperHoursPerDayAuto = plantCount >= 1000
+    ? roundToStep(Math.min(8, plantCount * 8 / 3000), 0.5, "nearest")
+    : 0;
+  const helperSchedule = {
+    hoursPerDay: helperHoursPerDayAuto,
+    daysPerWeek: helperHoursPerDayAuto > 0 ? 5 : 0,
+    workingDaysPerMonth: helperHoursPerDayAuto > 0 ? 22 : 0
+  };
+  const hireSchedule = {
+    hoursPerDay: 8,
+    daysPerWeek: 5,
+    workingDaysPerMonth: 22
+  };
+  const employeeFte = roundToStep(plantCount / 3000, 0.05, "nearest");
+  const activeSchedule = mode === "self" ? ownerSchedule : helperSchedule;
+  const ownerHoursPerDay = mode === "self" || mode === "hybrid" ? ownerSchedule.hoursPerDay : 0;
+  const growerHoursPerDay = mode === "hire" ? ownerSchedule.hoursPerDay : 0;
+  const helperHoursPerDay = mode === "hybrid" || mode === "hire" ? helperSchedule.hoursPerDay : 0;
+  const helperRatePerHour = normalizeInputValue(currentState.a8, CONTROL_CONFIG[8]);
+  const salaryPerMonth = normalizeInputValue(currentState.a9, CONTROL_CONFIG[9]);
+  const daysPerMonth = activeSchedule.workingDaysPerMonth;
+  const monthlyLaborCost = mode === "hire"
+    ? Math.max(0, roundToStep(salaryPerMonth * employeeFte, 1, "nearest"))
+    : mode === "hybrid"
+      ? Math.max(0, roundToStep(helperHoursPerDay * helperRatePerHour * daysPerMonth, 1, "nearest"))
+      : 0;
+  const modeLabel = mode === "hire" ? "Найм" : mode === "hybrid" ? "Гибрид" : "Сам";
+  const note = mode === "hire"
+    ? "Ферма меньше зависит от владельца, но требует ежемесячного фонда оплаты."
+    : mode === "hybrid"
+      ? "Владелец контролирует процесс, помощник закрывает регулярную рутину."
+      : "Денежных затрат на персонал нет, но ферма требует регулярного личного времени.";
+
+  return {
+    mode,
+    modeLabel,
+    recommendedMode,
+    employeeFte,
+    ownerHoursPerDay,
+    ownerDaysPerWeek: ownerSchedule.daysPerWeek,
+    ownerWorkingDaysPerMonth: ownerSchedule.workingDaysPerMonth,
+    growerHoursPerDay,
+    growerDaysPerWeek: ownerSchedule.daysPerWeek,
+    growerWorkingDaysPerMonth: ownerSchedule.workingDaysPerMonth,
+    helperHoursPerDay,
+    helperDaysPerWeek: helperSchedule.daysPerWeek,
+    helperWorkingDaysPerMonth: helperSchedule.workingDaysPerMonth,
+    hoursPerDay: activeSchedule.hoursPerDay,
+    daysPerWeek: activeSchedule.daysPerWeek,
+    workingDaysPerMonth: activeSchedule.workingDaysPerMonth,
+    helperRatePerHour,
+    salaryPerMonth,
+    daysPerMonth,
+    monthlyLaborCost,
+    note
+  };
+}
+
+function resolveLaborSchedule(weeklyHours) {
+  const safeWeeklyHours = Math.max(0, Number(weeklyHours || 0));
+  if (!safeWeeklyHours) {
+    return {
+      hoursPerDay: 0,
+      daysPerWeek: 0,
+      workingDaysPerMonth: 0
+    };
+  }
+  const daysPerWeek = Math.min(5, Math.max(1, Math.ceil(safeWeeklyHours / 8)));
+
+  return {
+    hoursPerDay: roundToStep(safeWeeklyHours / daysPerWeek, 0.5, "nearest"),
+    daysPerWeek,
+    workingDaysPerMonth: Math.max(1, Math.round(daysPerWeek * 4.33))
   };
 }
 
@@ -1010,15 +1152,22 @@ function calculateLegacyEconomy(context) {
   const pessimisticYieldPerPlant = isCucumber
     ? normalizeNonNegativeNumber(economyProfile.pessimisticKgPerPlantPerMonth, 1) * heightYieldCoeff
     : normalizeNonNegativeNumber(economyProfile.pessimisticGramsPerPlantPerMonth, 60) / 1000;
+  const harvestStartMonth = normalizeNonNegativeInteger(economyProfile.harvestStartMonth, 6, 12);
+  const monthsBeforeHarvest = Math.max(0, harvestStartMonth - 1);
+  const productiveMonthsYear = Math.max(0, 12 - monthsBeforeHarvest);
+  const breakEvenMonthlyKg = salePricePerKg > 0
+    ? roundToStep(monthlyOperatingCost / salePricePerKg, 0.1, "nearest")
+    : null;
 
   const buildScenario = (id, label, yieldPerPlantPerMonthKg) => {
     const monthlyYieldKg = roundToStep(plantCount * yieldPerPlantPerMonthKg, 0.1, "nearest");
-    const annualYieldKg = roundToStep(monthlyYieldKg * 12, 0.1, "nearest");
+    const annualYieldKg = roundToStep(monthlyYieldKg * productiveMonthsYear, 0.1, "nearest");
     const revenueMonth = roundToStep(monthlyYieldKg * salePricePerKg, 1, "nearest");
-    const revenueYear = roundToStep(revenueMonth * 12, 1, "nearest");
+    const revenueYear = roundToStep(revenueMonth * productiveMonthsYear, 1, "nearest");
     const netMonth = roundToStep(revenueMonth - monthlyOperatingCost, 1, "nearest");
-    const netYear = roundToStep(netMonth * 12, 1, "nearest");
-    const paybackMonths = netMonth > 0 ? Math.ceil(totalEquipmentCost / netMonth) : null;
+    const netYear = roundToStep(revenueYear - monthlyOperatingCost * 12, 1, "nearest");
+    const capitalBeforeHarvest = totalEquipmentCost + monthlyOperatingCost * monthsBeforeHarvest;
+    const paybackMonths = netMonth > 0 ? monthsBeforeHarvest + Math.ceil(capitalBeforeHarvest / netMonth) : null;
     const paybackYears = Number.isFinite(paybackMonths)
       ? roundToStep(paybackMonths / 12, 0.1, "nearest")
       : null;
@@ -1044,12 +1193,16 @@ function calculateLegacyEconomy(context) {
     buildScenario("pessimistic", "Пессимистичный", pessimisticYieldPerPlant)
   ];
   const realistic = scenarios.find((item) => item.id === "realistic") || scenarios[1];
-  const realisticYieldKgPerPlantPerYear = roundToStep(realistic.yieldPerPlantPerMonthKg * 12, 0.01, "nearest");
+  const realisticYieldKgPerPlantPerYear = roundToStep(realistic.yieldPerPlantPerMonthKg * productiveMonthsYear, 0.01, "nearest");
 
   return {
-    scenarios,
-    heightYieldCoeff,
-    realisticYieldKgPerPlantPerYear,
+	    scenarios,
+	    heightYieldCoeff,
+    harvestStartMonth,
+    monthsBeforeHarvest,
+    productiveMonthsYear,
+    breakEvenMonthlyKg,
+	    realisticYieldKgPerPlantPerYear,
     annualYieldKgReal: realistic.annualYieldKg,
     monthlyYieldKgReal: realistic.monthlyYieldKg,
     revenueMonthReal: realistic.revenueMonth,
