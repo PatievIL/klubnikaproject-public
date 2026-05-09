@@ -4,7 +4,7 @@ import {
   getProductPageData,
   parseCategorySearchParams,
 } from "./catalog-data.mjs";
-import { renderCatalogApp } from "./catalog-renderers.mjs";
+import { renderCatalogApp } from "./catalog-renderers.mjs?v=20260509footer1";
 
 const CART_KEY = "klubnika.catalog.cart.v1";
 const REVIEW_KEY = "klubnika.catalog.reviews.v1";

@@ -1261,27 +1261,57 @@ function renderHowBuy(ctx) {
 
 function renderFooter(ctx, state) {
   return `
-    <footer class="catalog-footer" id="catalog-contacts">
-      <div class="catalog-footer__shell">
-        <div class="catalog-footer__meta">
-          <div class="catalog-footer__copy">© ${escapeHtml(CATALOG_META.brandName)}</div>
-          <div class="catalog-footer__links">
-          <a href="${resolveHref(ctx, "/docs/policy/")}">Политика</a>
-          <a href="${resolveHref(ctx, "/docs/offero/")}">Оферта</a>
-          <a href="${resolveHref(ctx, "/docs/warrenty/")}">Гарантия</a>
-          </div>
+    <footer class="home-footer" id="footer" aria-label="Подвал сайта">
+      <div class="home-footer-inner">
+        <div class="home-footer-lead">
+          <a class="home-footer-logo" href="${resolveHref(ctx, "/")}" aria-label="Klubnika Project">
+            <img src="${resolveHref(ctx, "/assets/logo/klubnika-project-logo-green.svg")}" alt="Klubnika Project" />
+          </a>
         </div>
-        <div class="catalog-footer__contacts">
-          ${CATALOG_META.phones.map((phone) => `<a href="${phone.href}">${phone.value}</a>`).join("\n          ")}
-          <a href="mailto:${CATALOG_META.email}">${CATALOG_META.email}</a>
-          ${CATALOG_META.socialLinks
-            .map((item) => `<a href="${escapeHtml(item.href)}" target="_blank" rel="noreferrer">${escapeHtml(item.label)}</a>`)
-            .join("\n          ")}
-          <span>${escapeHtml(CATALOG_META.address)}</span>
+
+        <nav class="home-footer-columns" aria-label="Навигация подвала">
+          <div>
+            <span>Маршруты</span>
+            <a href="${resolveHref(ctx, "/calc/")}">Калькулятор</a>
+            <a href="${resolveHref(ctx, "/catalog/")}">Каталог решений</a>
+            <a href="${resolveHref(ctx, "/klubhack/")}">Клубничный Хак</a>
+            <a href="${resolveHref(ctx, "/consultations/")}">Консультации</a>
+            <a href="${resolveHref(ctx, "/cabinet/")}">Кабинет</a>
+          </div>
+          <div>
+            <span>Система фермы</span>
+            <a href="${resolveHref(ctx, "/catalog/led/")}">Свет</a>
+            <a href="${resolveHref(ctx, "/catalog/irrigation/")}">Полив</a>
+            <a href="${resolveHref(ctx, "/catalog/racks/")}">Стеллажи</a>
+            <a href="${resolveHref(ctx, "/seeds/")}">Посадочный материал</a>
+          </div>
+          <div>
+            <span>Связь</span>
+            ${CATALOG_META.phones.map((phone) => `<a href="${phone.href}">${phone.value}</a>`).join("\n            ")}
+            <a href="mailto:${CATALOG_META.email}">${CATALOG_META.email}</a>
+            <a href="https://wa.me/79891250150" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+            <a href="https://www.youtube.com/@Ilya_patiev" target="_blank" rel="noopener noreferrer">YouTube</a>
+          </div>
+          <div>
+            <span>Документы</span>
+            <a href="${resolveHref(ctx, "/docs/policy/")}">Политика конфиденциальности</a>
+            <a href="${resolveHref(ctx, "/docs/offero/")}">Оферта</a>
+            <a href="${resolveHref(ctx, "/docs/warrenty/")}">Гарантия</a>
+            <a href="${resolveHref(ctx, "/docs/consent/")}">Согласие на обработку ПД</a>
+          </div>
+        </nav>
+
+        <div class="home-footer-bottom">
+          <span>${escapeHtml(CATALOG_META.brandName)}, 2026</span>
+          <span>Работаем по России и СНГ</span>
         </div>
       </div>
     </footer>
   `;
+}
+
+function renderSharedFooterStyles(ctx) {
+  return `<link rel="stylesheet" href="${resolveHref(ctx, "/assets/css/kp-footer.css?v=20260427a")}" />`;
 }
 
 function renderSearchPanel(ctx, state) {
@@ -1609,6 +1639,7 @@ export function renderCatalogApp(ctx, rawState = {}) {
         ${pageMarkup}
         ${renderHowBuy(ctx)}
       </main>
+      ${renderSharedFooterStyles(ctx)}
       ${renderFooter(ctx, state)}
       ${renderFloatingAssistant()}
       ${renderSearchPanel(ctx, state)}
