@@ -256,24 +256,19 @@ function clearSessionTokens() {
 }
 
 async function fetchActiveSession() {
-  const accountOrder = readStoredSessionToken("admin") && !readStoredSessionToken("member")
-    ? ["admin", "member"]
-    : ["member", "admin"];
-
-  for (const accountType of accountOrder) {
-    const sessionUrl = accountType === "admin" ? `${apiBase()}/admin/auth/session` : `${apiBase()}/auth/session`;
-    const policyUrl = accountType === "admin" ? `${apiBase()}/admin/auth/access-policy` : `${apiBase()}/auth/access-policy`;
-    const sessionResult = await fetchJson(sessionUrl);
-    if (!sessionResult.ok) continue;
-    const policy = await fetchJson(policyUrl);
-    return {
-      ok: true,
-      accountType,
-      user: sessionResult.data.user,
-      policy: policy.ok ? policy.data.policy || {} : {},
-    };
-  }
-  return null;
+  const accountType = "member";
+  storeSessionToken("admin", "");
+  const sessionUrl = `${apiBase()}/auth/session`;
+  const policyUrl = `${apiBase()}/auth/access-policy`;
+  const sessionResult = await fetchJson(sessionUrl);
+  if (!sessionResult.ok) return null;
+  const policy = await fetchJson(policyUrl);
+  return {
+    ok: true,
+    accountType,
+    user: sessionResult.data.user,
+    policy: policy.ok ? policy.data.policy || {} : {},
+  };
 }
 
 function bindLogin() {
@@ -292,15 +287,14 @@ function bindLogin() {
 
     if (status) status.textContent = "Проверяем логин и открываем кабинет…";
 
-    const attempts = login.toLowerCase() === "admin" ? ["admin", "member"] : ["member", "admin"];
-    for (const accountType of attempts) {
-      const loginUrl = accountType === "admin" ? `${apiBase()}/admin/auth/password-login` : `${apiBase()}/auth/login`;
-      const result = await fetchJson(loginUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ login, password }),
-      });
-      if (!result.ok) continue;
+    const accountType = "member";
+    const loginUrl = `${apiBase()}/auth/login`;
+    const result = await fetchJson(loginUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ login, password }),
+    });
+    if (result.ok) {
       storeSessionToken(accountType, result.data?.session_token || "");
       storeSessionToken(accountType === "admin" ? "member" : "admin", "");
       const session = await fetchActiveSession();
