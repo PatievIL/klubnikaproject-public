@@ -17,6 +17,7 @@
 .legal-hero {
   display: grid;
   gap: 12px;
+  width: 100%;
   max-width: 760px;
   margin: 0 auto;
   padding: 30px 34px;
@@ -33,6 +34,7 @@
   line-height: 1;
   letter-spacing: -0.04em;
   text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
 .legal-hero p {
@@ -100,6 +102,7 @@
 
   .legal-hero h1 {
     font-size: clamp(1.65rem, 10vw, 2.6rem);
+    letter-spacing: 0;
   }
 
   .legal-richtext {

@@ -1,4 +1,5 @@
 const SITE_ADMIN_STORAGE_KEY = "klubnikaproject.site.admin.draft.v1";
+const CANONICAL_SUPPORT_EMAIL = "info@klubnikaproject.ru";
 
 function withStaticIndexPath(path) {
   if (!path) return path;
@@ -22,7 +23,7 @@ const SITE_ADMIN_DEFAULTS = {
   site: {
     supportTelegram: "@patiev_admin",
     supportTelegramUrl: "https://t.me/patiev_admin",
-    supportEmail: "info@klubnikaproject.ru",
+    supportEmail: CANONICAL_SUPPORT_EMAIL,
     supportWhatsapp: "https://wa.me/79891250150",
     supportInstagramUrl: "https://www.instagram.com/ilya_patiev/",
     supportYoutubeUrl: "https://www.youtube.com/@Ilya_patiev",
@@ -234,12 +235,18 @@ function bindLazyVideoEmbeds() {
 function loadSiteAdminConfig() {
   try {
     const raw = window.localStorage.getItem(SITE_ADMIN_STORAGE_KEY);
-    if (!raw) return cloneConfig(SITE_ADMIN_DEFAULTS);
+    if (!raw) return normalizeSiteConfig(cloneConfig(SITE_ADMIN_DEFAULTS));
     const parsed = JSON.parse(raw);
-    return mergeConfig(cloneConfig(SITE_ADMIN_DEFAULTS), parsed);
+    return normalizeSiteConfig(mergeConfig(cloneConfig(SITE_ADMIN_DEFAULTS), parsed));
   } catch (error) {
-    return cloneConfig(SITE_ADMIN_DEFAULTS);
+    return normalizeSiteConfig(cloneConfig(SITE_ADMIN_DEFAULTS));
   }
+}
+
+function normalizeSiteConfig(config) {
+  if (!config.site) config.site = {};
+  config.site.supportEmail = CANONICAL_SUPPORT_EMAIL;
+  return config;
 }
 
 function mergeConfig(base, patch) {
@@ -342,7 +349,7 @@ function ensureSharedFooterStyles(root) {
 }
 
 function applyGlobalContactLayer(config) {
-  const supportEmail = config.site.supportEmail || "info@klubnikaproject.ru";
+  const supportEmail = CANONICAL_SUPPORT_EMAIL;
   const supportWhatsapp = config.site.supportWhatsapp || "https://wa.me/79891250150";
   const telegramHref = config.site.supportTelegramUrl || "https://t.me/patiev_admin";
   const telegramHandle = config.site.supportTelegram || "@patiev_admin";

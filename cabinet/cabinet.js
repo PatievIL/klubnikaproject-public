@@ -1,4 +1,5 @@
 const SITE_ADMIN_BACKEND_CACHE_KEY = "klubnikaproject.site.backend.settings.v1";
+const CANONICAL_SUPPORT_EMAIL = "info@klubnikaproject.ru";
 const CATALOG_CART_STORAGE_KEY = "klubnika.catalog.cart.v1";
 const MEMBER_SAVED_STORAGE_KEY = "klubnikaproject.cabinet.saved.v1";
 const MEMBER_CALC_NOTES_STORAGE_KEY = "klubnikaproject.cabinet.calc-notes.v1";
@@ -10,7 +11,7 @@ const DEFAULT_SETTINGS = {
   site: {
     projectName: "Klubnika Project",
     supportPhone: "+7 925 583-16-69",
-    supportEmail: "info@klubnikaproject.ru",
+    supportEmail: CANONICAL_SUPPORT_EMAIL,
     supportTelegram: "@patiev_admin",
     supportTelegramUrl: "https://t.me/patiev_admin",
   },
@@ -150,11 +151,17 @@ function merge(base, patch) {
 function loadCachedSettings() {
   try {
     const raw = window.localStorage.getItem(SITE_ADMIN_BACKEND_CACHE_KEY);
-    if (!raw) return clone(DEFAULT_SETTINGS);
-    return merge(clone(DEFAULT_SETTINGS), JSON.parse(raw));
+    if (!raw) return normalizeSettings(clone(DEFAULT_SETTINGS));
+    return normalizeSettings(merge(clone(DEFAULT_SETTINGS), JSON.parse(raw)));
   } catch {
-    return clone(DEFAULT_SETTINGS);
+    return normalizeSettings(clone(DEFAULT_SETTINGS));
   }
+}
+
+function normalizeSettings(nextSettings) {
+  if (!nextSettings.site) nextSettings.site = {};
+  nextSettings.site.supportEmail = CANONICAL_SUPPORT_EMAIL;
+  return nextSettings;
 }
 
 async function refreshSettings() {
@@ -163,7 +170,7 @@ async function refreshSettings() {
     if (!response.ok) return;
     const payload = await response.json();
     if (!payload?.settings) return;
-    settings = merge(clone(DEFAULT_SETTINGS), payload.settings);
+    settings = normalizeSettings(merge(clone(DEFAULT_SETTINGS), payload.settings));
     window.localStorage.setItem(SITE_ADMIN_BACKEND_CACHE_KEY, JSON.stringify(payload.settings));
   } catch {
     // keep cached settings

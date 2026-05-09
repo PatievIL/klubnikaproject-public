@@ -1465,19 +1465,21 @@ a {
   }
 
   .compact-control {
-    grid-template-columns: minmax(42px, 1fr) max-content;
+    grid-template-columns: minmax(36px, 1fr) minmax(78px, max-content);
     gap: 4px;
     min-height: 46px;
     padding: 6px;
+    min-width: 0;
   }
 
   .control-number-wrap {
-    grid-template-columns: 18px 46px 18px;
-    width: 86px;
+    grid-template-columns: 18px minmax(38px, 1fr) 18px;
+    width: min(86px, 100%);
+    min-width: 0;
   }
 
   .control-number {
-    width: 46px;
+    width: 100%;
     font-size: 14px;
   }
 
