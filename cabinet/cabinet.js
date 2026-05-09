@@ -25,6 +25,7 @@ const routes = {
   shell: routePath("cabinet/"),
   login: routePath("cabinet/login/"),
   site: routePath(""),
+  catalog: routePath("catalog/"),
   calc: routePath("calc/"),
   consultations: routePath("consultations/"),
 };
@@ -549,7 +550,8 @@ function renderCartCard(session, entries) {
       ` : `
         <div class="account-empty">Корзина пока пустая. Если закупку нужно собрать вручную, напишите команде.</div>
         <div class="cabinet-home-actions">
-          <a class="btn btn-primary" href="${escapeAttribute(cabinetSectionHref("messages"))}">Написать по закупке</a>
+          <a class="btn btn-primary" href="${escapeAttribute(routes.catalog)}">Перейти в каталог</a>
+          <a class="btn btn-secondary" href="${escapeAttribute(cabinetSectionHref("messages"))}">Написать по закупке</a>
           <a class="btn btn-secondary" href="${escapeAttribute(routes.calc)}">Открыть калькулятор</a>
         </div>
       `}
