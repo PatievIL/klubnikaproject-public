@@ -891,7 +891,7 @@ function bindCartSection(session) {
     try {
       const catalogItems = await loadMemberCatalogItems().catch(() => []);
       const lineItems = cartEntries.map(([productId, qty]) => {
-        const product = catalogItems.find((item) => item.id === productId) || { id: productId, title: productId };
+        const product = normalizeCartProduct(productId, findCatalogCartItem(productId, catalogItems));
         return {
           product_id: product.id,
           title: product.title || product.name || product.id,
@@ -1087,7 +1087,7 @@ function saveSaved(session, items) {
 function buildCartEntries(catalogItems = []) {
   return Object.entries(loadCart())
     .map(([productId, qty]) => {
-      const product = catalogItems.find((item) => item.id === productId) || { id: productId, title: productId };
+      const product = normalizeCartProduct(productId, findCatalogCartItem(productId, catalogItems));
       return { product, qty: Number(qty) || 0 };
     })
     .filter((entry) => entry.qty > 0);
@@ -1095,8 +1095,35 @@ function buildCartEntries(catalogItems = []) {
 
 function buildSavedItems(session, catalogItems = []) {
   return loadSaved(session)
-    .map((productId) => catalogItems.find((item) => item.id === productId))
+    .map((productId) => normalizeCartProduct(productId, findCatalogCartItem(productId, catalogItems)))
     .filter(Boolean);
+}
+
+function findCatalogCartItem(productId, catalogItems = []) {
+  const raw = String(productId || "").trim();
+  const productSlug = raw.replace(/^prod-/, "");
+  const apiSlug = `catalog-product-${productSlug}`;
+  return catalogItems.find((item) => {
+    const pathSlug = String(item.path || "").split("/").filter(Boolean).at(-1) || "";
+    return [item.id, item.slug, item.product_id, pathSlug].map((value) => String(value || "")).some((value) => (
+      value === raw || value === productSlug || value === apiSlug
+    ));
+  }) || null;
+}
+
+function normalizeCartProduct(productId, item) {
+  if (!item) {
+    return { id: productId, title: humanizeCartProductId(productId), summary: "", category: "" };
+  }
+  return { ...item, id: productId };
+}
+
+function humanizeCartProductId(productId) {
+  return String(productId || "Позиция")
+    .replace(/^prod-/, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function loadCalculationNotes(session) {
@@ -1322,13 +1349,32 @@ function humanizeDocumentStatus(status) {
 function humanizeCategory(value) {
   const labels = {
     led: "Освещение",
+    "linear-led": "Линейный свет",
+    "greenhouse-led": "Тепличный свет",
     irrigation: "Полив",
+    drippers: "Капельницы",
+    fittings: "Фитинги",
+    "irrigation-kits": "Наборы полива",
     racks: "Стеллажи",
+    "rack-frames": "Каркасы",
+    "trays-gutters": "Лотки",
     substrates: "Субстрат",
+    "substrate-slabs": "Субстратные маты",
+    "propagation-plugs": "Кубики и пробки",
     "planting-material": "Посадочный материал",
+    "frigo-plants": "Frigo-рассада",
+    "seed-series": "Семена",
     climate: "Климат",
+    "air-circulation": "Воздухообмен",
+    humidification: "Увлажнение",
+    nutrition: "Питание",
+    "base-nutrition": "Базовое питание",
+    "ph-ec-control": "pH/EC",
+    monitoring: "Мониторинг",
     sensors: "Датчики",
     controllers: "Автоматика",
+    packaging: "Упаковка",
+    "consumer-packaging": "Потребительская упаковка",
   };
   const normalized = String(value || "").trim().toLowerCase();
   return labels[normalized] || String(value || "Позиция").replace(/[_-]+/g, " ");

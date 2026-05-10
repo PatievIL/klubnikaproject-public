@@ -285,6 +285,15 @@ body[data-cabinet-family="user"] {
   min-width: 0;
 }
 
+.cabinet-inline-actions .btn {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(0, 77, 43, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+}
+
 .cabinet-field-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
