@@ -3983,11 +3983,18 @@ html[data-theme="dark"] .catalog-product-footer-cta {
 
   .catalog-product-card__title {
     font-size: 15px;
-    line-height: 1.08;
+    line-height: 1.16;
+    -webkit-line-clamp: 4;
   }
 
   .catalog-product-card__summary {
     display: none;
+  }
+
+  .catalog-product-card__title {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
   }
 
   .catalog-product-card__meta {

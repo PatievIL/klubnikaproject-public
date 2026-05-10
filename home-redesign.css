@@ -2255,6 +2255,11 @@ body.motion-ready .author-section .motion-reveal {
     padding-right: 0;
   }
 
+  .hero-media img {
+    animation: none;
+    transform: none;
+  }
+
   h1 {
     max-width: 700px;
     font-size: clamp(42px, 11vw, 74px);
@@ -2377,6 +2382,10 @@ body.motion-ready .author-section .motion-reveal {
     font-size: clamp(34px, 8.6vw, 38px);
     line-height: 1.02;
     overflow-wrap: anywhere;
+  }
+
+  .nowrap {
+    white-space: normal;
   }
 
   .hero-lead {

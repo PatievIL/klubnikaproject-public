@@ -1483,6 +1483,22 @@ a {
     font-size: 14px;
   }
 
+  @media (max-width: 360px) {
+    .calc-control-grid-geometry,
+    .calc-control-grid-economy {
+      grid-template-columns: 1fr;
+    }
+
+    .compact-control {
+      grid-template-columns: minmax(76px, 1fr) minmax(104px, max-content);
+    }
+
+    .control-number-wrap {
+      grid-template-columns: 24px minmax(44px, 1fr) 24px;
+      width: 104px;
+    }
+  }
+
   .summary-grid,
   .budget-structure-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
