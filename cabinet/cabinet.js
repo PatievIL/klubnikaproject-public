@@ -850,8 +850,9 @@ function bindProfileSection(session) {
     try {
       const profile = await saveMemberProfile(payload);
       currentSession.user = { ...currentSession.user, ...profile };
-      renderUserCard(session);
-      if (status) status.textContent = "Сохранено.";
+      await rerenderCurrentSection();
+      const nextStatus = document.querySelector("[data-member-profile-status]");
+      if (nextStatus) nextStatus.textContent = "Сохранено.";
     } catch (error) {
       if (status) status.textContent = `Не сохранилось: ${cleanupError(error.message || "runtime_error")}`;
     }
