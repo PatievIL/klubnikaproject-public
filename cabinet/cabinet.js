@@ -810,9 +810,11 @@ function bindMessagesSection() {
       if (status) status.textContent = "Введите текст сообщения.";
       return;
     }
-    await sendMemberMessage({ subject, message }, status);
-    if (bodyField) bodyField.value = "";
+    const sent = await sendMemberMessage({ subject, message }, status);
+    if (!sent) return;
     await rerenderCurrentSection();
+    const nextStatus = document.querySelector("[data-member-message-status]");
+    if (nextStatus) nextStatus.textContent = "Сообщение отправлено.";
   });
 }
 
@@ -953,8 +955,10 @@ async function sendMemberMessage(payload, status, successText = "Сообщен�
   try {
     await createMemberMessage(payload);
     if (status) status.textContent = successText;
+    return true;
   } catch (error) {
     if (status) status.textContent = `Не отправилось: ${cleanupError(error.message || "runtime_error")}`;
+    return false;
   }
 }
 
