@@ -828,13 +828,15 @@ function bindCalculationsSection(session) {
       return;
     }
     const snapshot = loadLatestCalculationSnapshot();
-    await sendMemberMessage({
+    const sent = await sendMemberMessage({
       subject: "Расчёт калькулятора",
       message: buildCalculationManagerMessage(snapshot, note),
     }, status, "Пометка отправлена менеджеру.");
+    if (!sent) return;
     saveCalculationNotes(session, [{ id: `${Date.now()}`, created_at: new Date().toISOString(), note, snapshot }, ...loadCalculationNotes(session)].slice(0, 12));
-    if (noteField) noteField.value = "";
     await rerenderCurrentSection();
+    const nextStatus = document.querySelector("[data-member-calc-note-status]");
+    if (nextStatus) nextStatus.textContent = "Пометка отправлена менеджеру.";
   });
 }
 
@@ -1181,7 +1183,7 @@ function buildCalculationSnapshot(cropId, state) {
   const rentRate = Number(state.a4 || 0);
   const saleRate = Number(state.a5 || 0);
   const area = width > 0 && length > 0 ? width * length : 0;
-  const sizeLabel = width && length ? `${formatNumber(width)} x ${formatNumber(length)} м` : "размер не задан";
+  const sizeLabel = width && length ? `${formatNumber(width)} × ${formatNumber(length)} м` : "размер не задан";
   const areaLabel = area ? `${formatNumber(area)} м²` : "площадь не задана";
   const economyLabel = [
     powerRate ? `${formatRub(powerRate)}/кВт` : "",
