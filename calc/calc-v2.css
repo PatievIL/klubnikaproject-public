@@ -276,7 +276,7 @@ a {
   margin: 0;
   color: var(--green);
   font-size: clamp(30px, 3.5vw, 40px);
-  line-height: 1;
+  line-height: 1.12;
 }
 
 .calc-config-group,
