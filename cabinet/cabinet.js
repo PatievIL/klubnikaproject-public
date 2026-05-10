@@ -473,7 +473,9 @@ async function renderPurchaseSection(session) {
   const selectedOrderId = new URLSearchParams(window.location.search).get("order");
   const selectedOrder = orders.find((order) => String(order.id) === String(selectedOrderId));
   if (selectedOrder) {
-    const documents = memberHasScope(session, "documents") ? await loadMemberOrderDocuments(selectedOrder.id).catch(() => []) : [];
+    const documents = memberHasScope(session, "documents")
+      ? (await loadMemberOrderDocuments(selectedOrder.id).catch(() => [])).map((item) => ({ ...item, orderTitle: selectedOrder.title || `Заказ #${selectedOrder.id || ""}` }))
+      : [];
     return renderOrderDetail(selectedOrder, documents, messages);
   }
 
@@ -875,9 +877,11 @@ function bindOrderMessages() {
         if (status) status.textContent = "Введите текст сообщения.";
         return;
       }
-      await sendMemberMessage({ subject, message }, status);
-      if (bodyField) bodyField.value = "";
+      const sent = await sendMemberMessage({ subject, message }, status);
+      if (!sent) return;
       await rerenderCurrentSection();
+      const nextStatus = document.querySelector(`[data-member-order-message-status="${cssEscape(orderId)}"]`);
+      if (nextStatus) nextStatus.textContent = "Сообщение отправлено.";
     });
   });
 }
