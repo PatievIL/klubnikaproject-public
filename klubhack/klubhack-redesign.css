@@ -458,10 +458,6 @@ html {
   font-size: 15px;
 }
 
-.kh-outcome-card {
-  min-height: 176px;
-}
-
 .kh-system-grid .kh-card,
 .kh-route-grid .kh-route-card {
   min-height: 210px;
@@ -627,30 +623,6 @@ html {
 }
 
 .kh-format-item span {
-  color: var(--kh-muted);
-}
-
-.kh-faq-list {
-  display: grid;
-  gap: 10px;
-}
-
-.kh-faq-item {
-  border: 1px solid var(--kh-line);
-  border-radius: 16px;
-  background: rgba(255, 250, 242, 0.72);
-}
-
-.kh-faq-item summary {
-  cursor: pointer;
-  padding: 18px;
-  color: var(--kh-green);
-  font-weight: 900;
-}
-
-.kh-faq-item p {
-  margin: 0;
-  padding: 0 18px 18px;
   color: var(--kh-muted);
 }
 
@@ -842,10 +814,6 @@ html {
   .kh-module__details {
     gap: 12px;
     padding: 0 14px 14px 72px;
-  }
-
-  .kh-outcome-card {
-    min-height: 0;
   }
 
   .kh-video__frame {

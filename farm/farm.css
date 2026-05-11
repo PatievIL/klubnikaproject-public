@@ -144,18 +144,6 @@ textarea {
   box-shadow: 0 14px 28px rgba(0, 77, 43, 0.16);
 }
 
-.farm-button--light {
-  background: var(--bg);
-  border-color: var(--bg);
-  color: var(--green);
-}
-
-.farm-button--ghost-light {
-  color: var(--bg);
-  border-color: rgba(245, 236, 223, 0.34);
-  background: rgba(245, 236, 223, 0.06);
-}
-
 .farm-hero-link {
   min-height: 48px;
   display: inline-flex;
