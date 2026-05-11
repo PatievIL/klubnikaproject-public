@@ -88,7 +88,7 @@ textarea {
   margin: 12px 0 0;
   color: var(--ink);
   font-size: clamp(34px, 4.5vw, 64px);
-  line-height: 0.98;
+  line-height: 1.03;
   letter-spacing: 0;
 }
 
@@ -250,7 +250,8 @@ textarea {
 
 .farm-fit-grid,
 .farm-check-grid,
-.farm-result-grid {
+.farm-result-grid,
+.farm-kit-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
@@ -337,6 +338,18 @@ textarea {
 
 .farm-check-card {
   background: var(--bg);
+}
+
+.farm-kit {
+  padding-top: 44px;
+}
+
+.farm-kit-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.farm-kit-grid .farm-card {
+  min-height: 230px;
 }
 
 .farm-result-grid {
@@ -562,7 +575,8 @@ textarea {
 @media (max-width: 1040px) {
   .farm-fit-grid,
   .farm-check-grid,
-  .farm-result-grid {
+  .farm-result-grid,
+  .farm-kit-grid {
     grid-template-columns: 1fr;
   }
 
@@ -610,6 +624,7 @@ textarea {
   .farm-fit-grid,
   .farm-check-grid,
   .farm-result-grid,
+  .farm-kit-grid,
   .farm-choice-grid {
     grid-template-columns: 1fr;
   }
