@@ -9,6 +9,7 @@ import {
 
 const STORAGE_KEY = "klubnikaproject.calc.state.v4";
 const CROP_STORAGE_KEY = "klubnikaproject.calc.crop.v1";
+const CALC_BRIEF_STORAGE_KEY = "klubnikaproject.calc.brief.v1";
 const BUILD_ID = "calc-20260405ay";
 const AUTH_API_BASE_DEFAULT = "https://api.klubnikaproject.ru/site/v1";
 const ADMIN_SESSION_STORAGE_KEY = "klubnikaproject.admin.session.v1";
@@ -111,6 +112,8 @@ const elements = {
   nextStepText: document.getElementById("next-step-text"),
   summaryInterpretationTitle: document.getElementById("summary-interpretation-title"),
   summaryInterpretationText: document.getElementById("summary-interpretation-text"),
+  projectBriefLink: document.getElementById("project-brief-link"),
+  calcBriefText: document.querySelector("[data-calc-brief-text]"),
   equipmentWithoutSeedlings: document.getElementById("equipment-without-seedlings"),
   seedlingsTotalCost: document.getElementById("seedlings-total-cost"),
   assemblyIncludesList: document.getElementById("assembly-includes-list"),
@@ -225,12 +228,14 @@ function buildInitialState() {
     base[control.key] = normalizeInputValue(base[control.key], control);
   });
 
-  if (!pricing.presets.some((preset) => preset.id === base.presetSize)) {
+  if (base.presetSize && !pricing.presets.some((preset) => preset.id === base.presetSize)) {
     base.presetSize = UI_DEFAULTS.presetSize;
   }
 
   base.roomMode = "have-room";
-  syncPresetIntoState(base);
+  if (base.presetSize) {
+    syncPresetIntoState(base);
+  }
   return base;
 }
 
@@ -317,6 +322,16 @@ function bindEvents() {
 
   if (elements.downloadCalculationButton) {
     elements.downloadCalculationButton.addEventListener("click", handleDownloadCalculationClick);
+  }
+
+  if (elements.projectBriefLink) {
+    elements.projectBriefLink.addEventListener("click", handleProjectBriefLinkClick);
+  }
+
+  if (elements.calcBriefText) {
+    elements.calcBriefText.addEventListener("input", () => {
+      elements.calcBriefText.dataset.userTouched = "true";
+    });
   }
 
   elements.roomQuickPresets.forEach((button) => {
@@ -429,6 +444,7 @@ function handleNumericInput(event) {
 
   state[control.key] = clampNumericValue(draftValue, control);
   resetLaborModeAutoForControl(control.key);
+  syncPresetSelectionFromGeometry(control.key);
   acceptedFields.add(control.key);
   render();
 }
@@ -442,6 +458,7 @@ function handleNumericAccept(event) {
 
   state[control.key] = normalizeInputValue(input.value, control);
   resetLaborModeAutoForControl(control.key);
+  syncPresetSelectionFromGeometry(control.key);
   input.value = formatInputValue(state[control.key]);
   acceptedFields.add(control.key);
   render();
@@ -479,6 +496,7 @@ function handleStepControlClick(event) {
   const nextValue = normalizeInputValue(currentValue + direction * step, control);
   state[key] = nextValue;
   resetLaborModeAutoForControl(key);
+  syncPresetSelectionFromGeometry(key);
   acceptedFields.add(key);
 
   const input = document.querySelector(`[data-input-type='number'][data-key='${key}']`);
@@ -542,6 +560,18 @@ function resetLaborModeAutoForControl(key) {
   }
 }
 
+function syncPresetSelectionFromGeometry(key) {
+  if (!["a0", "a1"].includes(key)) {
+    return;
+  }
+
+  const matchingPreset = pricing.presets.find((preset) => (
+    Number(preset.width) === Number(state.a0) &&
+    Number(preset.length) === Number(state.a1)
+  ));
+  state.presetSize = matchingPreset?.id || "";
+}
+
 function render() {
   saveState();
 
@@ -567,6 +597,11 @@ function render() {
 function handleDownloadCalculationClick() {
   const calc = latestCalculation || calculateFarm(state, pricing);
   downloadCalculationReport(calc);
+}
+
+function handleProjectBriefLinkClick() {
+  const calc = latestCalculation || calculateFarm(state, pricing);
+  persistCalcBrief(calc);
 }
 
 function downloadCalculationReport(calc) {
@@ -749,6 +784,7 @@ function buildCalculationReportHtml(calc) {
 function getCropCopy(calc) {
   const isCucumber = calc.cropProfile?.id === "cucumber";
   return {
+    cropLabel: isCucumber ? "Огурец" : "Клубника",
     produceLabel: isCucumber ? "Огурец" : "Ягода",
     produceLabelGenitive: isCucumber ? "огурца" : "ягоды",
     salePriceLabel: isCucumber ? "Цена реализации огурца" : "Цена реализации ягоды",
@@ -1132,6 +1168,50 @@ function renderSummary(calc) {
       ? "Простыми словами: видно, что помещается, сколько это стоит и что делать дальше."
       : "Даже без объекта уже понятны порядок цифр и следующий шаг.";
   }
+  syncCalcBriefDraft(calc);
+}
+
+function syncCalcBriefDraft(calc) {
+  const briefText = buildCalcBriefText(calc);
+  persistCalcBrief(calc, briefText);
+
+  if (!elements.calcBriefText || elements.calcBriefText.dataset.userTouched === "true") {
+    return;
+  }
+
+  elements.calcBriefText.value = briefText;
+}
+
+function persistCalcBrief(calc, briefText = buildCalcBriefText(calc)) {
+  try {
+    window.localStorage.setItem(CALC_BRIEF_STORAGE_KEY, JSON.stringify({
+      source: "calc",
+      updatedAt: new Date().toISOString(),
+      room: `${formatSmart(calc.width)} × ${formatSmart(calc.length)} × ${formatSmart(calc.height)} м`,
+      area: `${formatSmart(calc.width * calc.length)} м²`,
+      crop: getCropCopy(calc).cropLabel || "Клубника",
+      text: briefText,
+    }));
+  } catch {
+    // localStorage only bridges calculator data to the next form.
+  }
+}
+
+function buildCalcBriefText(calc) {
+  const cropCopy = getCropCopy(calc);
+  return [
+    "Расчёт из калькулятора:",
+    `Культура: ${cropCopy.cropLabel || "Клубника"}`,
+    `Размер помещения: ${formatSmart(calc.width)} × ${formatSmart(calc.length)} × ${formatSmart(calc.height)} м`,
+    `Площадь: ${formatSmart(calc.width * calc.length)} м²`,
+    `Конфигурация: ${formatRackConfiguration(calc)}`,
+    `Растений: ${formatSmart(calc.plantCount)}`,
+    `Ориентир по комплекту: ${formatRub(calc.totalEquipmentCost)}`,
+    `Расходы / мес: ${formatRub(calc.monthlyOperatingCost)}`,
+    `Нагрузка: ${calc.electrical.phaseLabel} · ${formatSmart(calc.electrical.totalPowerKw)} кВт`,
+    "",
+    "Нужно проверить объект, проходы, коммуникации и состав комплекта."
+  ].join("\n");
 }
 
 function setAnimatedTotalEquipmentCost(nextTotal) {

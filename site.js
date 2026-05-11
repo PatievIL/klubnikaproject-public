@@ -1,5 +1,6 @@
 const SITE_ADMIN_STORAGE_KEY = "klubnikaproject.site.admin.draft.v1";
 const CANONICAL_SUPPORT_EMAIL = "info@klubnikaproject.ru";
+const CALC_BRIEF_STORAGE_KEY = "klubnikaproject.calc.brief.v1";
 
 function withStaticIndexPath(path) {
   if (!path) return path;
@@ -207,6 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
   injectProductRail(root);
   injectLegacyCatalogBanner(root);
   bindChoiceGroups();
+  hydrateBriefFormsFromCalc();
   bindDraftForms(siteAdminConfig);
   applyGlobalContactLayer(siteAdminConfig);
   bindLazyVideoEmbeds();
@@ -689,6 +691,35 @@ function bindChoiceGroups() {
     });
 
     applyState(hiddenInput.value || "");
+  });
+}
+
+function hydrateBriefFormsFromCalc() {
+  const forms = Array.from(document.querySelectorAll("[data-accept-calc-brief]"));
+  if (!forms.length) return;
+
+  let calcBrief = null;
+  try {
+    calcBrief = JSON.parse(window.localStorage.getItem(CALC_BRIEF_STORAGE_KEY) || "null");
+  } catch {
+    calcBrief = null;
+  }
+
+  if (!calcBrief?.text) return;
+
+  forms.forEach((form) => {
+    const summaryFields = Array.from(form.querySelectorAll("input, textarea"))
+      .filter((field) => detectBriefFieldRole(field) === "summary");
+    const roomField = summaryFields.find((field) => /помещение|площадь|объект/i.test(getBriefFieldLabel(field)));
+    const detailsField = summaryFields.find((field) => field.tagName === "TEXTAREA") || summaryFields[summaryFields.length - 1];
+
+    if (roomField && !roomField.value.trim()) {
+      roomField.value = [calcBrief.room, calcBrief.area].filter(Boolean).join(" · ");
+    }
+
+    if (detailsField && !detailsField.value.trim()) {
+      detailsField.value = calcBrief.text;
+    }
   });
 }
 

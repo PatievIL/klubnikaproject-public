@@ -48,7 +48,7 @@
             <section class="calc-config-group calc-config-size" aria-labelledby="calc-presets-title">
               <div class="calc-config-line calc-format-toolbar">
                 <div>
-                  <h3 id="calc-presets-title">Формат</h3>
+                  <h3 id="calc-presets-title">Что растим и размер</h3>
                 </div>
 
                 <div class="calc-format-toolbar-actions">
@@ -63,7 +63,7 @@
                     </button>
                   </div>
 
-                  <button class="calc-help-button" type="button" aria-label="Как считаем" data-method-dialog-open>?</button>
+                <button class="calc-help-button" type="button" aria-label="Как пользоваться калькулятором" data-method-dialog-open>?</button>
                 </div>
               </div>
 
@@ -278,7 +278,7 @@
                 <p id="summary-interpretation-text">Видно, что помещается, сколько это стоит и что делать дальше.</p>
               </div>
               <div class="calc-summary-actions">
-                <a class="btn btn-primary" id="project-brief-link" href="../farm/#brief">Получить разбор под мой объект</a>
+                <a class="btn btn-primary" id="project-brief-link" href="../farm/#brief">Передать расчёт на разбор</a>
                 <button class="btn btn-secondary" id="download-calculation-button" type="button">Скачать расчет</button>
               </div>
             </div>
@@ -342,11 +342,21 @@
           <input type="hidden" value="Калькулятор сайта" data-field-role="name" data-field-label="Имя" />
           <input type="hidden" value="Проверить расчёт калькулятора" data-field-role="request" data-field-label="Что нужно сейчас" />
           <label class="calc-final-field">
-            <span>Оставить вводные на сайте</span>
-            <textarea
+            <span>Куда ответить</span>
+            <input
               data-field-role="contact"
-              data-field-label="Контакт и вводные"
-              placeholder="Город, площадь, что получилось в расчёте и контакт для ответа"
+              data-field-label="Контакт для связи"
+              type="text"
+              placeholder="Телефон, Telegram или WhatsApp"
+            />
+          </label>
+          <label class="calc-final-field">
+            <span>Расчёт и вводные</span>
+            <textarea
+              data-calc-brief-text
+              data-field-role="summary"
+              data-field-label="Расчёт из калькулятора"
+              placeholder="Расчёт подставится автоматически. Добавьте город, ограничения или вопрос."
             ></textarea>
           </label>
           <div class="calc-final-form-actions">
@@ -432,7 +442,7 @@
     </div>
   </footer>
 
-  <script src="../site.js?v=20260509-qa1" defer></script>
-  <script type="module" src="./calc.js?v=20260508-break-even1"></script>
+  <script src="../site.js?v=20260511-review1" defer></script>
+  <script type="module" src="./calc.js?v=20260511-review1"></script>
 </body>
 </html>

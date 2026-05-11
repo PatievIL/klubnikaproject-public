@@ -14,7 +14,7 @@
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <link rel="canonical" href="https://klubnikaproject.ru/farm/" />
   <link rel="stylesheet" href="../assets/css/kp-header.css?v=20260428nocases" />
-  <link rel="stylesheet" href="./farm.css?v=20260427a" />
+  <link rel="stylesheet" href="./farm.css?v=20260511-review1" />
   <link rel="stylesheet" href="../assets/css/kp-footer.css?v=20260427a" />
 </head>
 <body class="farm-page" data-header-theme="dark">
@@ -27,7 +27,7 @@
           <span class="farm-eyebrow">Разбор объекта</span>
           <h1 class="farm-title">Ферма под реальное помещение</h1>
           <p class="farm-lead">
-            Проверяем площадь, ограничения, комплект и бюджет до закупки.
+            Проверяем площадь, ограничения, комплект оборудования и бюджет до закупки.
           </p>
           <p class="farm-copy">
             Если калькулятор дал первую цифру, здесь она превращается в рабочую схему: что помещается, что покупать и что требует уточнения.
@@ -54,7 +54,7 @@
           <article class="farm-card farm-card--primary">
             <span class="farm-tag">Сюда</span>
             <h3>Есть помещение или вводные</h3>
-            <p>Нужно сверить площадь, высоту, проходы, ресурсы и комплект до оплаты оборудования.</p>
+            <p>Нужно сверить площадь, высоту, проходы, ресурсы и комплект оборудования до оплаты.</p>
             <a class="farm-text-link" href="#brief">Оставить вводные</a>
           </article>
           <article class="farm-card">
@@ -78,7 +78,7 @@
         <div class="farm-work-shell">
           <div class="farm-section-head">
             <span class="farm-eyebrow">Что проверяем</span>
-            <h2 class="farm-title-md">Вводные, которые меняют комплект</h2>
+            <h2 class="farm-title-md">Вводные, которые меняют комплект оборудования</h2>
             <p class="farm-lead">
               Смотрим не отдельные покупки, а связку помещения, ресурсов и узлов фермы.
             </p>
@@ -113,6 +113,10 @@
               </ul>
             </article>
           </div>
+          <div class="farm-section-cta">
+            <a class="farm-button farm-button--primary" href="#brief">Оставить заявку на разбор</a>
+            <span>Если вводные уже есть, не нужно листать до конца страницы.</span>
+          </div>
         </div>
       </div>
     </section>
@@ -136,13 +140,17 @@
           <article class="farm-card">
             <span class="farm-tag">Узлы</span>
             <h3>Комплект к закупке</h3>
-            <p>Позиции, которые уже можно брать типовым решением.</p>
+            <p>Оборудование, которое уже можно брать типовым решением.</p>
           </article>
           <article class="farm-card">
             <span class="farm-tag">Риски</span>
             <h3>Первая очередь</h3>
             <p>Что покупать сейчас, что отложить и что уточнить отдельно.</p>
           </article>
+        </div>
+        <div class="farm-section-cta">
+          <a class="farm-button farm-button--primary" href="#brief">Проверить мой объект</a>
+          <span>Разбор нужен до закупки, чтобы не покупать лишнее и не пропустить ограничения.</span>
         </div>
       </div>
     </section>
@@ -197,6 +205,10 @@
             </div>
           </div>
         </div>
+        <div class="farm-section-cta farm-section-cta--compact">
+          <a class="farm-button farm-button--primary" href="#brief">Передать вводные</a>
+          <span>Форма ниже принимает расчёт из калькулятора автоматически.</span>
+        </div>
       </div>
     </section>
 
@@ -230,12 +242,13 @@
             <p class="farm-copy">Пишите коротко. Если чего-то не хватает, уточню.</p>
             <form
               class="farm-form"
+              data-accept-calc-brief
               data-brief-form="Ферма — разбор объекта"
               data-brief-button-label="Оставить заявку"
               data-brief-done-label="Заявка передана"
               data-brief-link-label="Написать в Telegram"
             >
-              <input class="farm-input" type="text" placeholder="Telegram / WhatsApp для связи" data-field-role="contact" data-field-label="Контакт для связи" />
+              <input class="farm-input" type="text" placeholder="Телефон + где писать: Telegram или WhatsApp" data-field-role="contact" data-field-label="Контакт для связи" />
               <input class="farm-input" type="text" placeholder="Площадь, высота и тип помещения" data-field-role="summary" data-field-label="Помещение" />
 
               <span class="farm-field-label">Что нужно сейчас</span>
@@ -308,6 +321,6 @@
     </div>
   </footer>
 
-  <script src="../site.js?v=20260509-qa1" defer></script>
+  <script src="../site.js?v=20260511-review1" defer></script>
 </body>
 </html>

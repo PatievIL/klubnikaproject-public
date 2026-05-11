@@ -177,6 +177,25 @@ textarea {
   text-underline-offset: 4px;
 }
 
+.farm-section-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.farm-section-cta--compact {
+  margin-top: 18px;
+}
+
+.farm-section-cta span {
+  max-width: 560px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
 .farm-hero {
   position: relative;
   min-height: 84svh;
