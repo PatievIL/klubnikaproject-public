@@ -57,17 +57,18 @@ html {
   text-decoration: none;
 }
 
+.kh-page .kp-site-header__cta {
+  background: var(--kp-header-cta-bg);
+  color: var(--kp-header-cta-ink);
+}
+
 .kh-page button,
 .kh-page textarea {
   font: inherit;
 }
 
 .kh-main {
-  padding-top: 24px;
-}
-
-.kh-page .kp-site-header__cta {
-  color: var(--kh-green);
+  padding-top: 0;
 }
 
 .kh-container {
@@ -77,6 +78,17 @@ html {
 
 .kh-section {
   padding: clamp(28px, 4vw, 46px) 0;
+}
+
+.kh-hero-section {
+  padding: 0 0 clamp(32px, 5vw, 58px);
+  background:
+    linear-gradient(180deg, rgba(0, 77, 43, 0.98) 0%, rgba(0, 77, 43, 0.98) 74%, transparent 74%),
+    var(--kh-bg);
+}
+
+.kh-hero-section .kh-container {
+  padding-top: clamp(86px, 9vw, 122px);
 }
 
 .kh-shell {
@@ -225,7 +237,7 @@ html {
 }
 
 .kh-hero {
-  min-height: min(560px, calc(100vh - 110px));
+  min-height: min(620px, calc(100svh - 78px));
   display: grid;
   grid-template-columns: minmax(0, 0.98fr) minmax(340px, 0.62fr);
   gap: clamp(22px, 3vw, 40px);
@@ -733,6 +745,17 @@ html {
 
   .kh-section {
     padding: 28px 0;
+  }
+
+  .kh-hero-section {
+    padding: 0 0 28px;
+    background:
+      linear-gradient(180deg, rgba(0, 77, 43, 0.98) 0%, rgba(0, 77, 43, 0.98) 82%, transparent 82%),
+      var(--kh-bg);
+  }
+
+  .kh-hero-section .kh-container {
+    padding-top: 76px;
   }
 
   .kh-shell,
