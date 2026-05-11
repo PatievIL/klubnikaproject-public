@@ -6,10 +6,10 @@
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
   <link rel="manifest" href="../site.webmanifest" />
-  <title>Консультация по клубничной ферме — Klubnika Project</title>
+  <title>Консультации — короткий вопрос по клубничной ферме — Klubnika Project</title>
   <meta
     name="description"
-    content="Точечная консультация по клубничной ферме: проверить один вопрос, совместимость узлов, проблему по ягоде или следующий шаг без полного расчёта проекта."
+    content="Консультации Klubnika Project: короткий вопрос по свету, поливу, растению, покупке или следующему шагу с явным согласованием формата и стоимости."
   />
   <link rel="stylesheet" href="../styles.css?v=20260405h" />
   <style>
@@ -179,6 +179,35 @@
       gap: 14px;
     }
 
+    body.consult-page .consult-price-strip {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    body.consult-page .consult-price-card {
+      padding: 20px 22px;
+      border: 1px solid var(--consult-line);
+      border-radius: 26px;
+      background: var(--consult-surface);
+      box-shadow: none;
+    }
+
+    body.consult-page .consult-price-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--green);
+      font-size: 21px;
+      line-height: 1.15;
+    }
+
+    body.consult-page .consult-price-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
     body.consult-page .consult-scope-grid .card,
     body.consult-page .consult-process-grid .card,
     body.consult-page .result-card,
@@ -293,7 +322,8 @@
       body.consult-page .consult-route-strip,
       body.consult-page .consult-decision-strip,
       body.consult-page .consult-scope-grid,
-      body.consult-page .consult-process-grid {
+      body.consult-page .consult-process-grid,
+      body.consult-page .consult-price-strip {
         grid-template-columns: 1fr;
       }
 
@@ -350,7 +380,6 @@
     }
   </style>
   <!-- SEO:START -->
-  <meta name="robots" content="index, follow, max-image-preview:large" />
   <link rel="canonical" href="https://klubnikaproject.ru/consultations/" />
   <script type="application/ld+json">
   {
@@ -358,8 +387,8 @@
     "@type": "WebPage",
     "@id": "https://klubnikaproject.ru/consultations/#webpage",
     "url": "https://klubnikaproject.ru/consultations/",
-    "name": "Консультация по клубничной ферме: точечный разбор одного вопроса",
-    "description": "Точечная консультация по клубничной ферме: проверить один вопрос, совместимость узлов, проблему по ягоде или следующий шаг без полного расчёта проекта.",
+    "name": "Консультации: короткий вопрос по клубничной ферме",
+    "description": "Консультации Klubnika Project: короткий вопрос по свету, поливу, растению, покупке или следующему шагу с явным согласованием формата и стоимости.",
     "inLanguage": "ru-RU",
     "isPartOf": {
       "@id": "https://klubnikaproject.ru/#website"
@@ -379,21 +408,21 @@
 
         <div class="hero-grid consult-hero-grid">
           <div class="hero-copy hero-copy-lean">
-            <span class="eyebrow">Консультация</span>
-            <h1>Разбор одного вопроса по ферме</h1>
+            <span class="eyebrow">Короткий вопрос</span>
+            <h1>Разобрать один вопрос без полного проекта</h1>
             <p class="lead">
-              Проверяем решение, симптом или следующий шаг без полного расчёта проекта.
+              Проверяем решение, симптом, покупку или следующий шаг, когда не нужен полный расчёт фермы.
             </p>
             <p class="sublead">
               Формат нужен, когда вопрос уже можно сузить: совместимость узла, поведение растения, ошибка в режиме, покупка оборудования или выбор маршрута.
             </p>
             <p class="sublead">
-              После заявки сначала уточняем формат и стоимость, если нужен платный разбор. Сюрприза со счётом после отправки формы не будет.
+              Отправка формы бесплатная. Если вопрос требует платного разбора, формат и стоимость согласуются до начала работы.
             </p>
 
             <div class="btn-row hero-cta">
               <a class="btn btn-primary" href="#request">Оставить вопрос</a>
-              <a class="btn btn-secondary" href="../farm/">Нужен расчёт</a>
+              <a class="btn btn-secondary" href="../farm/">Нужна проверка объекта</a>
             </div>
           </div>
         </div>
@@ -407,7 +436,7 @@
         <div class="section-head">
           <span class="eyebrow">Когда сюда</span>
           <h2>Когда вопрос уже конкретный</h2>
-          <p class="sublead">Консультация закрывает одну развилку. Если нужно собрать всю ферму с нуля, лучше идти в расчёт.</p>
+          <p class="sublead">Консультация закрывает одну развилку. Если нужно собрать всю ферму с нуля, лучше идти в расчёт или проверку объекта.</p>
         </div>
 
         <div class="grid grid-3">
@@ -436,11 +465,22 @@
         <div class="consult-route-strip">
           <div class="consult-route-strip__item">
             <strong>Есть только идея?</strong>
-            <p>Сначала откройте калькулятор и получите первую рамку по площади и бюджету.</p>
+            <p>Сначала откройте калькулятор и получите первую рамку по площади, посадке и бюджету.</p>
           </div>
           <div class="consult-route-strip__item">
-            <strong>Нужно вести ферму дальше?</strong>
-            <p>Если решений несколько и они связаны между собой, лучше идти в сопровождение.</p>
+            <strong>Есть помещение?</strong>
+            <p>Если вопрос касается комплекта оборудования и ограничений объекта, лучше начать с проверки объекта.</p>
+          </div>
+        </div>
+
+        <div class="consult-price-strip" aria-label="Условия консультации">
+          <div class="consult-price-card">
+            <strong>Форма бесплатная</strong>
+            <p>Вы оставляете вопрос и контакт. По этим вводным понятно, хватит ли короткого ответа или нужен отдельный платный разбор.</p>
+          </div>
+          <div class="consult-price-card">
+            <strong>Платный формат согласуется заранее</strong>
+            <p>Никакого счёта “после заявки”: сначала уточняем объём, формат ответа, сроки и стоимость, если работа выходит за короткий ориентир.</p>
           </div>
         </div>
       </div>
@@ -475,7 +515,7 @@
           <article class="card card-pad">
             <div class="tag">Маршрут</div>
             <h3>Покупать или считать</h3>
-            <p>Фиксируем, что делать дальше: купить, пересчитать, собрать данные или идти в сопровождение.</p>
+            <p>Фиксируем, что делать дальше: купить, пересчитать, собрать данные или идти в проверку объекта.</p>
           </article>
         </div>
 
@@ -486,7 +526,7 @@
           </div>
           <div>
             <strong>Если вопрос больше одного узла, формат меняется.</strong>
-            <p>Когда задача цепляет режимы, закупку и регулярные решения, её лучше вести как сопровождение.</p>
+            <p>Когда задача цепляет режимы, закупку и регулярные решения, её лучше вести как проверку объекта или сопровождение.</p>
           </div>
         </div>
       </div>
@@ -538,7 +578,7 @@
           <div>
             <span class="eyebrow">Вводные</span>
             <h2>Оставить вопрос</h2>
-            <p class="sublead">Достаточно контакта, стадии и одного вопроса. Если нужен платный или более широкий формат, это согласуется до работы.</p>
+            <p class="sublead">Достаточно контакта, стадии и одного вопроса. Форма бесплатная; платный или более широкий формат согласуется до работы.</p>
 
             <ul class="consult-brief-list">
               <li>
