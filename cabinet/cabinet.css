@@ -2,6 +2,10 @@ body[data-cabinet-family="user"] {
   background: var(--cream, #f6efe4);
 }
 
+body[data-cabinet-pending="true"] .cabinet-shell-section {
+  visibility: hidden;
+}
+
 .cabinet-shell-section,
 .cabinet-login-section {
   padding-top: 32px;

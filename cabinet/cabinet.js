@@ -58,6 +58,7 @@ async function initCabinet() {
   }
 
   currentSession = session;
+  document.body.removeAttribute("data-cabinet-pending");
   renderUserCard(session);
   await renderCabinet(session);
   bindLogout();
