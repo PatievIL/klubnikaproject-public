@@ -53,7 +53,7 @@ async function initCabinet() {
 
   const session = await fetchActiveSession();
   if (!session?.ok) {
-    renderGuestShell();
+    redirectToLogin();
     return;
   }
 
