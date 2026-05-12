@@ -6,6 +6,7 @@
     { label: "Оборудование", href: "catalog/" },
     { label: "Контакты", href: "consultations/" },
   ];
+  const CABINET_ITEM = { label: "Кабинет", href: "cabinet/" };
 
   function getRoot() {
     const script = document.currentScript || document.querySelector('script[src*="kp-header.js"]');
@@ -62,6 +63,7 @@
           `).join("")}
         </nav>
         <div class="kp-site-header__actions">
+          <a class="kp-site-header__cabinet${isActive(pagePath, CABINET_ITEM.href) ? " is-active" : ""}" href="${resolveHref(root, CABINET_ITEM.href)}">${CABINET_ITEM.label}</a>
           <a class="kp-site-header__cta" href="${root}#contact">Обсудить ферму</a>
           <button class="kp-site-header__toggle" type="button" aria-label="Открыть меню" aria-expanded="false">
             <span></span>
@@ -72,6 +74,7 @@
         ${NAV_ITEMS.map((item) => `
           <a class="kp-site-header__link${isActive(pagePath, item.href) ? " is-active" : ""}" href="${resolveHref(root, item.href)}">${item.label}</a>
         `).join("")}
+        <a class="kp-site-header__link${isActive(pagePath, CABINET_ITEM.href) ? " is-active" : ""}" href="${resolveHref(root, CABINET_ITEM.href)}">${CABINET_ITEM.label}</a>
         <a class="kp-site-header__cta" href="${root}#contact">Обсудить ферму</a>
       </nav>
     `;

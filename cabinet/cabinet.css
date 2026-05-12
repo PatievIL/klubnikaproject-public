@@ -406,6 +406,94 @@ body[data-cabinet-family="user"] {
   background: rgba(255, 255, 255, 0.52);
 }
 
+.cabinet-auth-screen {
+  min-height: calc(100svh - 64px);
+  display: grid;
+  place-items: center;
+  padding: clamp(28px, 6vw, 72px) 16px;
+  background:
+    radial-gradient(circle at 20% 12%, rgba(229, 199, 148, 0.24), transparent 30%),
+    linear-gradient(180deg, rgba(245, 236, 223, 0.7), rgba(245, 236, 223, 0.96));
+}
+
+.cabinet-auth-modal {
+  width: min(480px, 100%);
+  display: grid;
+  gap: 18px;
+  padding: clamp(20px, 3vw, 28px);
+  border: 1px solid rgba(0, 77, 43, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 250, 242, 0.96);
+  box-shadow: 0 20px 60px rgba(20, 52, 37, 0.14);
+}
+
+.cabinet-auth-head {
+  display: grid;
+  gap: 10px;
+}
+
+.cabinet-auth-head .hero-title-compact {
+  margin: 0;
+}
+
+.cabinet-auth-head .sublead {
+  margin: 0;
+  color: var(--muted, #5f6f63);
+}
+
+.cabinet-auth-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid rgba(0, 77, 43, 0.12);
+  border-radius: 8px;
+  background: rgba(0, 77, 43, 0.05);
+}
+
+.cabinet-auth-tab {
+  min-height: 42px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--green, #004d2b);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.cabinet-auth-tab.is-active {
+  background: var(--green, #004d2b);
+  color: var(--cream, #f6efe4);
+}
+
+.cabinet-auth-form[hidden] {
+  display: none;
+}
+
+.cabinet-auth-actions {
+  display: grid;
+}
+
+.cabinet-auth-actions .btn {
+  width: 100%;
+}
+
+.cabinet-auth-legal {
+  margin: 0;
+  color: var(--muted, #5f6f63);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.cabinet-auth-legal a {
+  color: var(--green, #004d2b);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .cabinet-entry-grid {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(320px, 0.75fr);
@@ -418,6 +506,14 @@ body[data-cabinet-family="user"] {
 .cabinet-entry-note {
   display: grid;
   gap: 14px;
+}
+
+.cabinet-entry-copy--login .lead {
+  color: var(--muted, #5f6f63);
+}
+
+[data-cabinet-logout][hidden] {
+  display: none !important;
 }
 
 @media (max-width: 1100px) {
@@ -470,6 +566,16 @@ body[data-cabinet-family="user"] {
   .cabinet-shell-section,
   .cabinet-login-section {
     padding-top: 16px;
+  }
+
+  .cabinet-auth-screen {
+    min-height: calc(100svh - 56px);
+    padding: 18px 12px;
+  }
+
+  .cabinet-auth-modal {
+    gap: 14px;
+    padding: 18px;
   }
 
   .cabinet-frame,

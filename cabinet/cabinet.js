@@ -221,10 +221,13 @@ async function fetchActiveSession() {
 
 function bindLogin() {
   const form = document.getElementById("cabinet-login-form");
+  const registerForm = document.getElementById("cabinet-register-form");
   const status = document.getElementById("cabinet-login-status");
-  if (!form) return;
+  if (!form && !registerForm) return;
 
-  form.addEventListener("submit", async (event) => {
+  bindAuthTabs(status);
+
+  form?.addEventListener("submit", async (event) => {
     event.preventDefault();
     const login = document.getElementById("cabinet-login-identity")?.value.trim() || "";
     const password = document.getElementById("cabinet-login-password")?.value || "";
@@ -255,6 +258,74 @@ function bindLogin() {
     currentSession = session;
     redirectAuthenticatedSession(session);
   });
+
+  registerForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const displayName = document.getElementById("cabinet-register-name")?.value.trim() || "";
+    const email = document.getElementById("cabinet-register-email")?.value.trim() || "";
+    const password = document.getElementById("cabinet-register-password")?.value || "";
+    if (!displayName || !email || !password) {
+      if (status) status.textContent = "Введите имя, email и пароль.";
+      return;
+    }
+    if (password.length < 8) {
+      if (status) status.textContent = "Пароль должен быть не короче 8 символов.";
+      return;
+    }
+
+    if (status) status.textContent = "Создаём кабинет...";
+    const result = await fetchJson(`${apiBase()}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ display_name: displayName, email, password }),
+    });
+
+    if (!result.ok || !result.data?.session_token) {
+      if (status) status.textContent = authErrorMessage(result, "Не удалось зарегистрироваться.");
+      return;
+    }
+
+    storeMemberToken(result.data.session_token);
+    const session = await fetchActiveSession();
+    if (!session?.ok) {
+      if (status) status.textContent = "Регистрация прошла, но сессия не открылась. Попробуйте войти.";
+      return;
+    }
+
+    currentSession = session;
+    redirectAuthenticatedSession(session);
+  });
+}
+
+function bindAuthTabs(status) {
+  const tabs = Array.from(document.querySelectorAll("[data-cabinet-auth-tab]"));
+  const panels = Array.from(document.querySelectorAll("[data-cabinet-auth-panel]"));
+  if (!tabs.length || !panels.length) return;
+
+  const activate = (target) => {
+    tabs.forEach((tab) => {
+      const active = tab.dataset.cabinetAuthTab === target;
+      tab.classList.toggle("is-active", active);
+      tab.setAttribute("aria-selected", active ? "true" : "false");
+    });
+    panels.forEach((panel) => {
+      const active = panel.dataset.cabinetAuthPanel === target;
+      panel.classList.toggle("is-active", active);
+      panel.hidden = !active;
+    });
+    if (status) status.textContent = "";
+  };
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => activate(tab.dataset.cabinetAuthTab || "login"));
+  });
+}
+
+function authErrorMessage(result, fallback) {
+  if (result?.status === 409) return "Этот email уже зарегистрирован. Войдите через вкладку «Вход».";
+  if (result?.status === 422) return "Проверьте имя, email и пароль.";
+  if (result?.status === 429) return "Слишком много попыток. Попробуйте позже.";
+  return fallback;
 }
 
 function redirectAuthenticatedSession(session) {
@@ -376,6 +447,10 @@ function renderUserCard(session) {
 function applyShellModel(session, section) {
   const sections = getAllowedSections(session);
   const displayName = getDisplayName(session);
+  document.querySelectorAll("[data-cabinet-logout]").forEach((button) => {
+    button.hidden = false;
+    button.style.display = "";
+  });
   setText("[data-cabinet-shell-mode-label]", "Кабинет");
   setText("[data-cabinet-shell-meta]", `${displayName} · ${sections.length} раздела`);
   setText("[data-cabinet-shell-section-label]", section.label);
@@ -394,6 +469,10 @@ function renderGuestShell() {
   const sections = getAllowedSections();
   const nav = document.getElementById("cabinet-nav");
   const content = document.getElementById("cabinet-section-content");
+  document.querySelectorAll("[data-cabinet-logout]").forEach((button) => {
+    button.hidden = true;
+    button.style.display = "none";
+  });
 
   document.querySelectorAll("[data-cabinet-user]").forEach((target) => {
     target.innerHTML = `

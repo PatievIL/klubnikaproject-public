@@ -11,10 +11,10 @@
     name="description"
     content="Вход в кабинет KLUBNIKA PROJECT для проекта, заказов, документов, сообщений и обучения."
   />
-  <link rel="stylesheet" href="../../styles.css?v=20260405h" />
+  <link rel="stylesheet" href="../../styles.css?v=20260512-hero-label" />
   <link rel="stylesheet" href="../../account/account.css?v=20260402b" />
-  <link rel="stylesheet" href="../cabinet.css?v=20260510-layout2" />
-  <link rel="stylesheet" href="../../assets/css/kp-header.css?v=20260428nocases" />
+  <link rel="stylesheet" href="../cabinet.css?v=20260512-auth-popup" />
+  <link rel="stylesheet" href="../../assets/css/kp-header.css?v=20260512-cabinet-entry" />
   <!-- SEO:START -->
   <meta name="robots" content="noindex, nofollow" />
   <link rel="canonical" href="https://klubnikaproject.ru/cabinet/login/" />
@@ -24,7 +24,7 @@
     "@type": "WebPage",
     "@id": "https://klubnikaproject.ru/cabinet/login/#webpage",
     "url": "https://klubnikaproject.ru/cabinet/login/",
-    "name": "Один вход в рабочий кабинет",
+    "name": "Вход в кабинет",
     "description": "Вход в кабинет KLUBNIKA PROJECT для проекта, заказов, документов, сообщений и обучения.",
     "inLanguage": "ru-RU",
     "isPartOf": {
@@ -36,74 +36,60 @@
 </head>
 <body data-cabinet-view="login" data-cabinet-account="member" data-header-theme="light">
   <header class="kp-site-header" data-kp-header data-root="../../"></header>
-  <script src="../../assets/js/kp-header.js?v=20260428nextstep"></script>
+  <script src="../../assets/js/kp-header.js?v=20260512-cabinet-entry"></script>
   <main>
-    <section class="section cabinet-login-section">
-      <div class="container">
-        <div class="section-frame cabinet-frame cabinet-frame--login">
-          <div class="account-shell cabinet-login-shell">
-            <div class="cabinet-entry-grid cabinet-entry-grid--login">
-              <div class="cabinet-entry-copy cabinet-entry-copy--login">
-                <span class="eyebrow">Кабинет</span>
-                <h1 class="hero-title-compact">Один вход в рабочий кабинет</h1>
-                <p class="lead">Кабинет собирается вокруг покупки: корзина, контроль заказа, расчёт с пометкой менеджеру и связь с командой.</p>
-                <div class="cabinet-entry-actions">
-                  <a class="btn btn-secondary" href="../../calc/">Открыть расчёт</a>
-                  <a class="btn btn-secondary" href="../../consultations/">Задать вопрос</a>
-                </div>
-                <div class="cabinet-entry-note cabinet-entry-note--login">
-                  <div class="tag">Что внутри</div>
-                  <ul class="calc-list">
-                    <li>корзина и контроль покупки;</li>
-                    <li>документы и доставка рядом с заказом;</li>
-                    <li>расчёт калькулятора с текстовой пометкой менеджеру;</li>
-                    <li>один диалог с командой без лишней терминологии.</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div class="cabinet-login-form-stack">
-                <article class="card card-pad account-panel cabinet-login-panel">
-                  <div class="tag">Доступ</div>
-                  <h2 class="calc-card-title">Войти в кабинет</h2>
-                  <p class="sublead">После входа откроются только ваши покупка, расчёты и сообщения.</p>
-                  <form class="account-form" id="cabinet-login-form">
-                    <label class="account-label">
-                      <span>Логин или email</span>
-                      <input class="account-input" id="cabinet-login-identity" type="text" autocomplete="username" placeholder="Например, ваш email" />
-                    </label>
-                    <label class="account-label">
-                      <span>Пароль</span>
-                      <input class="account-input" id="cabinet-login-password" type="password" autocomplete="current-password" placeholder="Введите пароль" />
-                    </label>
-                    <div class="account-actions">
-                      <button class="btn btn-primary" type="submit">Открыть кабинет</button>
-                      <a class="btn btn-secondary" href="../../">Вернуться на сайт</a>
-                    </div>
-                  </form>
-                  <div class="account-status" id="cabinet-login-status"></div>
-                </article>
-
-                <article class="card card-pad cabinet-login-support">
-                  <div class="cabinet-kicker">После входа</div>
-                  <div class="cabinet-mini-list cabinet-mini-list--tight">
-                    <div class="cabinet-mini-card">
-                      <strong>Клиентский режим</strong>
-                      <span>Сначала следующий шаг по проекту, потом документы, материалы и связь.</span>
-                    </div>
-                    <div class="cabinet-mini-card">
-                      <strong>Связь с командой</strong>
-                      <span>Вопросы по расчёту, заказу и документам остаются в одном диалоге.</span>
-                    </div>
-                  </div>
-                </article>
-              </div>
-            </div>
-          </div>
+    <section class="cabinet-auth-screen" aria-labelledby="cabinet-auth-title">
+      <div class="cabinet-auth-modal" role="dialog" aria-modal="true" aria-labelledby="cabinet-auth-title">
+        <div class="cabinet-auth-head">
+          <span class="cabinet-kicker">Кабинет</span>
+          <h1 class="hero-title-compact" id="cabinet-auth-title">Вход в кабинет</h1>
+          <p class="sublead">Войдите в рабочую зону проекта или зарегистрируйтесь, чтобы сохранить покупку, расчёт и переписку.</p>
         </div>
+
+        <div class="cabinet-auth-tabs" role="tablist" aria-label="Доступ в кабинет">
+          <button class="cabinet-auth-tab is-active" type="button" role="tab" aria-selected="true" data-cabinet-auth-tab="login">Вход</button>
+          <button class="cabinet-auth-tab" type="button" role="tab" aria-selected="false" data-cabinet-auth-tab="register">Регистрация</button>
+        </div>
+
+        <form class="account-form cabinet-auth-form is-active" id="cabinet-login-form" data-cabinet-auth-panel="login">
+          <label class="account-label">
+            <span>Логин или email</span>
+            <input class="account-input" id="cabinet-login-identity" type="text" autocomplete="username" placeholder="Например, ваш email" />
+          </label>
+          <label class="account-label">
+            <span>Пароль</span>
+            <input class="account-input" id="cabinet-login-password" type="password" autocomplete="current-password" placeholder="Введите пароль" />
+          </label>
+          <div class="account-actions cabinet-auth-actions">
+            <button class="btn btn-primary" type="submit">Открыть кабинет</button>
+          </div>
+        </form>
+
+        <form class="account-form cabinet-auth-form" id="cabinet-register-form" data-cabinet-auth-panel="register" hidden>
+          <label class="account-label">
+            <span>Имя</span>
+            <input class="account-input" id="cabinet-register-name" type="text" autocomplete="name" placeholder="Как к вам обращаться" />
+          </label>
+          <label class="account-label">
+            <span>Email</span>
+            <input class="account-input" id="cabinet-register-email" type="email" autocomplete="email" placeholder="email@example.com" />
+          </label>
+          <label class="account-label">
+            <span>Пароль</span>
+            <input class="account-input" id="cabinet-register-password" type="password" autocomplete="new-password" placeholder="Минимум 8 символов" />
+          </label>
+          <div class="account-actions cabinet-auth-actions">
+            <button class="btn btn-primary" type="submit">Зарегистрироваться</button>
+          </div>
+          <p class="cabinet-auth-legal">
+            Регистрируясь, вы соглашаетесь с <a href="../../docs/policy/">политикой обработки данных</a>.
+          </p>
+        </form>
+
+        <div class="account-status" id="cabinet-login-status" aria-live="polite"></div>
       </div>
     </section>
   </main>
-  <script src="../cabinet.js?v=20260510-order1" type="module"></script>
+  <script src="../cabinet.js?v=20260512-auth-popup" type="module"></script>
 </body>
 </html>
