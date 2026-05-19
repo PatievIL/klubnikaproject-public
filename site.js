@@ -1073,7 +1073,7 @@ function validateBriefForm(form, config) {
   });
 
   const missing = [];
-  if (required.has("Имя") && !values.name) missing.push("Имя");
+  if (required.has("Имя") && hasRoleField(form, "name") && !values.name) missing.push("Имя");
   if (required.has("Контакт") && !values.contact) missing.push("Контакт");
   if (required.has("Стадия проекта") && config.forms.collectStage && hasRoleField(form, "stage") && !values.stage) missing.push("Стадия проекта");
   if (required.has("Что нужно") && hasRoleField(form, "request") && !values.request) missing.push("Что нужно");
