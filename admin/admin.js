@@ -143,6 +143,7 @@ const inventoryWorkspace = {
   query: "",
   category: "",
   stockStatus: "",
+  publicationStatus: "",
   editorSlug: "",
   editorDraft: null,
   editorLoadingSlug: "",
@@ -712,6 +713,7 @@ function renderInventorySection() {
                   <th>Категория</th>
                   <th>Цена</th>
                   <th>Наличие</th>
+                  <th>Публикация</th>
                   <th>Маршрут и действия</th>
                 </tr>
               </thead>
@@ -758,6 +760,13 @@ function renderInventorySection() {
             <select class="admin-select" id="inventory-stock-status">
               <option value="">Все статусы</option>
               ${buildInventoryStockOptions()}
+            </select>
+          </label>
+          <label class="admin-field">
+            <span class="admin-field-label">Публикация</span>
+            <select class="admin-select" id="inventory-publication-status">
+              <option value="">Все карточки</option>
+              ${buildInventoryPublicationOptions()}
             </select>
           </label>
         </div>
@@ -2219,6 +2228,7 @@ function bindInventorySection() {
   const queryField = document.getElementById("inventory-query");
   const categoryField = document.getElementById("inventory-category");
   const stockField = document.getElementById("inventory-stock-status");
+  const publicationField = document.getElementById("inventory-publication-status");
 
   if (queryField) {
     queryField.addEventListener("input", () => {
@@ -2237,6 +2247,13 @@ function bindInventorySection() {
     stockField.value = inventoryWorkspace.stockStatus;
     stockField.addEventListener("change", () => {
       inventoryWorkspace.stockStatus = stockField.value;
+      renderCurrentSection();
+    });
+  }
+  if (publicationField) {
+    publicationField.value = inventoryWorkspace.publicationStatus;
+    publicationField.addEventListener("change", () => {
+      inventoryWorkspace.publicationStatus = publicationField.value;
       renderCurrentSection();
     });
   }
@@ -2399,9 +2416,11 @@ function resetInventoryRow(slug) {
   const priceField = row.querySelector('[data-inventory-field="price"]');
   const oldPriceField = row.querySelector('[data-inventory-field="oldPrice"]');
   const stockField = row.querySelector('[data-inventory-field="stockStatus"]');
+  const statusField = row.querySelector('[data-inventory-field="status"]');
   if (priceField) priceField.value = formatNumberInputValue(product.price);
   if (oldPriceField) oldPriceField.value = formatNumberInputValue(product.oldPrice);
   if (stockField) stockField.value = product.stockStatus || "in_stock";
+  if (statusField) statusField.value = product.status || "published";
   updateInventoryRowState(row);
   els.status.textContent = `Изменения по ${slug} сброшены.`;
 }
@@ -2916,9 +2935,15 @@ function patchInventoryProductInSnapshot(product) {
   if (!catalogSnapshotDraft || !product?.slug || !Array.isArray(catalogSnapshotDraft.products)) return;
   const index = catalogSnapshotDraft.products.findIndex((item) => item.slug === product.slug);
   if (index === -1) return;
+  const current = catalogSnapshotDraft.products[index] || {};
   catalogSnapshotDraft.products[index] = {
-    ...catalogSnapshotDraft.products[index],
+    ...current,
     ...product,
+    oldPrice: product.old_price ?? product.oldPrice ?? current.oldPrice ?? null,
+    old_price: product.old_price ?? product.oldPrice ?? current.old_price ?? null,
+    stockStatus: product.stock_status || product.stockStatus || current.stockStatus || "in_stock",
+    stock_status: product.stock_status || product.stockStatus || current.stock_status || "in_stock",
+    status: product.status || current.status || "published",
   };
 }
 
@@ -2969,6 +2994,14 @@ function buildInventoryStockOptions() {
     .join("");
 }
 
+function buildInventoryPublicationOptions() {
+  return ["published", "draft", "hidden", "archived"]
+    .map((status) => `
+      <option value="${status}" ${inventoryWorkspace.publicationStatus === status ? "selected" : ""}>${escapeHtml(formatInventoryPublicationLabel(status))}</option>
+    `)
+    .join("");
+}
+
 function filterInventoryProducts(products, categories) {
   const categoryMap = new Map(categories.map((category) => [category.slug, category]));
   const query = inventoryWorkspace.query.trim().toLowerCase();
@@ -2982,6 +3015,9 @@ function filterInventoryProducts(products, categories) {
       }
     }
     if (inventoryWorkspace.stockStatus && product.stockStatus !== inventoryWorkspace.stockStatus) {
+      return false;
+    }
+    if (inventoryWorkspace.publicationStatus && (product.status || "published") !== inventoryWorkspace.publicationStatus) {
       return false;
     }
     if (!query) return true;
@@ -3067,6 +3103,14 @@ function renderInventoryRow(product, categories) {
           `).join("")}
         </select>
         <div class="admin-inventory-price-note">Сейчас: <span class="admin-inventory-stock is-${escapeAttribute(product.stockStatus || "out_of_stock")}">${escapeHtml(formatInventoryStockLabel(product.stockStatus))}</span></div>
+      </td>
+      <td>
+        <select class="admin-select admin-inventory-select" data-inventory-field="status">
+          ${["published", "draft", "hidden", "archived"].map((status) => `
+            <option value="${status}" ${(product.status || "published") === status ? "selected" : ""}>${escapeHtml(formatInventoryPublicationLabel(status))}</option>
+          `).join("")}
+        </select>
+        <div class="admin-inventory-price-note">Сейчас: ${escapeHtml(formatInventoryPublicationLabel(product.status || "published"))}</div>
       </td>
       <td>
         <div class="admin-mono admin-inventory-path">${escapeHtml(product.path || "—")}</div>
@@ -3367,6 +3411,14 @@ function formatInventoryStockLabel(status) {
   return status || "Не указан";
 }
 
+function formatInventoryPublicationLabel(status) {
+  if (status === "published") return "Опубликовано";
+  if (status === "draft") return "Черновик";
+  if (status === "hidden") return "Скрыто";
+  if (status === "archived") return "Архив";
+  return status || "Не указан";
+}
+
 function formatMoney(value) {
   const amount = Number(value);
   if (!Number.isFinite(amount) || amount <= 0) {
@@ -3387,12 +3439,14 @@ function readInventoryRowDraft(row) {
   const priceField = row.querySelector('[data-inventory-field="price"]');
   const oldPriceField = row.querySelector('[data-inventory-field="oldPrice"]');
   const stockField = row.querySelector('[data-inventory-field="stockStatus"]');
+  const statusField = row.querySelector('[data-inventory-field="status"]');
   const price = Number(priceField?.value || 0);
   const oldPrice = Number(oldPriceField?.value || 0);
   return {
     price,
     old_price: Number.isFinite(oldPrice) && oldPrice > 0 ? oldPrice : null,
     stock_status: stockField?.value || "in_stock",
+    status: statusField?.value || "published",
   };
 }
 
@@ -3406,7 +3460,8 @@ function isInventoryRowDirty(row) {
   const normalizedCurrentOldPrice = Number.isFinite(currentOldPrice) && currentOldPrice > 0 ? currentOldPrice : null;
   return draftRow.price !== currentPrice
     || draftRow.old_price !== normalizedCurrentOldPrice
-    || draftRow.stock_status !== (product.stockStatus || "in_stock");
+    || draftRow.stock_status !== (product.stockStatus || "in_stock")
+    || draftRow.status !== (product.status || "published");
 }
 
 function updateInventoryRowState(row) {
