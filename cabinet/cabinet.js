@@ -210,7 +210,7 @@ function clearSessionTokens() {
 
 async function fetchActiveSession() {
   const sessionResult = await fetchJson(`${apiBase()}/auth/session`);
-  if (!sessionResult.ok) return null;
+  if (!sessionResult.ok || !sessionResult.data?.session) return null;
   const policyResult = await fetchJson(`${apiBase()}/auth/access-policy`);
   return {
     ok: true,
