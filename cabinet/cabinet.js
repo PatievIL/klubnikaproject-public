@@ -371,9 +371,10 @@ function bindLogout() {
 
 function getAllowedSections() {
   return [
-    { id: "purchase", label: "Покупка", note: "Корзина, заказ, документы и доставка." },
-    { id: "calculations", label: "Расчёты", note: "Калькулятор и пометка менеджеру." },
-    { id: "messages", label: "Сообщения", note: "Связь с командой по покупке и расчёту." },
+    { id: "purchase", label: "Покупки", note: "Заказы и корзина." },
+    { id: "course", label: "Курс", note: "Уроки и прогресс." },
+    { id: "profile", label: "Профиль", note: "Контакты и доставка." },
+    { id: "messages", label: "Сообщения", note: "Вопросы команде." },
   ];
 }
 
@@ -388,10 +389,10 @@ function normalizeRequestedSectionId(sectionId) {
     cart: "purchase",
     orders: "purchase",
     documents: "purchase",
-    profile: "purchase",
+    profile: "profile",
     requests: "calculations",
     special: "calculations",
-    course: "calculations",
+    course: "course",
   };
   const raw = String(sectionId || "").trim();
   return aliases[raw] || raw || preferredSectionId();
@@ -430,6 +431,8 @@ async function renderCabinet(session) {
 
 async function renderSection(session, sectionId) {
   if (sectionId === "purchase") return renderPurchaseSection(session);
+  if (sectionId === "course") return renderCourseSection(session);
+  if (sectionId === "profile") return renderProfileSection(session);
   if (sectionId === "calculations") return renderCalculationsSection(session);
   if (sectionId === "messages") return renderMessagesSection(session);
   return renderUnavailable("Кабинет", "Раздел не найден.");
@@ -438,41 +441,42 @@ async function renderSection(session, sectionId) {
 function bindSectionRuntime(session, sectionId) {
   if (sectionId === "purchase") {
     bindCartSection(session);
-    bindProfileSection(session);
     bindOrderMessages();
   }
+  if (sectionId === "course") bindCourseSection(session);
+  if (sectionId === "profile") bindProfileSection(session);
   if (sectionId === "calculations") bindCalculationsSection(session);
   if (sectionId === "messages") bindMessagesSection();
 }
 
 function renderUserCard(session) {
   document.body.dataset.cabinetFamily = "user";
-  const displayName = getDisplayName(session);
+  const displayName = getCabinetCustomerLabel(session);
+  const email = session?.user?.email || "";
   document.querySelectorAll("[data-cabinet-user]").forEach((target) => {
     target.innerHTML = `
       <div class="cabinet-access-card cabinet-access-card--member">
         <strong class="cabinet-user-name">${escapeHtml(displayName)}</strong>
+        ${email ? `<span class="cabinet-user-note">${escapeHtml(email)}</span>` : ""}
       </div>
     `;
   });
 }
 
 function applyShellModel(session, section) {
-  const sections = getAllowedSections(session);
-  const displayName = getDisplayName(session);
   document.querySelectorAll("[data-cabinet-logout]").forEach((button) => {
     button.hidden = false;
     button.style.display = "";
   });
-  setText("[data-cabinet-shell-mode-label]", "Кабинет");
-  setText("[data-cabinet-shell-meta]", `${displayName} · ${sections.length} раздела`);
+  setText("[data-cabinet-shell-mode-label]", "Личный кабинет");
+  setText("[data-cabinet-shell-meta]", "Личный кабинет");
   setText("[data-cabinet-shell-section-label]", section.label);
   setText("[data-cabinet-shell-section-note]", section.note);
-  setText("[data-cabinet-nav-label]", "Разделы");
+  setText("[data-cabinet-nav-label]", "Меню");
   setText("[data-cabinet-rail-role]", "Кабинет покупателя");
-  setLink("[data-cabinet-shell-primary]", "Сообщения", cabinetSectionHref("messages"));
-  setLink("[data-cabinet-shell-secondary]", "Открыть калькулятор", routes.calc);
-  setLink("[data-cabinet-shell-tertiary]", "Задать вопрос", routes.consultations);
+  setLink("[data-cabinet-shell-primary]", "Написать", cabinetSectionHref("messages"));
+  setLink("[data-cabinet-shell-secondary]", "Калькулятор", routes.calc);
+  setLink("[data-cabinet-shell-tertiary]", "Поддержка", routes.consultations);
   setLink("[data-cabinet-site-link]", "Открыть сайт", routes.site);
 }
 
@@ -503,11 +507,11 @@ function renderGuestShell() {
     `;
   });
 
-  setText("[data-cabinet-shell-mode-label]", "Статус");
-  setText("[data-cabinet-shell-meta]", "Кабинет готовится");
-  setText("[data-cabinet-shell-section-label]", "Скелет без личных данных");
-  setText("[data-cabinet-shell-section-note]", "После входа здесь появятся покупка, расчёты и сообщения.");
-  setText("[data-cabinet-nav-label]", "Разделы");
+  setText("[data-cabinet-shell-mode-label]", "Личный кабинет");
+  setText("[data-cabinet-shell-meta]", "Личный кабинет");
+  setText("[data-cabinet-shell-section-label]", "Вход");
+  setText("[data-cabinet-shell-section-note]", "После входа появятся покупки, курс и сообщения.");
+  setText("[data-cabinet-nav-label]", "Меню");
   setText("[data-cabinet-rail-role]", "Кабинет покупателя");
   setLink("[data-cabinet-shell-primary]", "Войти", loginHref);
   setLink("[data-cabinet-shell-secondary]", "Открыть калькулятор", routes.calc);
@@ -529,7 +533,7 @@ function renderGuestShell() {
         <div class="cabinet-section-intro">
           <div class="cabinet-kicker">Кабинет</div>
           <h2 class="calc-card-title">Личный кабинет без лишних разделов</h2>
-          <p class="sublead">Внутри только покупка, расчёты и сообщения. Личные данные откроются после входа.</p>
+        <p class="sublead">Внутри покупки, курс, профиль и сообщения. Личные данные откроются после входа.</p>
         </div>
         <section class="cabinet-section-grid">
           ${sections.map((section) => `
@@ -554,8 +558,7 @@ function renderGuestShell() {
 
 async function renderPurchaseSection(session) {
   const bundle = await loadMemberProjectBundle(session);
-  const [profile, orders, messages] = await Promise.all([
-    loadMemberProfile(session),
+  const [orders, messages] = await Promise.all([
     memberHasScope(session, "orders") ? loadMemberOrders().catch(() => []) : Promise.resolve([]),
     loadMemberMessages().catch(() => []),
   ]);
@@ -582,20 +585,13 @@ async function renderPurchaseSection(session) {
     <div class="cabinet-section-stack">
       <div class="cabinet-section-intro">
         <div class="cabinet-kicker">Покупка</div>
-        <h2 class="calc-card-title">Корзина и контроль покупки</h2>
-        <p class="sublead">Корзина, заказы, документы и данные доставки собраны в одном месте.</p>
-      </div>
-      <div class="cabinet-stat-grid cabinet-stat-grid--member">
-        ${renderStatCard("В корзине", String(cartEntries.length), cartEntries.length ? "можно собрать заказ" : "корзина пустая")}
-        ${renderStatCard("Заказы", String(orders.length), orders.length ? "есть история" : "пока нет")}
-        ${renderStatCard("Документы", String(documents.length), documents.length ? "готовы к открытию" : "пока нет")}
-        ${renderStatCard("Профиль", `${profileCompleteness(profile)}/3`, "email, телефон, доставка")}
+        <h2 class="calc-card-title">Мои покупки</h2>
+        <p class="sublead">Заказы, документы и корзина собраны в одном месте.</p>
       </div>
       <div class="cabinet-home-grid cabinet-home-grid--single">
         <div class="cabinet-home-main">
-          ${renderCartCard(session, cartEntries)}
           ${renderOrdersCard(orders, documents)}
-          ${renderProfileCard(profile)}
+          ${renderCartCard(session, cartEntries)}
           ${renderSavedCard(session, savedItems)}
         </div>
       </div>
@@ -607,7 +603,7 @@ function renderCartCard(session, entries) {
   return `
     <section class="card card-pad cabinet-card">
       <div class="cabinet-kicker">Корзина</div>
-      <h3 class="calc-card-title">Позиции к закупке</h3>
+      <h3 class="calc-card-title">Корзина</h3>
       ${entries.length ? `
         <div class="cabinet-home-actions">
           ${memberHasScope(session, "orders")
@@ -657,29 +653,32 @@ function renderOrdersCard(orders, documents) {
   return `
     <section class="card card-pad cabinet-card">
       <div class="cabinet-kicker">Заказы</div>
-      <h3 class="calc-card-title">Контроль покупки</h3>
+      <h3 class="calc-card-title">Мои заказы</h3>
       ${orders.length ? `
         <div class="cabinet-list">
           <div class="cabinet-list-head cabinet-list-head--catalog">
-            <span>Заказ</span><span>Статус</span><span>Переход</span>
+            <span>Заказ</span><span>Статус и оплата</span><span>Переход</span>
           </div>
           <div class="cabinet-list-body">
-            ${orders.map((order) => `
+            ${orders.map((order) => {
+              const lineItems = orderLineItems(order);
+              const amount = formatOrderAmount(order);
+              return `
               <article class="cabinet-list-row cabinet-list-row--catalog">
                 <div class="cabinet-list-cell">
                   <strong>${escapeHtml(order.title || `Заказ #${order.id || ""}`)}</strong>
-                  <span>${escapeHtml(formatDate(order.created_at))}</span>
+                  <span>${escapeHtml([formatDate(order.created_at), amount].filter(Boolean).join(" · "))}</span>
                 </div>
                 <div class="cabinet-list-cell">
                   <strong>${escapeHtml(humanizeOrderStatus(order.status))}</strong>
-                  <span>${escapeHtml(order.note || "следующий шаг уточнит менеджер")}</span>
+                  <span>${escapeHtml(humanizePaymentStatus(order.payment_status))}</span>
                 </div>
                 <div class="cabinet-list-cell">
                   <strong><a href="${escapeAttribute(cabinetSectionHref("purchase", { order: order.id }))}">Открыть заказ</a></strong>
-                  <span>${escapeHtml((order.line_items || []).length)} позиций</span>
+                  <span>${escapeHtml(lineItems.length)} позиций</span>
                 </div>
               </article>
-            `).join("")}
+            `; }).join("")}
           </div>
         </div>
       ` : '<div class="account-empty">Заказов пока нет. Они появятся после подтверждения закупки.</div>'}
@@ -697,14 +696,28 @@ function renderOrdersCard(orders, documents) {
   `;
 }
 
+async function renderProfileSection(session) {
+  const profile = await loadMemberProfile(session);
+  return `
+    <div class="cabinet-section-stack">
+      <div class="cabinet-section-intro">
+        <div class="cabinet-kicker">Профиль</div>
+        <h2 class="calc-card-title">Контакты и доставка</h2>
+        <p class="sublead">Эти данные нужны для счёта, документов и отправки заказа.</p>
+      </div>
+      ${renderProfileCard(profile)}
+    </div>
+  `;
+}
+
 function renderProfileCard(profile) {
   return `
     <section class="card card-pad cabinet-card cabinet-profile-card">
-      <div class="cabinet-kicker">Данные для покупки</div>
+      <div class="cabinet-kicker">Данные</div>
       <h3 class="calc-card-title">Контакты и доставка</h3>
       <div class="cabinet-field-grid">
         ${renderInput("Имя", "display_name", profile.display_name || "")}
-        ${renderInput("Email", "email", profile.email || "", "email")}
+        ${renderInput("Email", "email", profile.email || "", "email", { readonly: true })}
         ${renderInput("Телефон", "phone", profile.phone || "")}
         ${renderTextarea("Адрес доставки", "delivery_address", profile.delivery_address || "", "Город, улица, склад или пункт выдачи")}
         ${renderTextarea("Комментарий к доставке", "delivery_comment", profile.delivery_comment || "", "Кто принимает и когда удобно привезти")}
@@ -742,26 +755,33 @@ function renderSavedCard(session, items) {
 
 function renderOrderDetail(order, documents, messages) {
   const orderMessages = filterMessagesForOrder(order, messages);
+  const lineItems = orderLineItems(order);
   return `
     <div class="cabinet-section-stack">
       <div class="cabinet-section-intro">
         <div class="cabinet-kicker">Покупка / заказ</div>
         <h2 class="calc-card-title">${escapeHtml(order.title || `Заказ #${order.id || ""}`)}</h2>
-        <p class="sublead">Состав, документы и сообщение менеджеру по этому заказу.</p>
+        <p class="sublead">${escapeHtml(`${humanizeOrderStatus(order.status)} · ${humanizePaymentStatus(order.payment_status)}`)}</p>
+      </div>
+      <div class="cabinet-stat-grid cabinet-stat-grid--member">
+        ${renderStatCard("Статус", humanizeOrderStatus(order.status), order.note || "следующий шаг уточнит менеджер")}
+        ${renderStatCard("Оплата", humanizePaymentStatus(order.payment_status), formatOrderAmount(order) || "сумма уточняется")}
+        ${renderStatCard("Позиции", String(lineItems.length), lineItems.length ? "в составе заказа" : "пока не добавлены")}
+        ${renderStatCard("Документы", String(documents.length), documents.length ? "есть файлы" : "пока нет")}
       </div>
       <section class="card card-pad cabinet-card">
         <div class="cabinet-kicker">Состав</div>
         <h3 class="calc-card-title">Что в заказе</h3>
-        ${(order.line_items || []).length ? `
+        ${lineItems.length ? `
           <div class="cabinet-list">
             <div class="cabinet-list-head cabinet-list-head--catalog">
               <span>Позиция</span><span>Количество</span><span>Категория</span>
             </div>
             <div class="cabinet-list-body">
-              ${(order.line_items || []).map((item) => `
+              ${lineItems.map((item) => `
                 <article class="cabinet-list-row cabinet-list-row--catalog">
                   <div class="cabinet-list-cell"><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.summary || "")}</span></div>
-                  <div class="cabinet-list-cell"><strong>${escapeHtml(String(item.qty || 1))}</strong><span>шт.</span></div>
+                  <div class="cabinet-list-cell"><strong>${escapeHtml(String(item.qty || item.quantity || 1))}</strong><span>шт.</span></div>
                   <div class="cabinet-list-cell"><strong>${escapeHtml(humanizeCategory(item.category || ""))}</strong>${item.path ? `<span><a href="${escapeAttribute(resolvePublicPath(item.path))}">Открыть</a></span>` : ""}</div>
                 </article>
               `).join("")}
@@ -841,6 +861,236 @@ async function renderCalculationsSection(session) {
       </section>
     </div>
   `;
+}
+
+async function renderCourseSection() {
+  const course = await loadMemberCourse();
+  const modules = Array.isArray(course.modules) ? course.modules : [];
+  const lessons = modules.flatMap((module) => module.lessons || []);
+  const completed = lessons.filter((lesson) => lesson.status === "completed").length;
+  const checked = lessons.filter((lesson) => lesson.status === "checked" || lesson.quiz_passed === true).length;
+  const available = lessons.filter((lesson) => lesson.available).length;
+  const progressPercent = lessons.length ? Math.round((completed / lessons.length) * 100) : 0;
+  const selectedLessonId = new URLSearchParams(window.location.search).get("lesson");
+  const selectedLesson = lessons.find((lesson) => lesson.id === selectedLessonId);
+
+  if (selectedLesson) {
+    const detail = await loadMemberLesson(selectedLesson.id).catch(() => selectedLesson);
+    return renderCourseLessonDetail(course, detail);
+  }
+
+  return `
+    <div class="cabinet-section-stack">
+      <div class="cabinet-section-intro">
+        <div class="cabinet-kicker">Курс</div>
+        <h2 class="calc-card-title">${escapeHtml(course.title || "Клубничный Хак")}</h2>
+        <p class="sublead">${course.has_access ? "Доступ активен. Проходите уроки, сдавайте короткие проверки и фиксируйте свой этап." : "Первый урок открыт как стартовый. Полный курс привязан к покупке и выдаче доступа."}</p>
+      </div>
+      <section class="card card-pad cabinet-card cabinet-course-progress">
+        <div class="cabinet-course-progress__head">
+          <div>
+            <div class="cabinet-kicker">Прогресс курса</div>
+            <h3 class="calc-card-title">${escapeHtml(String(progressPercent))}% пройдено</h3>
+          </div>
+          <span>${escapeHtml(String(completed))} из ${escapeHtml(String(lessons.length))} уроков</span>
+        </div>
+        <div class="cabinet-course-progress__track" aria-hidden="true">
+          <span style="width: ${escapeAttribute(String(progressPercent))}%"></span>
+        </div>
+        <div class="cabinet-course-stages">
+          ${modules.map((module) => renderCourseStage(module)).join("")}
+        </div>
+      </section>
+      <div class="cabinet-stat-grid cabinet-stat-grid--member">
+        ${renderStatCard("Доступ", course.has_access ? "Активен" : "Нет", course.has_access ? "по базе кабинета" : "нужна покупка или ручная выдача")}
+        ${renderStatCard("Уроки", String(lessons.length), `${available} доступно`)}
+        ${renderStatCard("Проверки", String(checked), checked ? "есть результаты тестов" : "пока нет")}
+        ${renderStatCard("Пройдено", String(completed), completed ? "прогресс сохранён" : "пока нет")}
+      </div>
+      ${modules.map(renderCourseModule).join("")}
+      ${course.has_access ? "" : `
+        <section class="card card-pad cabinet-card">
+          <div class="cabinet-kicker">Доступ</div>
+          <h3 class="calc-card-title">Курс пока закрыт</h3>
+          <p class="sublead">Если курс уже оплачен, отправьте сообщение: мы сверим покупку и выдадим доступ в новом кабинете.</p>
+          <div class="cabinet-home-actions">
+            <a class="btn btn-primary" href="${escapeAttribute(cabinetSectionHref("messages"))}">Написать по доступу</a>
+            <a class="btn btn-secondary" href="${escapeAttribute(routes.site)}klubhack/">Открыть страницу курса</a>
+          </div>
+        </section>
+      `}
+    </div>
+  `;
+}
+
+function renderCourseStage(module) {
+  const lessons = Array.isArray(module.lessons) ? module.lessons : [];
+  const completed = lessons.filter((lesson) => lesson.status === "completed").length;
+  const current = lessons.some((lesson) => lesson.status === "started" || lesson.status === "checked");
+  const label = completed === lessons.length && lessons.length ? "готово" : current ? "в работе" : "ожидает";
+  return `
+    <article class="cabinet-course-stage ${current ? "is-current" : ""} ${completed === lessons.length && lessons.length ? "is-done" : ""}">
+      <strong>${escapeHtml(module.title || module.id || "Модуль")}</strong>
+      <span>${escapeHtml(label)} · ${escapeHtml(String(completed))}/${escapeHtml(String(lessons.length))}</span>
+    </article>
+  `;
+}
+
+function renderCourseModule(module) {
+  const lessons = Array.isArray(module.lessons) ? module.lessons : [];
+  const completed = lessons.filter((lesson) => lesson.status === "completed").length;
+  return `
+    <section class="card card-pad cabinet-card">
+      <div class="cabinet-kicker">${escapeHtml(module.id || "Модуль")}</div>
+      <h3 class="calc-card-title">${escapeHtml(module.title || "Модуль курса")}</h3>
+      <p class="sublead">${escapeHtml(module.summary || `${completed} из ${lessons.length} уроков пройдено.`)}</p>
+      <div class="cabinet-list">
+        <div class="cabinet-list-body">
+          ${lessons.map((lesson) => `
+            <article class="cabinet-list-row cabinet-list-row--course">
+              <div class="cabinet-list-cell">
+                <strong>${escapeHtml(lesson.title || lesson.id)}</strong>
+                <span>${escapeHtml(lesson.summary || lesson.legacy_alias || "")}</span>
+              </div>
+              <div class="cabinet-list-cell">
+                <strong>${escapeHtml(humanizeCourseStatus(lesson.status))}</strong>
+                <span>${renderCourseLessonMeta(lesson)}</span>
+              </div>
+              <div class="cabinet-list-cell">
+                ${lesson.available
+                  ? `<strong><a href="${escapeAttribute(cabinetSectionHref("course", { lesson: lesson.id }))}">Открыть</a></strong>`
+                  : "<strong>Закрыт</strong>"}
+              </div>
+            </article>
+          `).join("")}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderCourseLessonMeta(lesson) {
+  const parts = [];
+  if (lesson.estimated_minutes) parts.push(`${lesson.estimated_minutes} мин`);
+  if (lesson.progress_percent) parts.push(`${lesson.progress_percent}%`);
+  if (lesson.quiz_passed === true) parts.push("тест зачтён");
+  if (lesson.quiz_passed === false) parts.push("тест не зачтён");
+  return escapeHtml(parts.join(" · ") || "без прогресса");
+}
+
+function renderCourseLessonDetail(course, lesson) {
+  const locked = lesson.locked || !lesson.available;
+  const quizPassed = lesson.quiz_passed === true;
+  const quizChecked = typeof lesson.quiz_passed === "boolean";
+  return `
+    <div class="cabinet-section-stack">
+      <div class="cabinet-section-intro">
+        <div class="cabinet-kicker">${escapeHtml(lesson.module_title || course.title || "Курс")}</div>
+        <h2 class="calc-card-title">${escapeHtml(lesson.title || "Урок")}</h2>
+        <p class="sublead">${locked ? "Урок закрыт до выдачи доступа." : escapeHtml(lesson.summary || "Пройдите материал, выполните действие и сдайте короткую проверку.")}</p>
+      </div>
+      <section class="card card-pad cabinet-card">
+        <div class="cabinet-kicker">${locked ? "Доступ" : "Урок"}</div>
+        <h3 class="calc-card-title">${locked ? "Нет доступа" : "Каркас прохождения"}</h3>
+        ${locked ? `
+          <p class="sublead">Если курс уже оплачен, напишите команде, чтобы сверить оплату и активировать доступ.</p>
+          <div class="cabinet-home-actions">
+            <a class="btn btn-primary" href="${escapeAttribute(cabinetSectionHref("messages"))}">Написать по доступу</a>
+          </div>
+        ` : `
+          <div class="cabinet-mini-list cabinet-mini-list--compact">
+            <article class="cabinet-mini-card"><strong>Этап</strong><span>${escapeHtml(lesson.stage_title || lesson.stage || "Курс")}</span></article>
+            <article class="cabinet-mini-card"><strong>Статус</strong><span>${escapeHtml(humanizeCourseStatus(lesson.status))}</span></article>
+            <article class="cabinet-mini-card"><strong>Прогресс</strong><span>${escapeHtml(String(lesson.progress_percent || 0))}%</span></article>
+            <article class="cabinet-mini-card"><strong>Проверка</strong><span>${quizChecked ? (quizPassed ? "зачтена" : "нужно повторить") : "не сдана"}</span></article>
+          </div>
+          <div class="cabinet-course-lesson-grid">
+            <article class="cabinet-course-block">
+              <div class="cabinet-kicker">Материал</div>
+              <h4>Что разобрать</h4>
+              ${renderCourseBulletList(lesson.objectives)}
+              ${renderCourseMaterials(lesson.materials)}
+            </article>
+            <article class="cabinet-course-block">
+              <div class="cabinet-kicker">Задание</div>
+              <h4>Что зафиксировать</h4>
+              <p>${escapeHtml(lesson.assignment || "Запишите решение по уроку и следующий шаг.")}</p>
+              <div class="cabinet-course-note">Позже сюда можно добавить поле ответа/домашки и проверку менеджером.</div>
+            </article>
+          </div>
+          ${renderCourseQuiz(lesson)}
+          <div class="cabinet-user-card-actions">
+            <button class="btn btn-secondary" type="button" data-course-progress="${escapeAttribute(lesson.id)}" data-course-status="started">Сохранить как начатый</button>
+            <button class="btn btn-primary" type="button" data-course-progress="${escapeAttribute(lesson.id)}" data-course-status="completed">Отметить урок пройденным</button>
+            <a class="btn btn-secondary" href="${escapeAttribute(cabinetSectionHref("course"))}">К списку уроков</a>
+          </div>
+          <div class="cabinet-users-status" data-course-progress-status></div>
+        `}
+      </section>
+    </div>
+  `;
+}
+
+function renderCourseBulletList(items) {
+  const list = Array.isArray(items) ? items.filter(Boolean) : [];
+  if (!list.length) return '<p class="sublead">Материал урока подключается из snapshot.</p>';
+  return `<ul class="cabinet-course-list">${list.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+}
+
+function renderCourseMaterials(items) {
+  const materials = Array.isArray(items) ? items : [];
+  if (!materials.length) return "";
+  return `
+    <div class="cabinet-course-materials">
+      ${materials.map((item) => `
+        <div class="cabinet-course-material">
+          <strong>${escapeHtml(item.title || "Материал")}</strong>
+          <span>${escapeHtml(humanizeCourseMaterialType(item.type))} · ${escapeHtml(humanizeCourseMaterialStatus(item.status))}</span>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderCourseQuiz(lesson) {
+  const questions = Array.isArray(lesson.quiz?.questions) ? lesson.quiz.questions : [];
+  if (!questions.length) return "";
+  return `
+    <form class="cabinet-course-quiz" data-course-quiz="${escapeAttribute(lesson.id)}">
+      <div class="cabinet-course-quiz__head">
+        <div>
+          <div class="cabinet-kicker">Тест</div>
+          <h4>Проверка урока</h4>
+        </div>
+        <span>${escapeHtml(renderCourseQuizResult(lesson))}</span>
+      </div>
+      ${questions.map((question, index) => `
+        <fieldset class="cabinet-course-question">
+          <legend>${escapeHtml(index + 1)}. ${escapeHtml(question.question || "Вопрос")}</legend>
+          ${(question.options || []).map((option) => `
+            <label class="cabinet-course-option">
+              <input
+                type="radio"
+                name="course-quiz-${escapeAttribute(lesson.id)}-${escapeAttribute(question.id)}"
+                value="${escapeAttribute(option.id)}"
+                ${lesson.quiz_answers?.[question.id] === option.id ? "checked" : ""}
+              />
+              <span>${escapeHtml(option.label || option.id)}</span>
+            </label>
+          `).join("")}
+        </fieldset>
+      `).join("")}
+      <div class="cabinet-user-card-actions">
+        <button class="btn btn-primary" type="submit" data-course-quiz-submit="${escapeAttribute(lesson.id)}">Проверить тест</button>
+      </div>
+    </form>
+  `;
+}
+
+function renderCourseQuizResult(lesson) {
+  if (typeof lesson.quiz_passed !== "boolean") return "ещё не сдавался";
+  const score = lesson.quiz_score ?? 0;
+  return lesson.quiz_passed ? `зачёт · ${score}%` : `повторить · ${score}%`;
 }
 
 async function renderMessagesSection() {
@@ -932,6 +1182,66 @@ function bindCalculationsSection(session) {
     const nextStatus = document.querySelector("[data-member-calc-note-status]");
     if (nextStatus) nextStatus.textContent = "Пометка отправлена менеджеру.";
   });
+}
+
+function bindCourseSection() {
+  document.querySelectorAll("[data-course-quiz]").forEach((form) => {
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const lessonId = form.dataset.courseQuiz;
+      const status = document.querySelector("[data-course-progress-status]");
+      const answers = collectCourseQuizAnswers(form, lessonId);
+      if (!Object.keys(answers).length) {
+        if (status) status.textContent = "Выберите ответы в тесте.";
+        return;
+      }
+      if (status) status.textContent = "Проверяем тест...";
+      try {
+        await saveMemberCourseProgress({
+          lesson_id: lessonId,
+          status: "checked",
+          progress_percent: 70,
+          quiz_answers: answers,
+        });
+        await rerenderCurrentSection();
+        const nextStatus = document.querySelector("[data-course-progress-status]");
+        if (nextStatus) nextStatus.textContent = "Тест проверен и сохранён.";
+      } catch (error) {
+        if (status) status.textContent = `Тест не сохранился: ${cleanupError(error.message || "runtime_error")}`;
+      }
+    });
+  });
+
+  document.querySelectorAll("[data-course-progress]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const status = document.querySelector("[data-course-progress-status]");
+      if (status) status.textContent = "Сохраняем прогресс...";
+      try {
+        await saveMemberCourseProgress({
+          lesson_id: button.dataset.courseProgress,
+          status: button.dataset.courseStatus || "started",
+          progress_percent: button.dataset.courseStatus === "completed" ? 100 : 10,
+        });
+        await rerenderCurrentSection();
+        const nextStatus = document.querySelector("[data-course-progress-status]");
+        if (nextStatus) nextStatus.textContent = "Прогресс сохранён.";
+      } catch (error) {
+        if (status) status.textContent = `Не сохранилось: ${cleanupError(error.message || "runtime_error")}`;
+      }
+    });
+  });
+}
+
+function collectCourseQuizAnswers(form, lessonId) {
+  const answers = {};
+  form.querySelectorAll("fieldset").forEach((fieldset) => {
+    const input = fieldset.querySelector("input[type='radio']");
+    if (!input?.name) return;
+    const checked = fieldset.querySelector("input[type='radio']:checked");
+    const questionId = input.name.replace(`course-quiz-${lessonId}-`, "");
+    if (questionId && checked?.value) answers[questionId] = checked.value;
+  });
+  return answers;
 }
 
 function bindProfileSection(session) {
@@ -1092,6 +1402,31 @@ async function loadMemberSpecialPages() {
     throw new Error(cleanupError(response.text || `HTTP ${response.status}`));
   }
   return response.data.items || [];
+}
+
+async function loadMemberCourse() {
+  const response = await fetchJson(`${apiBase()}/member/course`);
+  if (!response.ok) {
+    if ([401, 403].includes(response.status)) redirectToLogin();
+    throw new Error(cleanupError(response.text || `HTTP ${response.status}`));
+  }
+  return response.data.item || {};
+}
+
+async function loadMemberLesson(lessonId) {
+  const response = await fetchJson(`${apiBase()}/member/course/lessons/${encodeURIComponent(lessonId)}`);
+  if (!response.ok) throw new Error(cleanupError(response.text || `HTTP ${response.status}`));
+  return response.data.item || null;
+}
+
+async function saveMemberCourseProgress(payload) {
+  const response = await fetchJson(`${apiBase()}/member/course/progress`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) throw new Error(cleanupError(response.text || `HTTP ${response.status}`));
+  return response.data.item || null;
 }
 
 async function loadMemberProfile(session) {
@@ -1315,15 +1650,27 @@ function buildCalculationManagerMessage(snapshot, note) {
   ].join("\n");
 }
 
+function orderLineItems(order) {
+  const rawItems = Array.isArray(order?.line_items) ? order.line_items : Array.isArray(order?.items) ? order.items : [];
+  return rawItems.map((item) => ({
+    ...item,
+    qty: item.qty ?? item.quantity,
+    summary: item.summary || item.payload?.summary || "",
+    category: item.category || item.payload?.category || "",
+    path: item.path || item.payload?.path || "",
+  }));
+}
+
 function renderStatCard(label, value, note) {
   return `<article class="cabinet-stat-card"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><em>${escapeHtml(note || "")}</em></article>`;
 }
 
-function renderInput(label, field, value, type = "text") {
+function renderInput(label, field, value, type = "text", options = {}) {
+  const attrs = options.readonly ? ' readonly aria-readonly="true"' : "";
   return `
     <label class="cabinet-field">
       <span class="cabinet-field-label">${escapeHtml(label)}</span>
-      <input class="cabinet-input" data-member-profile="${escapeAttribute(field)}" type="${escapeAttribute(type)}" value="${escapeAttribute(value)}" />
+      <input class="cabinet-input" data-member-profile="${escapeAttribute(field)}" type="${escapeAttribute(type)}" value="${escapeAttribute(value)}"${attrs} />
     </label>
   `;
 }
@@ -1411,6 +1758,12 @@ function getDisplayName(session) {
   return session?.user?.display_name || session?.user?.user_name || session?.user?.email || "Покупатель";
 }
 
+function getCabinetCustomerLabel(session) {
+  const displayName = String(session?.user?.display_name || session?.user?.user_name || "").trim();
+  if (displayName && !/^admin$/i.test(displayName)) return displayName;
+  return "Покупатель";
+}
+
 function resolvePublicPath(path = "") {
   const raw = String(path || "").trim();
   if (!raw) return "";
@@ -1439,6 +1792,34 @@ function humanizeOrderStatus(status) {
   return labels[String(status || "").toLowerCase()] || status || "В работе";
 }
 
+function humanizePaymentStatus(status) {
+  const labels = {
+    paid: "Оплачено",
+    unpaid: "Не оплачено",
+    pending: "Оплата проверяется",
+    authorized: "Оплата авторизована",
+    refunded: "Возврат",
+    failed: "Оплата не прошла",
+    cancelled: "Оплата отменена",
+  };
+  return labels[String(status || "").toLowerCase()] || status || "Оплата уточняется";
+}
+
+function formatOrderAmount(order) {
+  const amount = Number(order?.total_amount || 0);
+  if (!Number.isFinite(amount) || amount <= 0) return "";
+  const currency = String(order?.currency || "RUB").trim().toUpperCase();
+  try {
+    return new Intl.NumberFormat("ru-RU", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+    }).format(amount);
+  } catch {
+    return `${amount.toLocaleString("ru-RU")} ${currency}`;
+  }
+}
+
 function humanizeDocumentStatus(status) {
   const labels = {
     draft: "Готовится",
@@ -1447,6 +1828,34 @@ function humanizeDocumentStatus(status) {
     archived: "Архив",
   };
   return labels[String(status || "").toLowerCase()] || status || "Готовится";
+}
+
+function humanizeCourseStatus(status) {
+  const labels = {
+    not_started: "Не начат",
+    started: "Начат",
+    checked: "Проверка сдана",
+    completed: "Пройден",
+  };
+  return labels[String(status || "").toLowerCase()] || status || "Не начат";
+}
+
+function humanizeCourseMaterialType(type) {
+  const labels = {
+    video: "видео",
+    worksheet: "практика",
+    text: "текст",
+  };
+  return labels[String(type || "").toLowerCase()] || "материал";
+}
+
+function humanizeCourseMaterialStatus(status) {
+  const labels = {
+    ready: "готово",
+    snapshot_pending: "из Tilda snapshot",
+    draft: "черновик",
+  };
+  return labels[String(status || "").toLowerCase()] || "в работе";
 }
 
 function humanizeCategory(value) {
