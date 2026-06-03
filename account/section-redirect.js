@@ -12,10 +12,10 @@ function normalizeTargetSection(section) {
     cart: "purchase",
     orders: "purchase",
     documents: "purchase",
-    profile: "purchase",
+    profile: "profile",
     requests: "calculations",
     special: "calculations",
-    course: "calculations",
+    course: "course",
   };
   return aliases[section] || section || "purchase";
 }

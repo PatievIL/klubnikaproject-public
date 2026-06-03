@@ -871,8 +871,31 @@ async function renderCourseSection() {
   const checked = lessons.filter((lesson) => lesson.status === "checked" || lesson.quiz_passed === true).length;
   const available = lessons.filter((lesson) => lesson.available).length;
   const progressPercent = lessons.length ? Math.round((completed / lessons.length) * 100) : 0;
+  const nextStep = getCourseNextStep(course);
+  const expandedModuleId = findExpandedCourseModuleId(modules);
   const selectedLessonId = new URLSearchParams(window.location.search).get("lesson");
   const selectedLesson = lessons.find((lesson) => lesson.id === selectedLessonId);
+
+  if (!course.has_access) {
+    return `
+      <div class="cabinet-section-stack">
+        <div class="cabinet-section-intro">
+          <div class="cabinet-kicker">Курс</div>
+          <h2 class="calc-card-title">${escapeHtml(course.title || "Клубничный Хак")}</h2>
+          <p class="sublead">Курс привязан к покупке и ручной выдаче доступа в новом кабинете.</p>
+        </div>
+        <section class="card card-pad cabinet-card">
+          <div class="cabinet-kicker">Доступ</div>
+          <h3 class="calc-card-title">Курс пока закрыт</h3>
+          <p class="sublead">Если курс уже оплачен, отправьте сообщение: мы сверим покупку и откроем материалы.</p>
+          <div class="cabinet-home-actions">
+            <a class="btn btn-primary" href="${escapeAttribute(cabinetSectionHref("messages"))}">Написать по доступу</a>
+            <a class="btn btn-secondary" href="${escapeAttribute(routes.site)}klubhack/">Открыть страницу курса</a>
+          </div>
+        </section>
+      </div>
+    `;
+  }
 
   if (selectedLesson) {
     const detail = await loadMemberLesson(selectedLesson.id).catch(() => selectedLesson);
@@ -884,8 +907,9 @@ async function renderCourseSection() {
       <div class="cabinet-section-intro">
         <div class="cabinet-kicker">Курс</div>
         <h2 class="calc-card-title">${escapeHtml(course.title || "Клубничный Хак")}</h2>
-        <p class="sublead">${course.has_access ? "Доступ активен. Проходите уроки, сдавайте короткие проверки и фиксируйте свой этап." : "Первый урок открыт как стартовый. Полный курс привязан к покупке и выдаче доступа."}</p>
+        <p class="sublead">Доступ активен. Проходите уроки, сдавайте короткие проверки и фиксируйте свой этап.</p>
       </div>
+      ${renderCourseNextStep(nextStep)}
       <section class="card card-pad cabinet-card cabinet-course-progress">
         <div class="cabinet-course-progress__head">
           <div>
@@ -907,18 +931,9 @@ async function renderCourseSection() {
         ${renderStatCard("Проверки", String(checked), checked ? "есть результаты тестов" : "пока нет")}
         ${renderStatCard("Пройдено", String(completed), completed ? "прогресс сохранён" : "пока нет")}
       </div>
-      ${modules.map(renderCourseModule).join("")}
-      ${course.has_access ? "" : `
-        <section class="card card-pad cabinet-card">
-          <div class="cabinet-kicker">Доступ</div>
-          <h3 class="calc-card-title">Курс пока закрыт</h3>
-          <p class="sublead">Если курс уже оплачен, отправьте сообщение: мы сверим покупку и выдадим доступ в новом кабинете.</p>
-          <div class="cabinet-home-actions">
-            <a class="btn btn-primary" href="${escapeAttribute(cabinetSectionHref("messages"))}">Написать по доступу</a>
-            <a class="btn btn-secondary" href="${escapeAttribute(routes.site)}klubhack/">Открыть страницу курса</a>
-          </div>
-        </section>
-      `}
+      <div class="cabinet-course-modules">
+        ${modules.map((module) => renderCourseModule(module, module.id === expandedModuleId)).join("")}
+      </div>
     </div>
   `;
 }
@@ -926,24 +941,32 @@ async function renderCourseSection() {
 function renderCourseStage(module) {
   const lessons = Array.isArray(module.lessons) ? module.lessons : [];
   const completed = lessons.filter((lesson) => lesson.status === "completed").length;
-  const current = lessons.some((lesson) => lesson.status === "started" || lesson.status === "checked");
-  const label = completed === lessons.length && lessons.length ? "готово" : current ? "в работе" : "ожидает";
+  const moduleStatus = getCourseModuleStatus(module);
   return `
-    <article class="cabinet-course-stage ${current ? "is-current" : ""} ${completed === lessons.length && lessons.length ? "is-done" : ""}">
+    <article class="cabinet-course-stage ${moduleStatus.id === "in_progress" || moduleStatus.id === "checked" ? "is-current" : ""} ${moduleStatus.id === "completed" ? "is-done" : ""}">
       <strong>${escapeHtml(module.title || module.id || "Модуль")}</strong>
-      <span>${escapeHtml(label)} · ${escapeHtml(String(completed))}/${escapeHtml(String(lessons.length))}</span>
+      <span>${escapeHtml(moduleStatus.label)} · ${escapeHtml(String(completed))}/${escapeHtml(String(lessons.length))}</span>
     </article>
   `;
 }
 
-function renderCourseModule(module) {
+function renderCourseModule(module, expanded = false) {
   const lessons = Array.isArray(module.lessons) ? module.lessons : [];
   const completed = lessons.filter((lesson) => lesson.status === "completed").length;
+  const moduleStatus = getCourseModuleStatus(module);
+  const available = lessons.filter((lesson) => lesson.available).length;
   return `
-    <section class="card card-pad cabinet-card">
-      <div class="cabinet-kicker">${escapeHtml(module.id || "Модуль")}</div>
-      <h3 class="calc-card-title">${escapeHtml(module.title || "Модуль курса")}</h3>
-      <p class="sublead">${escapeHtml(module.summary || `${completed} из ${lessons.length} уроков пройдено.`)}</p>
+    <details class="card card-pad cabinet-card cabinet-course-module" ${expanded ? "open" : ""}>
+      <summary class="cabinet-course-module__summary">
+        <span>
+          <strong>${escapeHtml(module.title || "Модуль курса")}</strong>
+        </span>
+        <span class="cabinet-course-module__meta">
+          ${escapeHtml(moduleStatus.label)} · ${escapeHtml(String(completed))}/${escapeHtml(String(lessons.length))} · ${escapeHtml(String(available))} доступно
+        </span>
+      </summary>
+      <div class="cabinet-course-module__body">
+        <p class="sublead">${escapeHtml(module.summary || `${completed} из ${lessons.length} уроков пройдено.`)}</p>
       <div class="cabinet-list">
         <div class="cabinet-list-body">
           ${lessons.map((lesson) => `
@@ -953,7 +976,7 @@ function renderCourseModule(module) {
                 <span>${escapeHtml(lesson.summary || lesson.legacy_alias || "")}</span>
               </div>
               <div class="cabinet-list-cell">
-                <strong>${escapeHtml(humanizeCourseStatus(lesson.status))}</strong>
+                <strong>${escapeHtml(getCourseLessonStatus(lesson).label)}</strong>
                 <span>${renderCourseLessonMeta(lesson)}</span>
               </div>
               <div class="cabinet-list-cell">
@@ -965,16 +988,27 @@ function renderCourseModule(module) {
           `).join("")}
         </div>
       </div>
-    </section>
+      </div>
+    </details>
   `;
+}
+
+function findExpandedCourseModuleId(modules) {
+  const list = Array.isArray(modules) ? modules : [];
+  return list.find((module) => getCourseModuleStatus(module).id === "in_progress")?.id ||
+    list.find((module) => getCourseModuleStatus(module).id === "checked")?.id ||
+    list.find((module) => (module.lessons || []).some((lesson) => lesson.available))?.id ||
+    list[0]?.id ||
+    "";
 }
 
 function renderCourseLessonMeta(lesson) {
   const parts = [];
   if (lesson.estimated_minutes) parts.push(`${lesson.estimated_minutes} мин`);
   if (lesson.progress_percent) parts.push(`${lesson.progress_percent}%`);
-  if (lesson.quiz_passed === true) parts.push("тест зачтён");
-  if (lesson.quiz_passed === false) parts.push("тест не зачтён");
+  if (lesson.quiz_stale) parts.push("тест обновлён");
+  else if (lesson.quiz_passed === true) parts.push("тест зачтён");
+  else if (lesson.quiz_passed === false) parts.push("тест не зачтён");
   return escapeHtml(parts.join(" · ") || "без прогресса");
 }
 
@@ -982,6 +1016,8 @@ function renderCourseLessonDetail(course, lesson) {
   const locked = lesson.locked || !lesson.available;
   const quizPassed = lesson.quiz_passed === true;
   const quizChecked = typeof lesson.quiz_passed === "boolean";
+  const canCompleteLesson = quizPassed && !lesson.quiz_stale;
+  const nextStep = getCourseNextStep(course, lesson);
   return `
     <div class="cabinet-section-stack">
       <div class="cabinet-section-intro">
@@ -991,7 +1027,7 @@ function renderCourseLessonDetail(course, lesson) {
       </div>
       <section class="card card-pad cabinet-card">
         <div class="cabinet-kicker">${locked ? "Доступ" : "Урок"}</div>
-        <h3 class="calc-card-title">${locked ? "Нет доступа" : "Каркас прохождения"}</h3>
+        <h3 class="calc-card-title">${locked ? "Нет доступа" : "Прохождение урока"}</h3>
         ${locked ? `
           <p class="sublead">Если курс уже оплачен, напишите команде, чтобы сверить оплату и активировать доступ.</p>
           <div class="cabinet-home-actions">
@@ -1000,10 +1036,11 @@ function renderCourseLessonDetail(course, lesson) {
         ` : `
           <div class="cabinet-mini-list cabinet-mini-list--compact">
             <article class="cabinet-mini-card"><strong>Этап</strong><span>${escapeHtml(lesson.stage_title || lesson.stage || "Курс")}</span></article>
-            <article class="cabinet-mini-card"><strong>Статус</strong><span>${escapeHtml(humanizeCourseStatus(lesson.status))}</span></article>
+            <article class="cabinet-mini-card"><strong>Статус</strong><span>${escapeHtml(getCourseLessonStatus(lesson).label)}</span></article>
             <article class="cabinet-mini-card"><strong>Прогресс</strong><span>${escapeHtml(String(lesson.progress_percent || 0))}%</span></article>
-            <article class="cabinet-mini-card"><strong>Проверка</strong><span>${quizChecked ? (quizPassed ? "зачтена" : "нужно повторить") : "не сдана"}</span></article>
+            <article class="cabinet-mini-card"><strong>Проверка</strong><span>${lesson.quiz_stale ? "тест обновлён" : quizChecked ? (quizPassed ? "зачтена" : "нужно повторить") : "не сдана"}</span></article>
           </div>
+          ${renderCourseNextStep(nextStep)}
           <div class="cabinet-course-lesson-grid">
             <article class="cabinet-course-block">
               <div class="cabinet-kicker">Материал</div>
@@ -1019,9 +1056,11 @@ function renderCourseLessonDetail(course, lesson) {
             </article>
           </div>
           ${renderCourseQuiz(lesson)}
-          <div class="cabinet-user-card-actions">
+          <div class="cabinet-user-card-actions" id="course-actions">
             <button class="btn btn-secondary" type="button" data-course-progress="${escapeAttribute(lesson.id)}" data-course-status="started">Сохранить как начатый</button>
-            <button class="btn btn-primary" type="button" data-course-progress="${escapeAttribute(lesson.id)}" data-course-status="completed">Отметить урок пройденным</button>
+            ${canCompleteLesson
+              ? `<button class="btn btn-primary" type="button" data-course-progress="${escapeAttribute(lesson.id)}" data-course-status="completed">Отметить урок пройденным</button>`
+              : '<button class="btn btn-primary" type="button" disabled>Сначала сдайте тест</button>'}
             <a class="btn btn-secondary" href="${escapeAttribute(cabinetSectionHref("course"))}">К списку уроков</a>
           </div>
           <div class="cabinet-users-status" data-course-progress-status></div>
@@ -1031,9 +1070,122 @@ function renderCourseLessonDetail(course, lesson) {
   `;
 }
 
+function getCourseNextStep(course, currentLesson = null) {
+  const modules = Array.isArray(course?.modules) ? course.modules : [];
+  const lessons = modules.flatMap((module) => (module.lessons || []).map((lesson) => ({
+    ...lesson,
+    module_title: module.title,
+  })));
+  if (!lessons.length) {
+    return {
+      tone: "muted",
+      kicker: "Следующий шаг",
+      title: "Курс готовится",
+      body: "Уроки появятся после подключения программы курса.",
+    };
+  }
+
+  if (currentLesson?.locked || currentLesson && !currentLesson.available) {
+    return {
+      tone: "locked",
+      kicker: "Следующий шаг",
+      title: "Активировать доступ",
+      body: "Этот урок закрыт. Если курс уже оплачен, напишите команде для сверки доступа.",
+      href: cabinetSectionHref("messages"),
+      action: "Написать по доступу",
+    };
+  }
+
+  if (currentLesson && currentLesson.quiz_stale) {
+    return {
+      tone: "warning",
+      kicker: "Следующий шаг",
+      title: "Пересдать обновлённый тест",
+      body: "Вопросы урока обновились, поэтому старый зачёт больше не учитывается.",
+      anchor: "course-quiz",
+      action: "Перейти к тесту",
+    };
+  }
+
+  if (currentLesson && currentLesson.status !== "completed") {
+    if (currentLesson.quiz_passed === true) {
+      return {
+        tone: "active",
+        kicker: "Следующий шаг",
+        title: "Зафиксировать прохождение урока",
+        body: "Тест зачтён. Отметьте урок пройденным, чтобы обновить общий прогресс курса.",
+        anchor: "course-actions",
+        action: "К кнопкам урока",
+      };
+    }
+    return {
+      tone: "active",
+      kicker: "Следующий шаг",
+      title: "Сдать проверку урока",
+      body: "Ответьте на короткий тест. После зачёта урок можно будет закрыть как пройденный.",
+      anchor: "course-quiz",
+      action: "Перейти к тесту",
+    };
+  }
+
+  const startIndex = currentLesson ? Math.max(lessons.findIndex((lesson) => lesson.id === currentLesson.id) + 1, 0) : 0;
+  const nextAvailable = lessons.slice(startIndex).find((lesson) => lesson.available && lesson.status !== "completed") ||
+    lessons.find((lesson) => lesson.available && lesson.status !== "completed");
+  if (nextAvailable) {
+    return {
+      tone: "active",
+      kicker: "Следующий шаг",
+      title: nextAvailable.status === "not_started" ? "Открыть следующий урок" : "Продолжить урок",
+      body: `${nextAvailable.module_title || "Курс"} · ${nextAvailable.title || nextAvailable.id}`,
+      href: cabinetSectionHref("course", { lesson: nextAvailable.id }),
+      action: "Открыть урок",
+    };
+  }
+
+  const nextLocked = lessons.slice(startIndex).find((lesson) => !lesson.available) || lessons.find((lesson) => !lesson.available);
+  if (nextLocked) {
+    return {
+      tone: "locked",
+      kicker: "Следующий шаг",
+      title: "Разблокировать продолжение",
+      body: `${nextLocked.module_title || "Следующий модуль"} · ${nextLocked.title || "следующий урок"} закрыт до выдачи доступа.`,
+      href: cabinetSectionHref("messages"),
+      action: "Написать по доступу",
+    };
+  }
+
+  return {
+    tone: "done",
+    kicker: "Следующий шаг",
+    title: "Курс пройден",
+    body: "Все доступные уроки закрыты. Можно вернуться к материалам или написать команде по внедрению.",
+    href: cabinetSectionHref("messages"),
+    action: "Написать команде",
+  };
+}
+
+function renderCourseNextStep(step) {
+  if (!step) return "";
+  const action = step.href
+    ? `<a class="btn btn-primary" href="${escapeAttribute(step.href)}">${escapeHtml(step.action || "Продолжить")}</a>`
+    : step.anchor
+      ? `<a class="btn btn-primary" href="#${escapeAttribute(step.anchor)}">${escapeHtml(step.action || "Перейти")}</a>`
+      : "";
+  return `
+    <article class="cabinet-course-next cabinet-course-next--${escapeAttribute(step.tone || "active")}">
+      <div>
+        <div class="cabinet-kicker">${escapeHtml(step.kicker || "Следующий шаг")}</div>
+        <h3 class="calc-card-title">${escapeHtml(step.title || "Продолжить курс")}</h3>
+        <p class="sublead">${escapeHtml(step.body || "")}</p>
+      </div>
+      ${action ? `<div class="cabinet-course-next__action">${action}</div>` : ""}
+    </article>
+  `;
+}
+
 function renderCourseBulletList(items) {
   const list = Array.isArray(items) ? items.filter(Boolean) : [];
-  if (!list.length) return '<p class="sublead">Материал урока подключается из snapshot.</p>';
+  if (!list.length) return '<p class="sublead">Материал урока готовится к публикации.</p>';
   return `<ul class="cabinet-course-list">${list.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
 }
 
@@ -1056,7 +1208,7 @@ function renderCourseQuiz(lesson) {
   const questions = Array.isArray(lesson.quiz?.questions) ? lesson.quiz.questions : [];
   if (!questions.length) return "";
   return `
-    <form class="cabinet-course-quiz" data-course-quiz="${escapeAttribute(lesson.id)}">
+    <form class="cabinet-course-quiz" id="course-quiz" data-course-quiz="${escapeAttribute(lesson.id)}">
       <div class="cabinet-course-quiz__head">
         <div>
           <div class="cabinet-kicker">Тест</div>
@@ -1088,6 +1240,7 @@ function renderCourseQuiz(lesson) {
 }
 
 function renderCourseQuizResult(lesson) {
+  if (lesson.quiz_stale) return "тест обновлён, пересдайте";
   if (typeof lesson.quiz_passed !== "boolean") return "ещё не сдавался";
   const score = lesson.quiz_score ?? 0;
   return lesson.quiz_passed ? `зачёт · ${score}%` : `повторить · ${score}%`;
@@ -1185,6 +1338,15 @@ function bindCalculationsSection(session) {
 }
 
 function bindCourseSection() {
+  document.querySelectorAll(".cabinet-course-module").forEach((details) => {
+    details.addEventListener("toggle", () => {
+      if (!details.open) return;
+      document.querySelectorAll(".cabinet-course-module[open]").forEach((item) => {
+        if (item !== details) item.open = false;
+      });
+    });
+  });
+
   document.querySelectorAll("[data-course-quiz]").forEach((form) => {
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -1830,14 +1992,24 @@ function humanizeDocumentStatus(status) {
   return labels[String(status || "").toLowerCase()] || status || "Готовится";
 }
 
-function humanizeCourseStatus(status) {
-  const labels = {
-    not_started: "Не начат",
-    started: "Начат",
-    checked: "Проверка сдана",
-    completed: "Пройден",
-  };
-  return labels[String(status || "").toLowerCase()] || status || "Не начат";
+function getCourseLessonStatus(lesson) {
+  if (!lesson?.available) return { id: "locked", label: "Закрыт" };
+  if (lesson.quiz_stale) return { id: "in_progress", label: "В работе" };
+  if (lesson.status === "completed") return { id: "completed", label: "Пройден" };
+  if (lesson.quiz_passed === true || lesson.status === "checked") return { id: "checked", label: "Тест сдан" };
+  if (lesson.status === "started" || Number(lesson.progress_percent || 0) > 0) return { id: "in_progress", label: "В работе" };
+  return { id: "available", label: "Доступен" };
+}
+
+function getCourseModuleStatus(module) {
+  const lessons = Array.isArray(module?.lessons) ? module.lessons : [];
+  if (!lessons.length) return { id: "locked", label: "Закрыт" };
+  const statuses = lessons.map((lesson) => getCourseLessonStatus(lesson).id);
+  if (statuses.every((status) => status === "completed")) return { id: "completed", label: "Пройден" };
+  if (statuses.some((status) => status === "in_progress" || status === "completed")) return { id: "in_progress", label: "В работе" };
+  if (statuses.some((status) => status === "checked")) return { id: "checked", label: "Тест сдан" };
+  if (statuses.some((status) => status === "available")) return { id: "available", label: "Доступен" };
+  return { id: "locked", label: "Закрыт" };
 }
 
 function humanizeCourseMaterialType(type) {
@@ -1852,7 +2024,7 @@ function humanizeCourseMaterialType(type) {
 function humanizeCourseMaterialStatus(status) {
   const labels = {
     ready: "готово",
-    snapshot_pending: "из Tilda snapshot",
+    snapshot_pending: "готовится",
     draft: "черновик",
   };
   return labels[String(status || "").toLowerCase()] || "в работе";
