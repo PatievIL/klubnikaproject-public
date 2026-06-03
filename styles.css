@@ -868,9 +868,24 @@ html[data-theme="dark"] .solutions-note span {
 }
 
 .hero-copy .eyebrow {
-  background: rgba(245, 236, 223, 0.12);
-  color: #fff;
-  border: 1px solid rgba(245, 236, 223, 0.14);
+  display: block;
+  width: fit-content;
+  min-height: 0;
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-copy .eyebrow::before {
+  content: none;
 }
 
 .page-copy .eyebrow {
@@ -3520,6 +3535,19 @@ html[data-theme="dark"] .route-card-catalog-item {
   line-height: 1.4;
 }
 
+.brief-legal-note {
+  margin: 0;
+  max-width: 48ch;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.brief-legal-note a {
+  color: var(--green);
+  font-weight: 800;
+}
+
 .final-cta-actions .btn {
   min-width: 0;
 }
@@ -5164,7 +5192,7 @@ html[data-theme="dark"] .route-card-catalog-item {
 }
 
 .hero-shell-cucumber .hero-copy h1 {
-  max-width: 11.6ch;
+  max-width: 17ch;
 }
 
 .visual-panel-cucumber .visual-main {
@@ -5731,6 +5759,108 @@ html[data-theme="dark"] .route-card-catalog-item {
 
   .service-hero-meta {
     grid-template-columns: 1fr;
+  }
+
+  .hero-shell-cucumber .text-link-row,
+  .hero-shell-cucumber .crumbs,
+  .hero-shell-cucumber .hero-copy .sublead,
+  .hero-shell-cucumber .visual-stack,
+  .hero-shell-cucumber .visual-note,
+  .hero-shell-cucumber .service-hero-meta {
+    display: none;
+  }
+
+  .hero-shell-cucumber .visual-panel {
+    padding: 12px;
+    gap: 0;
+  }
+
+  .hero-shell-cucumber .visual-grid {
+    grid-template-areas: "main";
+  }
+
+  .hero-shell-cucumber .visual-main {
+    max-height: 260px;
+    aspect-ratio: 1.26;
+  }
+
+  .hero-shell-cucumber .hero-cta .btn {
+    flex: 0 0 auto;
+    width: auto;
+    min-height: 48px;
+  }
+
+  .hero-shell-seeds .hero-copy .sublead,
+  .visual-panel-seeds .visual-stack,
+  .visual-panel-seeds .visual-note,
+  .seeds-lineup-photos {
+    display: none;
+  }
+
+  .visual-panel-seeds {
+    padding: 12px;
+    gap: 0;
+  }
+
+  .visual-panel-seeds .visual-grid {
+    grid-template-areas: "main";
+  }
+
+  .visual-panel-seeds .visual-main {
+    max-height: 240px;
+    aspect-ratio: 1.28;
+  }
+
+  .hero-shell-seeds .hero-cta .btn {
+    flex: 0 0 auto;
+    width: auto;
+    min-height: 48px;
+  }
+
+  .seeds-product-grid {
+    gap: 10px;
+  }
+
+  .seeds-product-grid .product-card {
+    grid-template-columns: 92px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px 12px;
+    padding: 12px;
+  }
+
+  .seeds-product-grid .product-photo {
+    grid-row: 1 / span 3;
+    width: 92px;
+    height: 92px;
+    min-height: 0;
+    aspect-ratio: 1;
+    border-radius: 16px;
+  }
+
+  .seeds-product-grid .product-meta {
+    align-items: start;
+    gap: 3px;
+  }
+
+  .seeds-product-grid .product-card .sublead {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .seeds-product-grid .product-card .btn-row {
+    margin-top: 0;
+  }
+
+  .seeds-product-grid .product-card .btn {
+    width: auto;
+    min-height: 38px;
+    padding: 8px 12px;
+    font-size: 13px;
   }
 
   .farm-hero-grid,

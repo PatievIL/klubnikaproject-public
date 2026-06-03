@@ -6,4 +6,4 @@ Disallow: /cabinet/
 Disallow: /calc/admin/
 Disallow: /shop/
 
-Sitemap: https://patievil.github.io/klubnikaproject-public/sitemap.xml
+Sitemap: https://klubnikaproject.ru/sitemap.xml

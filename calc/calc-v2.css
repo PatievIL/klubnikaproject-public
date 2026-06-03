@@ -127,18 +127,23 @@ a {
 }
 
 .eyebrow {
-  margin: 0;
+  display: block;
+  width: fit-content;
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--accent);
   font-size: 12px;
   font-weight: 850;
   letter-spacing: 0.08em;
-  line-height: 1;
+  line-height: 1.2;
   text-transform: uppercase;
 }
 
 .calc-intro h1 {
   max-width: 720px;
-  margin: 16px 0 22px;
+  margin: 0 0 22px;
   font-size: clamp(42px, 5.55vw, 78px);
   line-height: 1.08;
   letter-spacing: 0;
@@ -1146,6 +1151,18 @@ a {
   text-decoration: underline;
   text-decoration-color: rgba(0, 77, 43, 0.24);
   text-underline-offset: 5px;
+}
+
+.brief-legal-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.brief-legal-note a {
+  color: var(--green);
+  font-weight: 800;
 }
 
 .calc-final-form .brief-form-status {

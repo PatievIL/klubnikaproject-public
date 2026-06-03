@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Вход - Klubnika Project</title>
+  <link rel="stylesheet" href="./login.css?v=20260601-email-code1" />
+</head>
+<body>
+  <main class="auth-page">
+    <section class="auth-card" aria-labelledby="auth-title">
+      <img class="auth-logo" src="../assets/logo/klubnika-project-logo-green.svg" alt="Клубника Про" />
+      <h1 id="auth-title">Войти в профиль</h1>
+
+      <form class="auth-form" id="kp-login-form" novalidate>
+        <label class="auth-field" id="kp-login-email-field">
+          <span>Эл. почта</span>
+          <input id="kp-login-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="Введите эл. почту" required />
+        </label>
+
+        <div class="auth-code-panel" id="kp-login-code-panel" hidden>
+          <p class="auth-note" id="kp-login-code-note"></p>
+          <label class="auth-field">
+            <span>Код из письма</span>
+            <input id="kp-login-code" name="code" type="text" autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" />
+          </label>
+          <button class="auth-text-button" id="kp-login-change-email" type="button">Изменить email</button>
+        </div>
+
+        <button class="auth-submit" id="kp-login-submit" type="submit">Получить код</button>
+        <button class="auth-resend" id="kp-login-resend" type="button" hidden>Отправить код ещё раз</button>
+        <div class="auth-status" id="kp-login-status" aria-live="polite"></div>
+      </form>
+
+      <p class="auth-help">Не пришёл код? Проверьте «Спам». Поддержка: <a href="https://t.me/patiev_admin">@patiev_admin</a></p>
+    </section>
+  </main>
+
+  <script src="./login.js?v=20260601-email-code1" type="module"></script>
+</body>
+</html>

@@ -384,6 +384,11 @@ body[data-admin-auth="guest"] #admin-workspace {
   display: none;
 }
 
+body[data-admin-auth="guest"] #admin-workspace-shell,
+body[data-admin-auth="guest"] .admin-session-secondary {
+  display: none;
+}
+
 body[data-admin-auth="guest"] .admin-sticky {
   position: static;
 }

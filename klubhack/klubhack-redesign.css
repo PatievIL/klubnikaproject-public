@@ -288,9 +288,24 @@ html {
 }
 
 .kh-hero .kh-eyebrow {
-  background: rgba(245, 236, 223, 0.14);
-  border: 1px solid rgba(245, 236, 223, 0.16);
-  color: var(--kh-bg);
+  display: block;
+  width: fit-content;
+  min-height: 0;
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--kh-accent);
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.kh-hero .kh-title-xl {
+  margin-top: 0;
 }
 
 .kh-chip-row {
@@ -659,6 +674,18 @@ html {
   color: var(--kh-muted);
   font-size: 14px;
   line-height: 1.4;
+}
+
+.kh-legal-note {
+  margin: 0;
+  color: var(--kh-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.kh-legal-note a {
+  color: var(--kh-green);
+  font-weight: 800;
 }
 
 .kh-form-note a {

@@ -39,12 +39,21 @@ body[data-cabinet-pending="true"] .cabinet-shell-section {
 }
 
 .cabinet-shell-head__section span:last-child,
+.cabinet-shell-note,
 .cabinet-user-note,
 .cabinet-mini-card span,
 .cabinet-inline-hint,
 .cabinet-list-cell span,
 .cabinet-message__meta span {
   color: var(--muted, #5f6f63);
+}
+
+.cabinet-shell-title {
+  margin: 0;
+  color: var(--ink, #1b1a17);
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.05;
+  letter-spacing: 0;
 }
 
 .cabinet-shell-head__actions,

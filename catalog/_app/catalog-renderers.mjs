@@ -23,7 +23,7 @@ import {
   resolveAssetPath,
   sortReviews,
   summarizeReviewStats,
-} from "./catalog-data.mjs";
+} from "./catalog-data.mjs?v=20260520-shopcat-hero1";
 
 const emptyDialogs = {
   search: false,
@@ -340,6 +340,11 @@ function renderProductCard(ctx, state, categorySlug, product, options = {}) {
   const inCart = isInCart(state, product.id);
   const stock = STOCK_META[product.stockStatus] || STOCK_META.out_of_stock;
   const productHref = getProductCatalogPath(product);
+  const category = getCategoryBySlug(categorySlug) || { name: "Каталог" };
+  const positionMeta = inferPositionMeta(product);
+  const signals = getProductSignals(product, category)
+    .filter((signal) => signal.label !== "Раздел")
+    .slice(0, 2);
   return `
     <article class="catalog-product-card">
       <a class="catalog-product-card__media" href="${resolveHref(ctx, productHref)}">
@@ -351,10 +356,20 @@ function renderProductCard(ctx, state, categorySlug, product, options = {}) {
           ${renderStockBadge(product.stockStatus)}
           <span>Арт. ${escapeHtml(product.article)}</span>
         </div>
+        <div class="catalog-product-card__position catalog-product-card__position--${positionMeta.tone}">
+          ${escapeHtml(positionMeta.label)}
+        </div>
         <a class="catalog-product-card__title" href="${resolveHref(ctx, productHref)}">${escapeHtml(
           product.name
         )}</a>
         <p class="catalog-product-card__summary">${escapeHtml(getListingSummary(product))}</p>
+        ${
+          signals.length
+            ? `<div class="catalog-product-card__signals">${signals
+                .map((signal) => `<span><strong>${escapeHtml(signal.label)}</strong>${escapeHtml(signal.value)}</span>`)
+                .join("")}</div>`
+            : ""
+        }
         <div class="catalog-product-card__price-row">
           <div>
             <strong>${formatPrice(product.price)}</strong>
@@ -369,16 +384,16 @@ function renderProductCard(ctx, state, categorySlug, product, options = {}) {
                 }">${inCart ? "Уже в корзине" : "В корзину"}</button>`
               : `<button type="button" class="catalog-primary-button" disabled>Нет в наличии</button>`
           }
+          <a class="catalog-secondary-button" href="${resolveHref(ctx, productHref)}">Подробнее</a>
         </div>
-        ${
-          options.showQuickView
-            ? `
-              <div class="catalog-product-card__utility">
-                <button type="button" class="catalog-link-button" data-action="open-quick-view" data-product-id="${product.id}">Быстрый просмотр</button>
-              </div>
-            `
-            : ""
-        }
+        <div class="catalog-product-card__utility">
+          ${
+            options.showQuickView
+              ? `<button type="button" class="catalog-link-button" data-action="open-quick-view" data-product-id="${product.id}">Быстрый просмотр</button>`
+              : ""
+          }
+          <span>${escapeHtml(positionMeta.summary)}</span>
+        </div>
       </div>
     </article>
   `;
@@ -654,7 +669,7 @@ function renderCategoryListing(ctx, state, data) {
       ${
         applied.display === "grid"
           ? `<div class="catalog-grid-listing">${data.pageItems
-              .map((product) => renderProductCard(ctx, state, data.category.slug, product))
+              .map((product) => renderProductCard(ctx, state, data.category.slug, product, { showQuickView: true }))
               .join("")}</div>`
           : renderTableView(ctx, state, data.category.slug, data.pageItems, selectedProductIds)
       }
@@ -1213,23 +1228,45 @@ function renderLandingPage(ctx) {
   const data = getLandingPageData();
   const topCategoryCount = data.categories.length;
   const totalProductCount = data.categories.reduce((sum, category) => sum + category.productCount, 0);
+  const quickNodes = data.categories.slice(0, 6);
   return `
     <section class="catalog-page-head catalog-page-head--landing">
+      <img class="catalog-landing-hero__image" src="${resolveAsset(ctx, "assets/catalog/catalog-racks/greenhouse-rack-context.webp")}" alt="Стеллажная клубничная ферма с освещением и поливом" />
       ${renderBreadcrumbs(ctx, data.breadcrumbs)}
-      <div class="catalog-page-head__toolbar">
-        <div class="catalog-page-head__titleblock">
-          <h1>Система фермы по узлам</h1>
-          <p>Свет, стеллажи, полив, климат, питание и посадочный материал собраны как рабочая схема, а не как витрина отдельных товаров.</p>
+      <div class="catalog-landing-hero__main">
+        <div class="catalog-landing-hero__copy">
+          <span class="catalog-landing-hero__eyebrow">Каталог для закупки фермы</span>
+          <h1>Каталог фермы по узлам</h1>
+          <p>Свет, полив, стеллажи, климат, питание, посадка и контроль собраны как рабочая система. Можно идти от расчёта фермы или сразу открыть нужный узел.</p>
+          <div class="catalog-landing-hero__actions">
+            <a class="catalog-primary-button" href="${resolveHref(ctx, "/calc/")}">Сначала посчитать ферму</a>
+            <a class="catalog-secondary-button" href="#catalog-categories">Смотреть узлы</a>
+          </div>
         </div>
-        <div class="catalog-page-head__meta catalog-page-head__meta--toolbar">
-          <span>${topCategoryCount} разделов</span>
-          <span>${totalProductCount} товаров</span>
-        </div>
+        <aside class="catalog-landing-hero__proof" aria-label="Состав каталога">
+          <div class="catalog-landing-hero__metric">
+            <strong>${topCategoryCount}</strong>
+            <span>разделов по узлам фермы</span>
+          </div>
+          <div class="catalog-landing-hero__metric">
+            <strong>${totalProductCount}</strong>
+            <span>товаров для комплектации</span>
+          </div>
+          <p>Начните с категории, если уже понятен узел. Если объект ещё не рассчитан, сначала откройте калькулятор.</p>
+        </aside>
       </div>
-      <div class="catalog-page-head__actions">
-        <a class="catalog-primary-button" href="${resolveHref(ctx, "/calc/")}">Сначала посчитать ферму</a>
-        <a class="catalog-link-button" href="#catalog-categories">Смотреть узлы системы</a>
-      </div>
+      <nav class="catalog-landing-hero__nodes" aria-label="Быстрый переход к узлам каталога">
+        ${quickNodes
+          .map(
+            (category) => `
+              <a href="${resolveHref(ctx, `/catalog/${category.slug}/`)}">
+                <span>${escapeHtml(category.name)}</span>
+                <small>${category.productCount} товаров</small>
+              </a>
+            `
+          )
+          .join("")}
+      </nav>
     </section>
     <section class="catalog-category-layout catalog-category-layout--landing" id="catalog-categories">
       <div class="catalog-category-main">
@@ -1325,7 +1362,7 @@ function renderSearchPanel(ctx, state) {
           <button type="button" class="catalog-icon-button" data-action="close-dialog" data-dialog="search" aria-label="Закрыть поиск">×</button>
         </div>
         <div class="catalog-search-form">
-          <input type="search" value="${escapeHtml(state.search.query)}" placeholder="Название, артикул, категория" data-action="search-input" />
+          <input type="search" value="${escapeHtml(state.search.query)}" placeholder="Название, артикул, категория, характеристика" data-action="search-input" />
         </div>
         <div class="catalog-search-results">
           ${

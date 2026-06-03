@@ -110,6 +110,7 @@ const els = {
   tabs: document.getElementById("admin-tabs"),
   section: document.getElementById("admin-section-content"),
   summary: document.getElementById("admin-summary-grid"),
+  workspaceShell: document.getElementById("admin-workspace-shell"),
   status: document.getElementById("admin-status"),
   loginIdentity: document.getElementById("admin-login-identity"),
   loginPassword: document.getElementById("admin-login-password"),
@@ -190,7 +191,7 @@ function init() {
   renderSummary();
   bindGlobalEvents();
   persistDraft();
-  checkBackendSession();
+  checkBackendSession({ quiet: true });
 }
 
 function hydrateDraft() {
@@ -999,7 +1000,11 @@ function renderSummary() {
 }
 
 function updateWorkspaceVisibility() {
-  document.body.dataset.adminAuth = backendUser ? "authenticated" : "guest";
+  const authenticated = Boolean(backendUser);
+  document.body.dataset.adminAuth = authenticated ? "authenticated" : "guest";
+  if (els.workspaceShell) {
+    els.workspaceShell.hidden = !authenticated;
+  }
 }
 
 function downloadJson() {
@@ -2809,18 +2814,23 @@ async function loginToBackendWithPassword() {
   }
 }
 
-async function checkBackendSession() {
+async function checkBackendSession(options = {}) {
+  const quiet = Boolean(options.quiet);
   try {
-    els.sessionState.textContent = "Проверяем сессию...";
+    if (!quiet) els.sessionState.textContent = "Проверяем сессию...";
     const response = await adminFetch("/admin/auth/session");
     const user = response.user;
     await applyBackendAccessState(user || null);
-    els.sessionState.textContent = response.session
-      ? `Сессия активна: ${user?.user_name || user?.display_name || "пользователь"} (${user?.user_role || user?.role || "роль"})`
-      : "Сессия не найдена.";
+    if (response.session) {
+      els.sessionState.textContent = `Сессия активна: ${user?.user_name || user?.display_name || "пользователь"} (${user?.user_role || user?.role || "роль"})`;
+    } else if (!quiet) {
+      els.sessionState.textContent = "Сессия не найдена.";
+    } else {
+      els.sessionState.textContent = "";
+    }
   } catch (error) {
     applyGuestAccessState();
-    els.sessionState.textContent = `Не удалось проверить сессию: ${error.message}`;
+    els.sessionState.textContent = quiet ? "" : `Не удалось проверить сессию: ${error.message}`;
   }
 }
 

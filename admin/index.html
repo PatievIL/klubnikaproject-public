@@ -7,9 +7,9 @@
   <title>Админка - Klubnika Project</title>
   <link rel="stylesheet" href="../styles.css?v=20260512-hero-label" />
   <link rel="stylesheet" href="../calc/calc-v2.css?v=20260512-admin" />
-  <link rel="stylesheet" href="./admin.css?v=20260531-live-api" />
+  <link rel="stylesheet" href="./admin.css?v=20260601-login-only1" />
 </head>
-<body data-header-theme="light">
+<body data-header-theme="light" data-admin-auth="guest">
   <main class="section">
     <div class="container">
       <section class="hero-section admin-hub-hero">
@@ -29,17 +29,17 @@
               <span class="admin-field-label">Пароль</span>
               <input class="admin-input" id="admin-login-password" type="password" autocomplete="current-password" placeholder="Пароль администратора" />
             </label>
-            <div class="admin-toolbar-actions">
+            <div class="admin-auth-actions">
               <button class="btn btn-primary" id="admin-password-login-button" type="button">Войти</button>
-              <button class="btn btn-secondary" id="admin-session-button" type="button">Проверить</button>
-              <button class="btn btn-secondary" id="admin-logout-button" type="button">Выйти</button>
+              <button class="btn btn-secondary admin-session-secondary" id="admin-session-button" type="button">Проверить</button>
+              <button class="btn btn-secondary admin-session-secondary" id="admin-logout-button" type="button">Выйти</button>
             </div>
-            <div class="admin-session-state" id="admin-session-state" aria-live="polite">Проверяем сессию...</div>
+            <div class="admin-session-state" id="admin-session-state" aria-live="polite"></div>
           </div>
         </aside>
       </section>
 
-      <section class="section-frame">
+      <section class="section-frame" id="admin-workspace-shell" hidden>
         <div class="admin-hub-layout">
           <div class="admin-action-strip">
             <div class="admin-action-strip-copy">
@@ -79,6 +79,6 @@
     </div>
   </main>
 
-  <script src="./admin.js?v=20260531-live-api" type="module"></script>
+  <script src="./admin.js?v=20260601-login-only1" type="module"></script>
 </body>
 </html>

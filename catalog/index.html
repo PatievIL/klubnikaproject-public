@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
   <link rel="manifest" href="../site.webmanifest" />
   <link rel="stylesheet" href="../styles.css?v=20260512-hero-label" />
-  <link rel="stylesheet" href="./_app/catalog-app.css?v=20260510-sitefix1" />
+  <link rel="stylesheet" href="./_app/catalog-app.css?v=20260520-shopcat-hero1" />
   <link rel="stylesheet" href="./catalog-refine.css?v=20260511-catalog-prod1" />
   <link rel="stylesheet" href="../assets/css/kp-footer.css?v=20260427a" />
   <script type="application/ld+json">
@@ -45,10 +45,11 @@
   <script src="../assets/js/kp-header.js?v=20260512-cabinet-entry"></script>
 <div id="catalog-app">
     <div class="catalog-app-shell">
-<main class="catalog-main">
+      <main class="catalog-main">
 
 
     <section class="catalog-page-head catalog-page-head--landing">
+      <img class="catalog-landing-hero__image" src="../assets/catalog/catalog-racks/rack-aisle-context.webp" alt="Стеллажная клубничная ферма с освещением и поливом" />
 
     <nav class="catalog-breadcrumbs" aria-label="Хлебные крошки">
 
@@ -62,21 +63,58 @@
 
     </nav>
 
-      <div class="catalog-page-head__toolbar">
-        <div class="catalog-page-head__titleblock">
+      <div class="catalog-landing-hero__main">
+        <div class="catalog-landing-hero__copy">
+          <span class="catalog-landing-hero__eyebrow">Для клубничной фермы</span>
           <h1>Каталог оборудования</h1>
-          <p>Здесь не витрина случайных покупок. Разделы собраны как узлы клубничной фермы: свет, стеллажи, полив, климат, питание, посадка и контроль.</p>
+          <p>Разделы по свету, поливу, стеллажам, субстратам, климату и посадочному материалу. Откройте нужный узел и соберите комплект без лишнего маршрута.</p>
+          <div class="catalog-landing-hero__actions">
+            <a class="catalog-primary-button" href="#catalog-categories">Перейти к разделам</a>
+            <a class="catalog-secondary-button" href="../consultations/index.html">Помочь с выбором</a>
+          </div>
         </div>
-        <div class="catalog-page-head__meta catalog-page-head__meta--toolbar">
-          <span>9 разделов</span>
-          <span>55 товаров</span>
-        </div>
+        <aside class="catalog-landing-hero__proof" aria-label="Состав каталога">
+          <span class="catalog-landing-hero__proof-label">В каталоге</span>
+          <div class="catalog-landing-hero__summary">
+            <span><strong>9</strong> разделов</span>
+            <span><strong>55</strong> товаров</span>
+          </div>
+          <p class="catalog-landing-hero__proof-note">Категории сгруппированы по реальным узлам фермы, чтобы быстрее перейти от задачи к подходящим позициям.</p>
+        </aside>
       </div>
-      <div class="catalog-page-head__actions">
-        <a class="catalog-primary-button" href="../calc/index.html">Сначала рассчитать</a>
-        <a class="catalog-link-button" href="../farm/index.html">Проверить объект</a>
-        <a class="catalog-link-button" href="#catalog-categories">Смотреть узлы</a>
-      </div>
+      <nav class="catalog-landing-hero__nodes" aria-label="Быстрый переход к узлам каталога">
+
+              <a href="../catalog/led/index.html">
+                <span>LED-освещение</span>
+                <small>5 товаров</small>
+              </a>
+
+              <a href="../catalog/irrigation/index.html">
+                <span>Полив и дозирование</span>
+                <small>16 товаров</small>
+              </a>
+
+              <a href="../catalog/racks/index.html">
+                <span>Стеллажные системы</span>
+                <small>4 товаров</small>
+              </a>
+
+              <a href="../catalog/substrates/index.html">
+                <span>Субстраты и старт-корневая зона</span>
+                <small>5 товаров</small>
+              </a>
+
+              <a href="../catalog/planting-material/index.html">
+                <span>Посадочный материал</span>
+                <small>5 товаров</small>
+              </a>
+
+              <a href="../catalog/climate/index.html">
+                <span>Климат и воздух</span>
+                <small>6 товаров</small>
+              </a>
+
+      </nav>
     </section>
     <section class="catalog-category-layout catalog-category-layout--landing" id="catalog-categories">
       <div class="catalog-category-main">
@@ -84,7 +122,7 @@
 
     <a class="catalog-category-card" href="../catalog/led/index.html">
       <div class="catalog-category-card__media">
-        <img src="../assets/catalog/catalog-led/canopy-boost-200-ufarms-04.jpg" alt="LED-освещение в теплице с рассадой клубники" loading="lazy" />
+        <img src="../assets/catalog/catalog-racks/greenhouse-rack-context.webp" alt="LED-освещение" loading="lazy" />
       </div>
       <div class="catalog-category-card__body">
         <h3>LED-освещение</h3>
@@ -128,7 +166,7 @@
 
     <a class="catalog-category-card" href="../catalog/planting-material/index.html">
       <div class="catalog-category-card__media">
-        <img src="../assets/catalog/catalog-seeds/planting-frigo-main.webp" alt="Посадочный материал для клубничной фермы" loading="lazy" />
+        <img src="../assets/catalog/catalog-context/berry-red-context.webp" alt="Посадочный материал" loading="lazy" />
       </div>
       <div class="catalog-category-card__body">
         <h3>Посадочный материал</h3>
@@ -139,7 +177,7 @@
 
     <a class="catalog-category-card" href="../catalog/climate/index.html">
       <div class="catalog-category-card__media">
-        <img src="../assets/catalog/catalog-irrigation/split-system-climate-main.png" alt="Климатическое оборудование для фермы" loading="lazy" />
+        <img src="../assets/catalog/catalog-context/hero-process-context.webp" alt="Климат и воздух" loading="lazy" />
       </div>
       <div class="catalog-category-card__body">
         <h3>Климат и воздух</h3>
@@ -150,7 +188,7 @@
 
     <a class="catalog-category-card" href="../catalog/nutrition/index.html">
       <div class="catalog-category-card__media">
-        <img src="../assets/catalog/catalog-irrigation/fertilizer-year-1000-main.jpg" alt="Питание и сервис раствора" loading="lazy" />
+        <img src="../assets/catalog/catalog-racks/rack-context-01.webp" alt="Питание и сервис раствора" loading="lazy" />
       </div>
       <div class="catalog-category-card__body">
         <h3>Питание и сервис раствора</h3>
@@ -161,7 +199,7 @@
 
     <a class="catalog-category-card" href="../catalog/monitoring/index.html">
       <div class="catalog-category-card__media">
-        <img src="../assets/catalog/catalog-irrigation/smart-home-kit-main.jpg" alt="Датчики и автоматика фермы" loading="lazy" />
+        <img src="../assets/catalog/catalog-seeds/seed-rowena-main.webp" alt="Датчики и автоматика" loading="lazy" />
       </div>
       <div class="catalog-category-card__body">
         <h3>Датчики и автоматика</h3>
@@ -186,43 +224,27 @@
     </section>
 
 
-    <section class="catalog-info-strip catalog-route-panel" id="catalog-how-buy">
+    <section class="catalog-info-strip" id="catalog-how-buy">
       <div class="catalog-how-buy-note">
         <div class="catalog-how-buy-note__copy">
-          <strong>Сначала маршрут, потом закупка</strong>
-          <p>Если вы ещё не считали ферму, каталог будет выглядеть как длинный список. После расчёта или проверки объекта становится понятно, какие узлы нужны сейчас, а какие нельзя покупать без уточнения.</p>
+          <strong>Каталог лучше читать после расчёта</strong>
+          <p>Сначала понятно фиксируем площадь, ряды и базовую нагрузку. После этого разделы каталога становятся списком узлов, а не случайной закупкой.</p>
         </div>
         <div class="catalog-how-buy-note__actions">
           <a class="catalog-link-button" href="../calc/index.html">Быстрый расчёт</a>
-          <a class="catalog-link-button" href="../farm/index.html">Проверить объект</a>
+          <a class="catalog-link-button" href="../farm/index.html">Разбор объекта</a>
           <a class="catalog-link-button" href="../consultations/index.html">Короткий вопрос</a>
         </div>
-      </div>
-      <div class="catalog-route-grid" aria-label="Как пользоваться каталогом">
-        <article>
-          <span>01</span>
-          <strong>Есть только идея</strong>
-          <p>Идите в калькулятор: получите площадь, посадку, нагрузку и первую рамку бюджета.</p>
-        </article>
-        <article>
-          <span>02</span>
-          <strong>Есть помещение</strong>
-          <p>Сверьте высоту, проходы, воду, мощность и комплект до закупки оборудования.</p>
-        </article>
-        <article>
-          <span>03</span>
-          <strong>Есть точечный вопрос</strong>
-          <p>Разберите один узел: свет, полив, симптом растения, покупку или следующий шаг.</p>
-        </article>
       </div>
     </section>
 
       </main>
+      <link rel="stylesheet" href="../assets/css/kp-footer.css?v=20260427a" />
 
-    <footer class="home-footer" id="catalog-contacts" aria-label="Подвал сайта">
+    <footer class="home-footer" id="footer" aria-label="Подвал сайта">
       <div class="home-footer-inner">
         <div class="home-footer-lead">
-          <a class="home-footer-logo" href="../" aria-label="Klubnika Project">
+          <a class="home-footer-logo" href="../index.html" aria-label="Klubnika Project">
             <img src="../assets/logo/klubnika-project-logo-green.svg" alt="Klubnika Project" />
           </a>
         </div>
@@ -230,18 +252,18 @@
         <nav class="home-footer-columns" aria-label="Навигация подвала">
           <div>
             <span>Маршруты</span>
-            <a href="../calc/">Калькулятор</a>
-            <a href="../catalog/">Каталог</a>
-            <a href="../klubhack/">Курс</a>
-            <a href="../consultations/">Консультации</a>
-            <a href="../cabinet/">Кабинет</a>
+            <a href="../calc/index.html">Калькулятор</a>
+            <a href="../catalog/index.html">Каталог решений</a>
+            <a href="../klubhack/index.html">Клубничный Хак</a>
+            <a href="../consultations/index.html">Консультации</a>
+            <a href="../cabinet/index.html">Кабинет</a>
           </div>
           <div>
             <span>Система фермы</span>
             <a href="../catalog/led/index.html">Свет</a>
             <a href="../catalog/irrigation/index.html">Полив</a>
             <a href="../catalog/racks/index.html">Стеллажи</a>
-            <a href="../seeds/">Посадочный материал</a>
+            <a href="../seeds/index.html">Посадочный материал</a>
           </div>
           <div>
             <span>Связь</span>
@@ -252,10 +274,10 @@
           </div>
           <div>
             <span>Документы</span>
-            <a href="../docs/policy/">Политика конфиденциальности</a>
-            <a href="../docs/offero/">Оферта</a>
-            <a href="../docs/warrenty/">Гарантия</a>
-            <a href="../docs/consent/">Согласие на обработку ПД</a>
+            <a href="../docs/policy/index.html">Политика конфиденциальности</a>
+            <a href="../docs/offero/index.html">Оферта</a>
+            <a href="../docs/warrenty/index.html">Гарантия</a>
+            <a href="../docs/consent/index.html">Согласие на обработку ПД</a>
           </div>
         </nav>
 
@@ -280,7 +302,7 @@
           <button type="button" class="catalog-icon-button" data-action="close-dialog" data-dialog="search" aria-label="Закрыть поиск">×</button>
         </div>
         <div class="catalog-search-form">
-          <input type="search" value="" placeholder="Название, артикул, категория" data-action="search-input" />
+          <input type="search" value="" placeholder="Название, артикул, категория, характеристика" data-action="search-input" />
         </div>
         <div class="catalog-search-results">
           <p>Введите название, артикул или нужную группу товаров, чтобы начать поиск.</p>
@@ -329,7 +351,7 @@
         </div>
         <nav class="catalog-mobile-nav">
           <a href="../index.html">Главная</a>
-          <a href="../farm/index.html">Проверка объекта</a>
+          <a href="../farm/index.html">Расчёт фермы</a>
           <a href="../consultations/index.html">Консультации</a>
           <a href="../study/index.html">Сопровождение</a>
           <a href="../calc/index.html">Калькулятор</a>

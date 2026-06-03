@@ -349,6 +349,7 @@ button {
   font-size: 12px;
   font-weight: 850;
   letter-spacing: 0.08em;
+  line-height: 1.2;
   text-transform: uppercase;
 }
 
@@ -2016,6 +2017,18 @@ body.motion-ready .author-section .motion-reveal {
   text-decoration: underline;
   text-decoration-color: color-mix(in srgb, var(--green) 26%, transparent);
   text-underline-offset: 5px;
+}
+
+.final-brief-legal {
+  margin: 0;
+  color: color-mix(in srgb, var(--ink) 64%, var(--muted));
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.final-brief-legal a {
+  color: var(--green);
+  font-weight: 780;
 }
 
 .final-brief-status {

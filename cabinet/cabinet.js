@@ -23,7 +23,7 @@ const DEFAULT_SETTINGS = {
 const basePath = detectBasePath();
 const routes = {
   shell: routePath("cabinet/"),
-  login: routePath("cabinet/login/"),
+  login: routePath("login/"),
   site: routePath(""),
   catalog: routePath("catalog/"),
   calc: routePath("calc/"),
@@ -37,10 +37,18 @@ document.addEventListener("DOMContentLoaded", initCabinet);
 
 async function initCabinet() {
   settings = loadCachedSettings();
-  await refreshSettings();
-
   const view = document.body.dataset.cabinetView || "shell";
+  const localLoginPreview = view === "login" && isLocalPreview();
+  if (!localLoginPreview) {
+    await refreshSettings();
+  }
+
   if (view === "login") {
+    if (localLoginPreview) {
+      bindLogin();
+      return;
+    }
+
     const session = await fetchActiveSession();
     if (session?.ok) {
       currentSession = session;
@@ -73,6 +81,10 @@ function routePath(relativePath = "") {
   return `${basePath}${String(relativePath).replace(/^\//, "")}`;
 }
 
+function isLocalPreview() {
+  return ["127.0.0.1", "localhost"].includes(window.location.hostname);
+}
+
 function cabinetSectionHref(sectionId, params = {}) {
   const search = new URLSearchParams({ section: sectionId });
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -85,7 +97,7 @@ function cabinetSectionHref(sectionId, params = {}) {
 
 function apiBase() {
   const configured = String(settings.integrations?.apiBase || DEFAULT_SETTINGS.integrations.apiBase).trim().replace(/\/+$/, "");
-  if (["127.0.0.1", "localhost"].includes(window.location.hostname)) {
+  if (isLocalPreview()) {
     return "http://127.0.0.1:8010/v1";
   }
   return configured;

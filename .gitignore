@@ -25,10 +25,18 @@ assets/photos/raw/
 assets/**/_review/
 assets/site-legacy/
 assets/decor/
+assets/cucumber/
+assets/site-drive/best-of/
+assets/site-drive/folder-*/
+assets/site-drive/for-site/for-site-*
+assets/site-drive/for-site/selected/*.heic
 
 # Local coordination / agent memory layers
 .codex-memory/
 .sid-memory/
+.agent/
+.codex-visual-audit/
+HANDOFF.md
 
 # Parallel workspaces and internal concept branches kept outside the public runtime
 5sez/

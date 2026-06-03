@@ -3245,6 +3245,29 @@ const averageRating = (productId) => {
 };
 
 const EXCLUDED_PRODUCT_SLUGS = new Set(["frame-base-12", "berry-tray-160", "service-shelf-rail"]);
+const NON_FILTERABLE_ATTRIBUTE_KEYS = new Set([
+  "scenario",
+  "role",
+  "rol",
+  "service",
+  "set",
+  "kogda-podhodit",
+  "sleduyuschiy-shag",
+  "sovmestimost",
+  "kogda-sprosit",
+  "kogda-berut",
+  "kogda-ne-podhodit",
+  "kogda-ne-speshit",
+  "kogda-ne-brat",
+  "dlya-chego-berut",
+  "kogda-proveryat",
+  "chto-vazhno",
+  "chto-proverit",
+  "status",
+  "dlya-kogo",
+  "dlya-chego-podhodit",
+  "kogda-pokupat-srazu",
+]);
 
 const products = productsSeed.map((product) => {
   const rating = averageRating(product.id);
@@ -3578,6 +3601,7 @@ export function buildFacetData(items) {
     product.badges.forEach((badge) => badgeMap.set(badge, (badgeMap.get(badge) || 0) + 1));
     product.attributes.forEach((attribute) => {
       if (attribute.filterable === false) return;
+      if (NON_FILTERABLE_ATTRIBUTE_KEYS.has(attribute.key)) return;
       if (!attributeMap.has(attribute.key)) {
         attributeMap.set(attribute.key, {
           key: attribute.key,
@@ -3616,6 +3640,7 @@ export function buildFacetData(items) {
           count,
         })),
       }))
+      .filter((attribute) => attribute.values.length > 1)
       .sort((a, b) => `${a.group}-${a.label}`.localeCompare(`${b.group}-${b.label}`, "ru")),
   };
 }
@@ -3671,27 +3696,110 @@ export function getProductPageData(categorySlug, productSlug) {
   };
 }
 
+const SEARCH_ALIAS_GROUPS = [
+  ["frigo", "фриго"],
+  ["dosatron", "досатрон"],
+  ["led", "лед", "свет", "освещение", "досветка"],
+  ["ph", "pH", "пиаш", "кислотность"],
+  ["ec", "ес", "электропроводность"],
+  ["капельница", "капельницы", "dripper", "drippers"],
+  ["стеллаж", "стеллажи", "каркас", "каркасы", "лоток", "лотки"],
+  ["субстрат", "субстраты", "субстратный", "субстратные", "маты", "кубик", "кубики"],
+  ["датчик", "датчики", "сенсор", "сенсоры"],
+  ["упаковка", "упаковки", "контейнер", "контейнеры", "этикетка", "этикетки"],
+];
+
+function stripSearchHtml(value = "") {
+  return String(value).replace(/<[^>]*>/g, " ");
+}
+
+function normalizeSearchText(value = "") {
+  return stripSearchHtml(value)
+    .toLowerCase()
+    .replace(/ё/g, "е")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function expandSearchNeedles(query) {
+  const normalized = normalizeSearchText(query);
+  if (!normalized) return [];
+
+  const needles = new Set([normalized]);
+  SEARCH_ALIAS_GROUPS.forEach((group) => {
+    const normalizedGroup = group.map((item) => normalizeSearchText(item)).filter(Boolean);
+    if (normalizedGroup.some((alias) => normalized.includes(alias))) {
+      normalizedGroup.forEach((alias) => needles.add(alias));
+    }
+  });
+
+  return Array.from(needles);
+}
+
+function matchesSearch(value, needles) {
+  const haystack = normalizeSearchText(value);
+  const tokens = new Set(haystack.split(" ").filter(Boolean));
+  return needles.some((needle) => {
+    if (needle.length <= 3) return tokens.has(needle);
+    return haystack.includes(needle);
+  });
+}
+
+function buildCategorySearchText(category) {
+  return [
+    category.name,
+    category.description,
+    category.slug,
+    category.seo?.title,
+    category.seo?.description,
+  ].join(" ");
+}
+
+function buildProductSearchText(product) {
+  const category = getCategoryById(product.categoryId);
+  const ancestors = category ? getCategoryAncestors(category) : [];
+  const categoryText = [...ancestors, category]
+    .filter(Boolean)
+    .flatMap((item) => [item.name, item.description, item.slug]);
+  const attributeText = product.attributes.flatMap((attribute) => [
+    attribute.group,
+    attribute.label,
+    attribute.value,
+  ]);
+  const faqText = product.faq.flatMap((item) => [item.question, item.answer]);
+
+  return [
+    product.name,
+    product.article,
+    product.slug,
+    product.shortDescription,
+    product.fullDescription,
+    ...categoryText,
+    ...attributeText,
+    ...faqText,
+  ].join(" ");
+}
+
 export function getSearchResults(query, scope = "catalog") {
-  const normalized = query.trim().toLowerCase();
-  if (!normalized) {
+  const needles = expandSearchNeedles(query);
+  if (!needles.length) {
     return {
       categories: [],
       products: [],
       siteLinks: [],
     };
   }
-  const categoryResults = categories.filter((category) =>
-    `${category.name} ${category.description}`.toLowerCase().includes(normalized)
-  );
+  const categoryResults = categories.filter((category) => matchesSearch(buildCategorySearchText(category), needles));
   const productResults = products
-    .filter((product) => `${product.name} ${product.article} ${product.shortDescription}`.toLowerCase().includes(normalized))
+    .filter((product) => matchesSearch(buildProductSearchText(product), needles))
     .map((product) => ({
       ...product,
       categorySlug: product.categorySlug || getCategoryById(product.categoryId)?.slug || "",
     }));
   const siteLinks =
     scope === "site"
-      ? CATALOG_META.siteLinks.filter((item) => `${item.title} ${item.summary}`.toLowerCase().includes(normalized))
+      ? CATALOG_META.siteLinks.filter((item) => matchesSearch(`${item.title} ${item.summary}`, needles))
       : [];
   return {
     categories: categoryResults.slice(0, 6),

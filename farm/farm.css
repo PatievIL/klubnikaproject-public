@@ -4,6 +4,7 @@
   --surface-soft: #f1e7d7;
   --green: #004d2b;
   --green-2: #0f643c;
+  --accent: #e5c794;
   --ink: #153728;
   --muted: #637064;
   --line: rgba(0, 77, 43, 0.14);
@@ -76,7 +77,7 @@ textarea {
   font-size: 12px;
   font-weight: 850;
   line-height: 1.2;
-  letter-spacing: 0;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -214,13 +215,18 @@ textarea {
 }
 
 .farm-hero .farm-eyebrow {
-  color: var(--bg);
+  margin: 0 0 18px;
+  color: var(--accent);
 }
 
 .farm-hero .farm-title,
 .farm-hero .farm-lead,
 .farm-hero .farm-copy {
   color: var(--bg);
+}
+
+.farm-hero .farm-title {
+  margin-top: 0;
 }
 
 .farm-hero .farm-copy {
@@ -553,6 +559,10 @@ textarea {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.4;
+}
+
+.farm-legal-note {
+  font-size: 12px;
 }
 
 .farm-form-note a {
