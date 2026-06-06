@@ -324,8 +324,8 @@ function setupFinalBriefForm() {
       if (!response.ok) throw new Error('Lead API unavailable');
 
       input.value = '';
-      if (status) status.textContent = 'Вводные отправлены. Если нужен быстрый ответ, продублируйте их в Telegram.';
-      button.textContent = 'Отправлено';
+      if (status) status.textContent = 'Вводные переданы. Ответим, какой шаг лучше: расчёт, объект, консультация или курс.';
+      button.textContent = 'Вводные переданы';
     } catch (error) {
       const copied = await copyText(payload.brief_text);
       if (status) {

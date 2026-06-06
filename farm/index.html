@@ -280,17 +280,21 @@
           </div>
 
           <div class="farm-form-card">
-            <h3>Проверка объекта перед закупкой</h3>
-            <p class="farm-copy">Это не общая заявка. Нужны вводные по помещению, чтобы понять, что можно покупать, а что сначала нужно пересчитать.</p>
+            <h3>Проверить объект до оплаты поставщикам</h3>
+            <p class="farm-copy">Площадь, высота, вода, мощность и выбранные узлы влияют на весь комплект. Передайте вводные, чтобы понять, что можно покупать, а что нужно пересчитать.</p>
             <form
               class="farm-form"
               data-accept-calc-brief
               data-brief-form="Ферма — проверка объекта"
-              data-brief-button-label="Передать объект на проверку"
+              data-brief-button-label="Проверить объект до закупки"
               data-brief-done-label="Объект передан"
               data-brief-link-label="Написать в Telegram"
               data-brief-note-copy="Кнопка подготовит сообщение по объекту и скопирует его. Если нужно быстрее — продублируйте его в Telegram."
             >
+              <div class="farm-form-outcome" aria-label="Что будет после отправки">
+                <strong>После отправки</strong>
+                <span>сверим помещение, ограничения и первую очередь закупки</span>
+              </div>
               <input class="farm-input" type="text" placeholder="Имя или как к вам обращаться" data-field-role="name" data-field-label="Имя" />
               <input class="farm-input" type="text" placeholder="Телефон, Telegram или WhatsApp" data-field-role="contact" data-field-label="Контакт для связи" />
 
@@ -308,14 +312,14 @@
               <div class="farm-choice-grid" data-choice-group>
                 <input type="hidden" value="" data-field-role="request" data-field-label="Что нужно сейчас" />
                 <button class="farm-choice-chip" type="button" data-choice-value="Проверить помещение">Проверить помещение</button>
-                <button class="farm-choice-chip" type="button" data-choice-value="Собрать первую очередь">Собрать первую очередь</button>
-                <button class="farm-choice-chip" type="button" data-choice-value="Сверить выбранные узлы">Сверить узлы</button>
+                <button class="farm-choice-chip" type="button" data-choice-value="Сверить выбранный комплект">Сверить комплект</button>
+                <button class="farm-choice-chip" type="button" data-choice-value="Понять первую очередь закупки">Первая очередь</button>
               </div>
 
               <textarea class="farm-textarea" placeholder="Что уже выбрано или куплено, бюджет, ограничения по воде, мощности, проходам или срокам" data-field-role="summary" data-field-label="Важные ограничения"></textarea>
 
               <div class="farm-form-actions">
-                <button class="farm-button farm-button--primary" data-brief-button type="button">Передать объект на проверку</button>
+                <button class="farm-button farm-button--primary" data-brief-button type="button">Проверить объект до закупки</button>
                 <a class="farm-button brief-telegram-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Написать в Telegram</a>
               </div>
               <p class="farm-form-note farm-legal-note">Нажимая кнопку, вы соглашаетесь на <a href="../docs/consent/">обработку персональных данных</a> и принимаете <a href="../docs/policy/">политику конфиденциальности</a>.</p>

@@ -1953,6 +1953,27 @@ body.motion-ready .author-section .motion-reveal {
   line-height: 1.58;
 }
 
+.final-brief-outcome {
+  display: grid;
+  gap: 5px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--green) 14%, var(--line));
+  border-radius: calc(var(--radius-card) - 10px);
+  background: color-mix(in srgb, var(--accent) 20%, var(--surface));
+}
+
+.final-brief-outcome strong {
+  color: var(--green);
+  font-size: 16px;
+  line-height: 1.15;
+}
+
+.final-brief-outcome span {
+  color: color-mix(in srgb, var(--ink) 72%, var(--muted));
+  font-size: 14px;
+  line-height: 1.35;
+}
+
 .final-telegram-card .btn-primary {
   width: 100%;
   color: var(--green);
@@ -1995,18 +2016,17 @@ body.motion-ready .author-section .motion-reveal {
 }
 
 .final-brief-submit {
-  min-height: auto;
-  padding: 0;
-  border: 0;
-  color: var(--green);
-  background: transparent;
+  min-height: 50px;
+  padding: 0 20px;
+  border: 1px solid var(--green);
+  border-radius: 18px;
+  color: var(--white);
+  background: var(--green);
   font: inherit;
   font-size: 14px;
   font-weight: 780;
-  text-align: left;
-  text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--green) 26%, transparent);
-  text-underline-offset: 5px;
+  text-align: center;
+  text-decoration: none;
   cursor: pointer;
 }
 

@@ -495,6 +495,26 @@ textarea {
   gap: 9px;
 }
 
+.farm-form-outcome {
+  display: grid;
+  gap: 5px;
+  padding: 13px 14px;
+  border: 1px solid rgba(0, 77, 43, 0.12);
+  border-radius: 16px;
+  background: rgba(226, 191, 123, 0.16);
+}
+
+.farm-form-outcome strong {
+  color: var(--green);
+  line-height: 1.15;
+}
+
+.farm-form-outcome span {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.36;
+}
+
 .farm-field-label {
   margin-top: 2px;
   color: var(--green);

@@ -657,6 +657,26 @@ html {
   background: rgba(255, 250, 242, 0.76);
 }
 
+.kh-form-outcome {
+  display: grid;
+  gap: 5px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--kh-green) 14%, var(--kh-line));
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--kh-accent) 20%, rgba(255, 250, 242, 0.86));
+}
+
+.kh-form-outcome strong {
+  color: var(--kh-green);
+  line-height: 1.15;
+}
+
+.kh-form-outcome span {
+  color: var(--kh-muted);
+  font-size: 14px;
+  line-height: 1.36;
+}
+
 .kh-textarea {
   width: 100%;
   min-height: 180px;

@@ -597,10 +597,14 @@
           </div>
 
           <div class="card form-card">
-            <h3>Один вопрос на проверку</h3>
-            <p class="sublead">Сформулируйте, что именно нужно решить: купить, проверить симптом, выбрать следующий шаг или не ошибиться с узлом.</p>
-            <form class="form-grid" data-brief-form="Консультации — один вопрос" data-brief-button-label="Отправить вопрос" data-brief-done-label="Вопрос передан" data-brief-link-label="Написать в Telegram">
-              <input class="input" type="text" placeholder="Телефон + где писать: Telegram или WhatsApp" data-field-role="contact" data-field-label="Контакт для связи" />
+            <h3>Разобрать один конкретный вопрос</h3>
+            <p class="sublead">Подходит, если нужно проверить узел, симптом растения или следующий шаг. Если вопрос шире, переведём в проверку объекта.</p>
+            <form class="form-grid" data-brief-form="Консультации — один вопрос" data-brief-button-label="Передать вопрос на разбор" data-brief-done-label="Вопрос передан" data-brief-link-label="Написать в Telegram">
+              <div class="form-promise-card" aria-label="Что будет после отправки">
+                <strong>После отправки</strong>
+                <span>поймём, хватит ли короткого ответа или нужен отдельный разбор</span>
+              </div>
+              <input class="input" type="text" placeholder="Где ответить: Telegram или WhatsApp" data-field-role="contact" data-field-label="Контакт для связи" />
               <div class="field-group">
                 <span class="field-label">Стадия</span>
                 <div class="choice-grid" data-choice-group>
@@ -619,14 +623,14 @@
                   <button class="choice-chip" type="button" data-choice-value="Понять следующий шаг">Следующий шаг</button>
                 </div>
               </div>
-              <textarea class="textarea" placeholder="Опишите один вопрос: что хотите проверить, какие вводные уже есть и что нельзя менять" data-field-role="summary" data-field-label="Вопрос"></textarea>
+              <textarea class="textarea" placeholder="Опишите один вопрос: что происходит, что уже проверяли, какие вводные есть и что нельзя менять" data-field-role="summary" data-field-label="Вопрос"></textarea>
               <div class="brief-form-actions">
-                <button class="btn btn-primary" data-brief-button type="button">Отправить вопрос</button>
+                <button class="btn btn-primary" data-brief-button type="button">Передать вопрос на разбор</button>
                 <a class="brief-telegram-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Написать в Telegram</a>
               </div>
               <p class="brief-legal-note">Нажимая кнопку, вы соглашаетесь на <a href="../docs/consent/">обработку персональных данных</a> и принимаете <a href="../docs/policy/">политику конфиденциальности</a>.</p>
               <p class="brief-form-note">Если удобнее, можно сразу написать в <a href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">@patiev_admin</a>.</p>
-              <p class="brief-form-status" data-brief-status aria-live="polite"></p>
+              <p class="brief-form-status" data-brief-status aria-live="polite">Если нужен платный разбор, формат согласуем до начала работы.</p>
             </form>
           </div>
         </div>
