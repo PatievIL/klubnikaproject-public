@@ -6,36 +6,109 @@
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
   <link rel="manifest" href="../site.webmanifest" />
-  <title>Калькулятор фермы — Klubnika Project</title>
-  <meta name="description" content="Калькулятор фермы Klubnika Project: быстрый ориентир по размеру, комплекту, нагрузке и экономике до закупки оборудования." />
+  <title>Калькулятор фермы и питания — Klubnika Project</title>
+  <meta name="description" content="Калькулятор Klubnika Project: ориентир по размеру фермы, комплекту, нагрузке, экономике и первому рецепту питания с баками A/B." />
   <link rel="canonical" href="https://klubnikaproject.ru/calc/" />
-  <link rel="stylesheet" href="./calc-v2.css?v=20260512-hero-label" />
-  <link rel="stylesheet" href="../assets/css/kp-header.css?v=20260512-cabinet-entry" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ru_RU" />
+  <meta property="og:site_name" content="Klubnika Project" />
+  <meta property="og:title" content="Калькулятор фермы и питания — Klubnika Project" />
+  <meta property="og:description" content="Ориентир по размеру, комплекту, нагрузке, экономике и первому рецепту питания с баками A/B." />
+  <meta property="og:url" content="https://klubnikaproject.ru/calc/" />
+  <meta property="og:image" content="https://klubnikaproject.ru/assets/site-drive/for-site/selected/for-site-10-hero.webp" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Калькулятор фермы и питания — Klubnika Project" />
+  <meta name="twitter:description" content="Ориентир по размеру, комплекту, нагрузке, экономике и первому рецепту питания с баками A/B." />
+  <meta name="twitter:image" content="https://klubnikaproject.ru/assets/site-drive/for-site/selected/for-site-10-hero.webp" />
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "@id": "https://klubnikaproject.ru/calc/#webpage",
+      "url": "https://klubnikaproject.ru/calc/",
+      "name": "Калькулятор фермы и питания",
+      "description": "Калькулятор Klubnika Project: ориентир по размеру фермы, комплекту, нагрузке, экономике и первому рецепту питания с баками A/B.",
+      "inLanguage": "ru-RU",
+      "isPartOf": {
+        "@id": "https://klubnikaproject.ru/#website"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "@id": "https://klubnikaproject.ru/calc/#application",
+      "name": "Калькулятор фермы и питания",
+      "url": "https://klubnikaproject.ru/calc/",
+      "description": "Веб-калькулятор для предварительной оценки площади, посадки, комплекта оборудования, нагрузки, экономики и рабочего рецепта питания.",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "inLanguage": "ru-RU",
+      "provider": {
+        "@id": "https://klubnikaproject.ru/#organization"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "RUB"
+      }
+    }
+  ]
+  </script>
+  <link rel="stylesheet" href="./calc-v2.css?v=20260607-palette2" />
+  <link rel="stylesheet" href="../assets/css/kp-header.css?v=20260525-overlay1" />
   <link rel="stylesheet" href="../assets/css/kp-footer.css?v=20260427a" />
+  <!-- Yandex.Metrika counter 95619008 -->
+  <script type="text/javascript">
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    m[i].l=1*new Date();
+    for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+    (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+    ym(95619008, "init", {
+      clickmap: true,
+      trackLinks: true,
+      accurateTrackBounce: true,
+      webvisor: true
+    });
+  </script>
+  <!-- /Yandex.Metrika counter -->
 </head>
-<body data-header-theme="dark">
+<body data-header-theme="light">
   <header class="kp-site-header" data-kp-header data-root="../"></header>
-  <script src="../assets/js/kp-header.js?v=20260512-cabinet-entry"></script>
+  <script src="../assets/js/kp-header.js?v=20260603-cabinet-local"></script>
 <section class="calc-intro" aria-labelledby="calc-intro-title">
     <div class="calc-intro-media">
       <picture>
-        <source srcset="../assets/site-drive/for-site/selected/for-site-10-hero.jpg" media="(min-width: 760px)" />
-        <img src="../assets/site-drive/for-site/selected/for-site-10-hero.jpg" alt="Работающая ферма с рядами клубники" />
+        <source srcset="../assets/site-drive/for-site/selected/for-site-10-hero.webp" media="(min-width: 760px)" />
+        <img src="../assets/site-drive/for-site/selected/for-site-10-hero.webp" alt="Работающая ферма с рядами клубники" />
       </picture>
     </div>
 
     <div class="calc-intro-copy">
       <p class="eyebrow">Калькулятор фермы</p>
-      <h1 id="calc-intro-title">Калькулятор фермы</h1>
-      <p>Введите размеры помещения и базовые условия. Получите первый ориентир по комплекту, нагрузке и экономике до закупки оборудования.</p>
+      <h1 id="calc-intro-title">Калькулятор фермы и питания</h1>
+      <p>Введите размеры помещения или соберите первый рецепт раствора. Получите ориентир по комплекту, нагрузке, экономике и питанию до закупки.</p>
       <div class="calc-intro-actions" aria-label="Действия калькулятора">
-        <a class="btn btn-primary" href="#calculator-app">Настроить расчет</a>
+        <a class="btn btn-primary" href="#calculator-app">Перейти к расчету</a>
       </div>
     </div>
   </section>
 
   <main>
-    <section class="calc-workspace" id="calculator-app">
+    <nav class="calc-mode-switch" aria-label="Режим калькулятора">
+      <button class="calc-mode-button is-active" type="button" data-calc-mode="farm" aria-pressed="true">
+        <strong>Ферма</strong>
+        <span>площадь, комплект, экономика</span>
+      </button>
+      <button class="calc-mode-button" type="button" data-calc-mode="nutrition" aria-pressed="false">
+        <strong>Питание</strong>
+        <span>мастер замеса раствора</span>
+      </button>
+    </nav>
+
+    <section class="calc-workspace" id="calculator-app" data-calc-view="farm">
       <div class="calc-shell">
         <section class="calc-config-panel calc-config-next" aria-labelledby="calc-config-title">
           <div class="calc-config-head">
@@ -279,7 +352,7 @@
               </div>
               <div class="calc-summary-actions">
                 <a class="btn btn-primary" id="project-brief-link" href="../farm/#brief">Передать расчёт на разбор</a>
-                <button class="btn btn-secondary" id="download-calculation-button" type="button">Скачать расчет</button>
+                <button class="btn btn-secondary" id="download-calculation-button" type="button">Скачать PDF</button>
               </div>
             </div>
           </div>
@@ -287,7 +360,108 @@
       </div>
     </section>
 
-    <section class="calc-next-steps" aria-labelledby="calc-next-title">
+    <section class="nutrition-workspace" id="nutrition-calculator" data-calc-view="nutrition" hidden>
+      <div class="nutrition-shell">
+        <section class="nutrition-panel nutrition-config" aria-labelledby="nutrition-config-title">
+          <div class="nutrition-panel-head">
+            <div>
+              <p class="eyebrow">Калькулятор раствора</p>
+              <h2 id="nutrition-config-title">Профиль питания, мг/л</h2>
+              <p>Введите целевой профиль раствора. Калькулятор подберет источники удобрений, разнесет их по бакам и посчитает граммы.</p>
+            </div>
+            <button class="reset-inline-link" type="button" data-nutrition-reset>сбросить</button>
+          </div>
+
+          <section class="nutrition-card nutrition-ec-card" aria-labelledby="nutrition-ec-title">
+            <div class="nutrition-card-head">
+              <h3 id="nutrition-ec-title">EC-контроль</h3>
+            </div>
+            <div class="nutrition-ec-board">
+              <div class="nutrition-ec-main">
+                <span>Расчетный EC</span>
+                <strong id="nutrition-ec-preview">0.00</strong>
+                <small id="nutrition-ec-delta">цель 0.00</small>
+              </div>
+              <div class="nutrition-control-grid nutrition-ec-controls">
+                <label class="compact-control">
+                  <span class="compact-control-head"><strong>EC воды</strong><small>мСм/см</small></span>
+                  <input class="nutrition-number" type="text" inputmode="decimal" data-nutrition-input="sourceEc" />
+                </label>
+                <label class="compact-control">
+                  <span class="compact-control-head"><strong>Целевой EC</strong><small>мСм/см</small></span>
+                  <input class="nutrition-number" type="text" inputmode="decimal" data-nutrition-input="targetEc" />
+                </label>
+                <label class="compact-control">
+                  <span class="compact-control-head"><strong>Объем</strong><small>л</small></span>
+                  <input class="nutrition-number" type="text" inputmode="decimal" data-nutrition-input="volume" />
+                </label>
+              </div>
+              <div class="nutrition-ec-phase-panel">
+                <div class="nutrition-ec-phase-head">
+                  <strong>Профиль питания</strong>
+                  <span>загрузка и кабинет</span>
+                </div>
+                <label class="nutrition-profile-select-label">
+                  <span>Выбрать профиль</span>
+                  <select id="nutrition-profile-select"></select>
+                </label>
+                <div class="nutrition-profile-actions">
+                  <button type="button" data-nutrition-upload-trigger>Загрузить</button>
+                  <button type="button" data-nutrition-template>Шаблон Excel</button>
+                  <button type="button" data-nutrition-save-profile>В кабинет</button>
+                </div>
+                <input id="nutrition-profile-upload" type="file" accept=".csv,.xls,.xlsx,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden />
+                <small id="nutrition-profile-status">Клубника: рассада, вегетация, плодоношение.</small>
+              </div>
+            </div>
+            <div class="nutrition-fit-ec-row">
+              <button class="btn btn-secondary nutrition-fit-ec-button" type="button" data-nutrition-fit-ec>Пересчитать профиль под целевой EC</button>
+              <label class="nutrition-ec-factor-field">
+                <span>×</span>
+                <input id="nutrition-ec-factor" type="text" inputmode="decimal" aria-label="Коэффициент пересчета профиля" />
+              </label>
+            </div>
+          </section>
+
+          <section class="nutrition-card" aria-labelledby="nutrition-target-title">
+            <div class="nutrition-card-head">
+              <h3 id="nutrition-target-title">Элементы, мг/л</h3>
+              <span>N/P/K/Ca/Mg/S + микро</span>
+            </div>
+            <div class="nutrition-target-grid" id="nutrition-target-grid"></div>
+            <div class="nutrition-ratio-grid" id="nutrition-ratio-grid" aria-label="Соотношения элементов"></div>
+          </section>
+
+          <section class="nutrition-card" aria-labelledby="nutrition-salts-title">
+            <div class="nutrition-card-head">
+              <h3 id="nutrition-salts-title">Предложенные удобрения</h3>
+              <span>можно заменить через поиск</span>
+            </div>
+            <div class="nutrition-salt-picker">
+              <label class="nutrition-search-field">
+                <span>Заменить или добавить источник</span>
+                <input type="search" id="nutrition-salt-search" placeholder="Например: кальциевая, KNO3, Fe DTPA, сульфат магния" autocomplete="off" />
+              </label>
+              <div class="nutrition-search-results" id="nutrition-salt-results" aria-live="polite"></div>
+              <div class="nutrition-selected-salts" id="nutrition-salt-list"></div>
+            </div>
+          </section>
+
+        </section>
+
+        <aside class="nutrition-panel nutrition-result" aria-labelledby="nutrition-dose-title">
+          <section class="calc-result-card nutrition-dose-card" aria-labelledby="nutrition-dose-title">
+            <div class="calc-result-card-head">
+              <strong id="nutrition-dose-title">Как замешать</strong>
+            </div>
+            <div class="nutrition-dose-list" id="nutrition-dose-list"></div>
+          </section>
+
+        </aside>
+      </div>
+    </section>
+
+    <section class="calc-next-steps" aria-labelledby="calc-next-title" data-calc-view="farm">
       <div class="calc-section-head">
         <p class="eyebrow">После расчёта</p>
         <h2 id="calc-next-title">Что дальше</h2>
@@ -317,55 +491,25 @@
       </div>
     </section>
 
-    <section class="calc-final-cta" aria-labelledby="calc-final-title">
+    <section class="calc-final-cta calc-final-card" aria-labelledby="calc-final-title" data-calc-view="nutrition" hidden>
       <div class="calc-final-copy">
-        <p class="eyebrow">Разбор объекта</p>
-        <h2 id="calc-final-title">Обсудить расчёт</h2>
-        <p>Калькулятор даёт быстрый ориентир. Следующий шаг — сверить помещение, ограничения и комплект под ваши условия.</p>
+        <p class="eyebrow">Консультация</p>
+        <h2 id="calc-final-title">Если непонятно, как замешать раствор</h2>
+        <p>Калькулятор даёт ориентир. На разовой консультации разберём ваш профиль, воду, EC, выбранные соли и порядок замеса простым языком.</p>
+        <ul class="calc-final-benefits" aria-label="Что можно разобрать на консультации">
+          <li>почему рецепт не сходится по EC или пропорциям</li>
+          <li>какие соли выбрать из того, что есть под рукой</li>
+          <li>как не смешать несовместимые удобрения в одном баке</li>
+        </ul>
       </div>
 
-      <div class="calc-final-actions">
-        <article class="calc-final-telegram">
-          <span>Быстрее всего</span>
-          <strong>Написать в Telegram</strong>
-          <p>Так проще отправить размеры, скрин расчёта и сразу уточнить следующий шаг.</p>
-          <a class="btn btn-primary" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Написать в Telegram</a>
-        </article>
-
-        <form
-          class="calc-final-form"
-          data-brief-form="Калькулятор — обсудить расчёт"
-          data-brief-button-label="Отправить вводные"
-          data-brief-done-label="Вводные переданы"
-          data-brief-link-label="Написать в Telegram"
-        >
-          <input type="hidden" value="Калькулятор сайта" data-field-role="name" data-field-label="Имя" />
-          <input type="hidden" value="Проверить расчёт калькулятора" data-field-role="request" data-field-label="Что нужно сейчас" />
-          <label class="calc-final-field">
-            <span>Куда ответить</span>
-            <input
-              data-field-role="contact"
-              data-field-label="Контакт для связи"
-              type="text"
-              placeholder="Телефон, Telegram или WhatsApp"
-            />
-          </label>
-          <label class="calc-final-field">
-            <span>Расчёт и вводные</span>
-            <textarea
-              data-calc-brief-text
-              data-field-role="summary"
-              data-field-label="Расчёт из калькулятора"
-              placeholder="Расчёт подставится автоматически. Добавьте город, ограничения или вопрос."
-            ></textarea>
-          </label>
-          <div class="calc-final-form-actions">
-            <button class="btn btn-primary" data-brief-button type="button">Отправить вводные</button>
-            <a class="calc-final-link brief-telegram-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Написать в Telegram</a>
-          </div>
-          <p class="brief-legal-note">Нажимая кнопку, вы соглашаетесь на <a href="../docs/consent/">обработку персональных данных</a> и принимаете <a href="../docs/policy/">политику конфиденциальности</a>.</p>
-          <p class="brief-form-status" data-brief-status aria-live="polite"></p>
-        </form>
+      <div class="calc-final-panel">
+        <div class="calc-consult-card">
+          <strong>Разовая консультация</strong>
+          <p>Подходит, если вы не уверены в исходной воде, дозировках, баках A/B или хотите перед внесением проверить логику рецепта.</p>
+          <a class="btn btn-primary" href="../consultations/">Записаться на консультацию</a>
+          <a class="calc-final-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Задать вопрос в Telegram</a>
+        </div>
       </div>
     </section>
   </main>
@@ -401,7 +545,7 @@
     <div class="home-footer-inner">
       <div class="home-footer-lead">
         <a class="home-footer-logo" href="../" aria-label="Klubnika Project">
-          <img src="../assets/logo/klubnika-project-logo-green.svg" alt="Klubnika Project" />
+          <img src="../assets/logo/klubnika-project-logo-green-transparent.webp" alt="Klubnika Project" />
         </a>
       </div>
 
@@ -443,7 +587,8 @@
     </div>
   </footer>
 
-  <script src="../site.js?v=20260512-publish1" defer></script>
-  <script type="module" src="./calc.js?v=20260511-review1"></script>
+  <script src="../site.js?v=20260525-webp1" defer></script>
+  <script type="module" src="./calc.js?v=20260603-cabinet-local"></script>
+  <script type="module" src="./nutrition.js?v=20260607-palette2"></script>
 </body>
 </html>
