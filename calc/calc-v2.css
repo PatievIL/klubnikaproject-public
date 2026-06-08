@@ -1198,7 +1198,7 @@ a {
 }
 
 body.calc-mode-nutrition .calc-final-cta {
-  width: min(920px, calc(100% - 48px));
+  width: min(1240px, calc(100% - 48px));
 }
 
 .nutrition-workspace {
@@ -1211,7 +1211,7 @@ body.calc-mode-nutrition .calc-final-cta {
   grid-template-columns: minmax(0, 1fr);
   align-items: start;
   gap: 12px;
-  width: min(920px, calc(100% - 48px));
+  width: min(1240px, calc(100% - 48px));
   margin: 0 auto;
   padding: 12px;
   border: 1px solid var(--line);
@@ -1234,8 +1234,8 @@ body.calc-mode-nutrition .calc-final-cta {
 .nutrition-card {
   display: grid;
   min-width: 0;
-  gap: 10px;
-  padding: 10px;
+  gap: 12px;
+  padding: 12px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--surface) 96%, white);
@@ -1254,10 +1254,10 @@ body.calc-mode-nutrition .calc-final-cta {
 }
 
 .nutrition-panel-head p:not(.eyebrow) {
-  max-width: 520px;
+  max-width: 620px;
   margin: 8px 0 0;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 650;
   line-height: 1.35;
 }
@@ -1276,29 +1276,29 @@ body.calc-mode-nutrition .calc-final-cta {
 .nutrition-card-head h3 {
   margin: 0;
   color: var(--green);
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1.05;
 }
 
 .nutrition-card-head span {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 750;
   line-height: 1.2;
   text-align: right;
 }
 
 .nutrition-ec-card {
-  gap: 8px;
-  padding: 10px;
+  gap: 10px;
+  padding: 12px;
   border-color: color-mix(in srgb, var(--green) 24%, var(--line));
   background: color-mix(in srgb, var(--green) 4%, var(--surface));
 }
 
 .nutrition-ec-board {
   display: grid;
-  grid-template-columns: minmax(180px, 220px) minmax(155px, 175px) minmax(0, 1fr);
-  gap: 8px;
+  grid-template-columns: minmax(210px, 260px) minmax(175px, 210px) minmax(0, 1fr);
+  gap: 10px;
   align-items: stretch;
 }
 
@@ -1306,8 +1306,8 @@ body.calc-mode-nutrition .calc-final-cta {
   display: grid;
   align-content: center;
   gap: 5px;
-  min-height: 104px;
-  padding: 12px;
+  min-height: 116px;
+  padding: 14px;
   border-radius: var(--radius);
   background: var(--green);
   color: var(--white);
@@ -1315,7 +1315,7 @@ body.calc-mode-nutrition .calc-final-cta {
 
 .nutrition-ec-main span {
   color: color-mix(in srgb, var(--white) 74%, transparent);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 850;
   line-height: 1.1;
   text-transform: uppercase;
@@ -1328,7 +1328,7 @@ body.calc-mode-nutrition .calc-final-cta {
 
 .nutrition-ec-main small {
   color: color-mix(in srgb, var(--white) 84%, transparent);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
   line-height: 1.2;
 }
@@ -1344,12 +1344,12 @@ body.calc-mode-nutrition .calc-final-cta {
 .nutrition-ec-card .nutrition-ec-controls {
   grid-template-columns: 1fr;
   align-content: stretch;
-  gap: 6px;
+  gap: 8px;
 }
 
 .nutrition-ec-card .compact-control {
-  min-height: 54px;
-  padding: 7px;
+  min-height: 58px;
+  padding: 8px;
 }
 
 .nutrition-ec-card .compact-control-head {
@@ -1357,17 +1357,17 @@ body.calc-mode-nutrition .calc-final-cta {
 }
 
 .nutrition-ec-card .nutrition-number {
-  min-height: 34px;
+  min-height: 38px;
   padding: 0 10px;
 }
 
 .nutrition-ec-phase-panel {
   display: grid;
   align-content: start;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
-  min-height: 104px;
-  padding: 10px;
+  min-height: 116px;
+  padding: 12px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--surface) 96%, white);
@@ -1383,14 +1383,14 @@ body.calc-mode-nutrition .calc-final-cta {
 
 .nutrition-ec-phase-head strong {
   color: var(--green);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 900;
   line-height: 1.1;
 }
 
 .nutrition-ec-phase-head span {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   line-height: 1.15;
   text-align: right;
@@ -1404,20 +1404,20 @@ body.calc-mode-nutrition .calc-final-cta {
   display: grid;
   gap: 5px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 850;
   line-height: 1;
 }
 
 .nutrition-profile-select-label select {
   width: 100%;
-  min-height: 38px;
+  min-height: 42px;
   padding: 0 10px;
   border: 1px solid rgba(31, 90, 61, 0.12);
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--surface) 88%, white);
   color: var(--green);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 850;
 }
 
@@ -1428,13 +1428,13 @@ body.calc-mode-nutrition .calc-final-cta {
 }
 
 .nutrition-profile-actions button {
-  min-height: 34px;
+  min-height: 38px;
   padding: 6px 7px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--surface) 96%, white);
   color: var(--green);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
   line-height: 1.15;
   cursor: pointer;
@@ -1447,7 +1447,7 @@ body.calc-mode-nutrition .calc-final-cta {
 
 #nutrition-profile-status {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 750;
   line-height: 1.2;
 }
@@ -1461,7 +1461,7 @@ body.calc-mode-nutrition .calc-final-cta {
 
 .nutrition-fit-ec-button {
   width: 100%;
-  min-height: 44px;
+  min-height: 48px;
   border-color: var(--green);
   background: var(--green);
   color: var(--white);
@@ -1530,7 +1530,7 @@ body.calc-mode-nutrition .calc-final-cta {
 
 .nutrition-readonly-chip span {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 850;
   line-height: 1;
   text-transform: uppercase;
@@ -1587,12 +1587,12 @@ body.calc-mode-nutrition .calc-final-cta {
 
 .nutrition-target-grid {
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 6px;
+  gap: 8px;
 }
 
 .nutrition-ratio-grid {
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 6px;
+  gap: 8px;
   padding-top: 2px;
 }
 
@@ -1601,7 +1601,7 @@ body.calc-mode-nutrition .calc-final-cta {
   display: grid;
   gap: 5px;
   min-width: 0;
-  padding: 9px;
+  padding: 10px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--surface) 96%, white);
@@ -1610,15 +1610,15 @@ body.calc-mode-nutrition .calc-final-cta {
 .nutrition-target-field {
   align-items: center;
   gap: 4px;
-  padding: 7px;
+  padding: 8px;
   text-align: center;
 }
 
 .nutrition-ratio-item {
   align-items: center;
   gap: 3px;
-  min-height: 44px;
-  padding: 7px;
+  min-height: 48px;
+  padding: 8px;
   background: color-mix(in srgb, var(--green) 5%, var(--surface));
   text-align: center;
 }
@@ -1634,7 +1634,7 @@ body.calc-mode-nutrition .calc-final-cta {
   grid-column: 1 / -1;
   gap: 3px;
   min-width: 0;
-  padding: 9px 10px;
+  padding: 10px 12px;
   border: 1px solid color-mix(in srgb, var(--green) 18%, var(--line));
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--green) 6%, var(--surface));
@@ -1649,7 +1649,7 @@ body.calc-mode-nutrition .calc-final-cta {
 .nutrition-target-field span,
 .nutrition-ratio-item span {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 850;
   line-height: 1;
   text-transform: none;
@@ -1657,21 +1657,21 @@ body.calc-mode-nutrition .calc-final-cta {
 
 .nutrition-ratio-item strong {
   color: var(--green);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 900;
   line-height: 1;
 }
 
 .nutrition-ratio-comment strong {
   color: var(--green);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 900;
   line-height: 1.15;
 }
 
 .nutrition-ratio-comment span {
   color: color-mix(in srgb, var(--green) 66%, var(--muted));
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 750;
   line-height: 1.25;
 }
@@ -1696,9 +1696,9 @@ body.calc-mode-nutrition .calc-final-cta {
 }
 
 .nutrition-target-field input {
-  min-height: 32px;
+  min-height: 36px;
   padding: 0 7px;
-  font-size: 15px;
+  font-size: 16px;
   text-align: center;
 }
 
@@ -1814,14 +1814,14 @@ body.calc-mode-nutrition .calc-final-cta {
 }
 
 .nutrition-search-result strong {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 850;
   line-height: 1.18;
 }
 
 .nutrition-search-result span {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -1829,7 +1829,7 @@ body.calc-mode-nutrition .calc-final-cta {
 .nutrition-search-result em {
   margin-top: 2px;
   color: color-mix(in srgb, var(--copper) 82%, var(--green));
-  font-size: 11px;
+  font-size: 12px;
   font-style: normal;
   font-weight: 850;
   line-height: 1.2;
@@ -1863,7 +1863,7 @@ body.calc-mode-nutrition .calc-final-cta {
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--green) 5%, var(--surface));
   color: color-mix(in srgb, var(--green) 80%, var(--muted));
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
   line-height: 1.2;
 }
@@ -1874,7 +1874,7 @@ body.calc-mode-nutrition .calc-final-cta {
   align-items: center;
   justify-content: space-between;
   color: var(--green);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 900;
   line-height: 1.1;
 }
@@ -1912,7 +1912,7 @@ body.calc-mode-nutrition .calc-final-cta {
 
 .nutrition-selected-salt strong {
   color: var(--green);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 850;
   line-height: 1.18;
 }
@@ -1920,7 +1920,7 @@ body.calc-mode-nutrition .calc-final-cta {
 .nutrition-selected-salt span {
   margin-top: 2px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -1980,7 +1980,7 @@ body.calc-mode-nutrition .calc-final-cta {
 .nutrition-tank-total span,
 .nutrition-tank-total small {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   line-height: 1.15;
 }
@@ -2010,7 +2010,7 @@ body.calc-mode-nutrition .calc-final-cta {
 
 .nutrition-dose-group-head strong {
   color: var(--green);
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.15;
 }
 
@@ -2048,13 +2048,13 @@ body.calc-mode-nutrition .calc-final-cta {
 
 .nutrition-dose-row strong {
   color: var(--green);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.18;
 }
 
 .nutrition-dose-row span {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 1.25;
 }
@@ -2067,7 +2067,7 @@ body.calc-mode-nutrition .calc-final-cta {
   border-radius: 999px;
   background: color-mix(in srgb, var(--accent) 24%, var(--surface-3));
   color: var(--green);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
   text-align: center;
   white-space: nowrap;
