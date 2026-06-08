@@ -1288,6 +1288,47 @@ body.calc-mode-nutrition .calc-final-cta {
   text-align: right;
 }
 
+.nutrition-salts-details {
+  gap: 0;
+}
+
+.nutrition-salts-details[open] {
+  gap: 12px;
+}
+
+.nutrition-salts-summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.nutrition-salts-summary::-webkit-details-marker {
+  display: none;
+}
+
+.nutrition-salts-summary h3 {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.nutrition-salts-summary h3::after {
+  content: "+";
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--green) 5%, var(--surface-3));
+  color: var(--green);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.nutrition-salts-details[open] .nutrition-salts-summary h3::after {
+  content: "-";
+}
+
 .nutrition-ec-card {
   gap: 10px;
   padding: 12px;
@@ -1955,6 +1996,53 @@ body.calc-mode-nutrition .calc-final-cta {
   cursor: default;
 }
 
+.nutrition-dose-mode {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  margin: 0 10px;
+  padding: 9px 10px;
+  border: 1px solid color-mix(in srgb, var(--green) 20%, var(--line));
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--green) 5%, var(--surface));
+  color: var(--green);
+}
+
+.nutrition-dose-mode.is-manual {
+  border-color: color-mix(in srgb, var(--copper) 42%, var(--line));
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface));
+}
+
+.nutrition-dose-mode span,
+.nutrition-dose-mode strong,
+.nutrition-dose-mode button {
+  font-size: 12px;
+  line-height: 1.15;
+}
+
+.nutrition-dose-mode span {
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.nutrition-dose-mode strong {
+  min-width: 0;
+  color: color-mix(in srgb, var(--green) 72%, var(--muted));
+  font-weight: 750;
+}
+
+.nutrition-dose-mode button {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid color-mix(in srgb, var(--green) 24%, var(--line));
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface-3) 90%, white);
+  color: var(--green);
+  font-weight: 900;
+  cursor: pointer;
+}
+
 .nutrition-dose-overview,
 .nutrition-dose-columns {
   display: grid;
@@ -2029,15 +2117,19 @@ body.calc-mode-nutrition .calc-final-cta {
 
 .nutrition-dose-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
   min-width: 0;
-  min-height: 54px;
-  padding: 9px;
+  min-height: 112px;
+  padding: 10px;
   border: 1px solid color-mix(in srgb, var(--green) 18%, var(--line));
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--surface) 96%, white);
+}
+
+.nutrition-dose-copy {
+  min-width: 0;
 }
 
 .nutrition-dose-row strong,
@@ -2059,17 +2151,66 @@ body.calc-mode-nutrition .calc-final-cta {
   line-height: 1.25;
 }
 
-.nutrition-dose-row small {
-  justify-self: end;
-  min-width: 62px;
-  padding: 6px 9px;
+.nutrition-dose-actions {
+  display: grid;
+  grid-template-columns: auto minmax(104px, 132px);
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  align-self: end;
+  min-width: 0;
+}
+
+.nutrition-dose-tank-button {
+  align-self: stretch;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid color-mix(in srgb, var(--green) 22%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--green) 6%, var(--surface-3));
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.nutrition-dose-tank-button:hover {
+  border-color: var(--line-strong);
+  background: color-mix(in srgb, var(--green) 10%, var(--surface-3));
+}
+
+.nutrition-dose-amount {
+  display: grid;
+  grid-template-columns: minmax(68px, 1fr) auto;
+  gap: 5px;
+  align-items: center;
+  justify-self: stretch;
+  min-width: 104px;
+  min-height: 34px;
+  padding: 3px 8px;
   border: 1px solid color-mix(in srgb, var(--green) 16%, var(--line));
   border-radius: 999px;
   background: color-mix(in srgb, var(--accent) 24%, var(--surface-3));
   color: var(--green);
+}
+
+.nutrition-dose-amount input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
   font-size: 13px;
   font-weight: 900;
   text-align: center;
+  outline: 0;
+}
+
+.nutrition-dose-amount span {
+  color: color-mix(in srgb, var(--green) 68%, var(--muted));
+  font-size: 12px;
+  font-weight: 900;
   white-space: nowrap;
 }
 

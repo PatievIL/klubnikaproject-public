@@ -55,7 +55,7 @@
     }
   ]
   </script>
-  <link rel="stylesheet" href="./calc-v2.css?v=20260608-width1" />
+  <link rel="stylesheet" href="./calc-v2.css?v=20260608-dose-order1" />
   <link rel="stylesheet" href="../assets/css/kp-header.css?v=20260525-overlay1" />
   <link rel="stylesheet" href="../assets/css/kp-footer.css?v=20260427a" />
   <!-- Yandex.Metrika counter 95619008 -->
@@ -432,11 +432,11 @@
             <div class="nutrition-ratio-grid" id="nutrition-ratio-grid" aria-label="Соотношения элементов"></div>
           </section>
 
-          <section class="nutrition-card" aria-labelledby="nutrition-salts-title">
-            <div class="nutrition-card-head">
+          <details class="nutrition-card nutrition-salts-details" aria-labelledby="nutrition-salts-title">
+            <summary class="nutrition-card-head nutrition-salts-summary">
               <h3 id="nutrition-salts-title">Предложенные удобрения</h3>
               <span>можно заменить через поиск</span>
-            </div>
+            </summary>
             <div class="nutrition-salt-picker">
               <label class="nutrition-search-field">
                 <span>Заменить или добавить источник</span>
@@ -445,7 +445,7 @@
               <div class="nutrition-search-results" id="nutrition-salt-results" aria-live="polite"></div>
               <div class="nutrition-selected-salts" id="nutrition-salt-list"></div>
             </div>
-          </section>
+          </details>
 
         </section>
 
@@ -587,8 +587,8 @@
     </div>
   </footer>
 
-  <script src="../site.js?v=20260525-webp1" defer></script>
+  <script src="../site.js?v=20260608-metrika1" defer></script>
   <script type="module" src="./calc.js?v=20260603-cabinet-local"></script>
-  <script type="module" src="./nutrition.js?v=20260607-palette2"></script>
+  <script type="module" src="./nutrition.js?v=20260608-target-round1"></script>
 </body>
 </html>

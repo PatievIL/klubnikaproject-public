@@ -862,14 +862,41 @@ function calculateElectricalModel(context) {
   const lightPowerTotalW = lightCount * fixturePowerW;
   const driverSidePowerW = lightPowerTotalW / 2;
   const maxLinePowerW = electricalModel.maxLinePowerW || 2500;
-  const driverSideLineCount = Math.max(1, Math.ceil(driverSidePowerW / maxLinePowerW));
-  const totalLightLines = driverSideLineCount * 2;
-  const lightingGroups = driverSideLineCount;
-  const racksPerLine = Math.max(1, Math.ceil(rackCount / driverSideLineCount));
+  const lightControlGroupCount = electricalModel.lightControlGroupCount || 2;
+  const driverSideLineCount = lightControlGroupCount;
+  const totalLightLines = lightControlGroupCount;
+  const lightingGroups = lightControlGroupCount;
+  const racksPerLine = rackCount;
   const panelToRackZoneM = electricalModel.panelToRackZoneM || 4;
-  const lightLineTerminalReserveM = electricalModel.lightLineTerminalReserveM || 2;
-  const oneLightLineM = panelToRackZoneM + racksPerLine * rackLayout.occupiedLengthPerLane + lightLineTerminalReserveM;
-  const allLightLinesM = Math.ceil(totalLightLines * oneLightLineM * layoutCoeff);
+  const lightRackLineCount = electricalModel.lightRackLineCount || 2;
+  const lightHarnessPerStandM = electricalModel.lightHarnessPerStandM || 3;
+  const rackBusCablePerEightMetersM = electricalModel.rackBusCablePerEightMetersM || 15;
+  const panelToRackLightLineM = electricalModel.panelToRackLightLineM || 20;
+  const lightHarnessCableSpec = electricalModel.lightHarnessCableSpec || "ШВВП 2×0.75";
+  const rackStandCountPerLane = rackLayout.runLengths.reduce((sum, runLength) => (
+    sum + Math.round(runLength / loadedPricing.constants.rackGeometry.segmentLength) + 1
+  ), 0);
+  const junctionBoxCount = rackCount * rackStandCountPerLane;
+  const lightHarnessCount = junctionBoxCount;
+  const lightHarnessCableM = Math.ceil(lightHarnessCount * lightHarnessPerStandM);
+  const rackBusCableM = Math.ceil(rackCount * (rackLayout.growLengthPerLane / 8) * rackBusCablePerEightMetersM);
+  const panelToRackCableM = lightRackLineCount * panelToRackLightLineM;
+  const allLightLinesM = lightHarnessCableM + rackBusCableM + panelToRackCableM;
+  const oneLightLineM = Math.ceil(allLightLinesM / totalLightLines);
+  const rackLinePowerW = rackCount > 0 ? (lightPowerTotalW / rackCount) / lightRackLineCount : 0;
+  const rackLineAmps = rackLinePowerW / 220;
+  const controlGroupPowerW = lightPowerTotalW / totalLightLines;
+  const controlGroupAmps = controlGroupPowerW / 220;
+  const rackBusCableSpec = pickTwoCoreCableSpec(
+    rackLineAmps,
+    electricalModel.rackBusCableFamily || "ВВГнг-LS/ПВС",
+    electricalModel.rackBusMinCableSectionMm2 || 1.5
+  );
+  const panelToRackCableSpec = pickTwoCoreCableSpec(
+    controlGroupAmps,
+    electricalModel.panelToRackCableFamily || "ВВГнг-LS",
+    electricalModel.panelToRackMinCableSectionMm2 || 2.5
+  );
   const exhaustPowerW = electricalModel.exhaustPowerW || 1000;
   const exhaustLineM = Math.ceil((panelToRackZoneM + length / 2 + 2) * layoutCoeff);
   const climateEnabled = Boolean(currentState.includeClimatePack);
@@ -897,9 +924,10 @@ function calculateElectricalModel(context) {
   const splitColdFactor = electricalModel.splitColdFactor || 1.2;
   const btuPerW = electricalModel.btuPerW || 3.412;
   const splitEer = electricalModel.splitEer || 3.2;
+  const splitInputPowerW = electricalModel.splitInputPowerW || 3000;
   const splitColdW = climateEnabled ? lightPowerTotalW * splitColdFactor : 0;
   const splitBtu = Math.ceil(splitColdW * btuPerW);
-  const splitInputW = climateEnabled ? Math.ceil(splitColdW / splitEer) : 0;
+  const splitInputW = climateEnabled ? Math.max(splitInputPowerW, Math.ceil(splitColdW / splitEer)) : 0;
   const splitLineM = climateEnabled ? Math.ceil((panelToRackZoneM + length / 2 + 3) * layoutCoeff) : 0;
   const serviceReserveW = electricalModel.serviceReserveW || 1500;
   const serviceLineM = Math.ceil((panelToRackZoneM + rackLayout.occupiedLengthPerLane + 3) * layoutCoeff);
@@ -908,16 +936,21 @@ function calculateElectricalModel(context) {
   const runningAmps = phaseMode === "one-phase"
     ? totalPowerW / 220
     : totalPowerW / (1.73 * 380);
-  const inputSizingPowerW = lightPowerTotalW * 2 + exhaustPowerW + splitInputW + serviceReserveW;
+  const lightInputReserveFactor = electricalModel.lightInputReserveFactor || 1.5;
+  const inputSizingPowerW = lightPowerTotalW * lightInputReserveFactor + exhaustPowerW + splitInputW + serviceReserveW;
   const inputSizingAmps = phaseMode === "one-phase"
     ? inputSizingPowerW / 220
     : inputSizingPowerW / (1.73 * 380);
-  const lineAmps = maxLinePowerW / 220;
   const standardBreakers = electricalModel.standardBreakersA || [6, 10, 16, 20, 25, 32, 40, 50, 63];
-  const lightLineBreakerA = Math.max(pickStandardBreaker(lineAmps, standardBreakers), 16);
+  const lightLineMinBreakerA = electricalModel.lightLineMinBreakerA || 25;
+  const splitMinBreakerA = electricalModel.splitMinBreakerA || 25;
+  const lightContactorMinA = electricalModel.lineContactorA || 25;
+  const lineAmps = controlGroupAmps;
+  const lightLineBreakerA = Math.max(pickStandardBreaker(lineAmps, standardBreakers), lightLineMinBreakerA);
   const exhaustBreakerA = Math.max(pickStandardBreaker(exhaustPowerW / 220, standardBreakers), 10);
   const serviceBreakerA = Math.max(pickStandardBreaker(serviceReserveW / 220, standardBreakers), 16);
-  const splitBreakerA = splitInputW ? Math.max(pickStandardBreaker(splitInputW / 220, standardBreakers), 16) : 0;
+  const splitBreakerA = splitInputW ? Math.max(pickStandardBreaker(splitInputW / 220, standardBreakers), splitMinBreakerA) : 0;
+  const lightContactorA = Math.max(pickStandardBreaker(controlGroupAmps, standardBreakers), lightContactorMinA);
   const smartRelayCount = lightingGroups;
   const lightPowerKwhPerDay = (lightPowerTotalW / 1000) * (lightFullHours + lightHalfHours * lightHalfFactor);
   const exhaustPowerWForEnergy = Math.min(exhaustPowerW, 1000);
@@ -938,12 +971,12 @@ function calculateElectricalModel(context) {
     monthlyPowerCost
   };
   const inputBreakerPoles = phaseMode === "one-phase" ? 2 : 4;
-  const cableSpecLight = "ВВГнг-LS 3×2.5";
   const cableSpecExhaust = "ВВГнг-LS 3×1.5";
   const cableSpecSplit = "ВВГнг-LS 3×2.5";
   const cableSpecService = "ВВГнг-LS 3×2.5";
-  const junctionBoxCount = rackCount * rackLayout.runCount;
-  const wagoCount = lightCount * 4;
+  const wagoTwoPortCount = lightCount * 2;
+  const wagoThreePortCount = junctionBoxCount * 2;
+  const wagoCount = wagoTwoPortCount + wagoThreePortCount;
   const shieldNote = phaseMode === "one-phase"
     ? `под ${inputBreakerAPlaceholder(inputSizingAmps, standardBreakers)} А ввод 2P и ${totalLightLines} световых линий`
     : `под ${inputBreakerAPlaceholder(inputSizingAmps, standardBreakers)} А ввод 4P и ${totalLightLines} световых линий`;
@@ -971,15 +1004,15 @@ function calculateElectricalModel(context) {
       qty: totalLightLines,
       unit: "шт",
       spec: `1P ${lightLineBreakerA} А`,
-      note: "Отдельно на каждую линию драйверов"
+      note: "Отдельно на каждую группу света"
     },
     {
       id: "light-contactors",
-      label: "Контакторы света",
+      label: "Пускатели света",
       qty: totalLightLines,
       unit: "шт",
-      spec: `2P ${electricalModel.lineContactorA || 25} А`,
-      note: "Размыкаем фазу и ноль по каждой линии"
+      spec: `${electricalModel.lineContactorPoles || 4}P ${lightContactorA} А`,
+      note: "Две общие группы примерно по 50% света"
     },
     {
       id: "smart-relays",
@@ -987,7 +1020,7 @@ function calculateElectricalModel(context) {
       qty: smartRelayCount,
       unit: "шт",
       spec: "управление группами",
-      note: "По одному на пару линий драйверов 1/2"
+      note: "По одному на каждую группу света"
     },
     {
       id: "exhaust-breaker",
@@ -1010,24 +1043,56 @@ function calculateElectricalModel(context) {
       label: "Распаячные коробки",
       qty: junctionBoxCount,
       unit: "шт",
-      spec: "по одной на стеллаж",
-      note: "Для разводки на зону стеллажей"
+      spec: "по одной на стойку",
+      note: `${rackStandCountPerLane} стоек на стеллаж`
     },
     {
-      id: "wago-connectors",
-      label: "Клеммы WAGO",
-      qty: wagoCount,
+      id: "wago-two-port",
+      label: "WAGO 2-контактные",
+      qty: wagoTwoPortCount,
       unit: "шт",
-      spec: "4 на светильник",
-      note: "На подключение драйверов и светильников"
+      spec: "на светильники",
+      note: "По две клеммы на светильник: фаза и ноль"
     },
     {
-      id: "light-cable",
-      label: "Кабель света",
-      qty: allLightLinesM,
+      id: "wago-three-port",
+      label: "WAGO 3-контактные",
+      qty: wagoThreePortCount,
+      unit: "шт",
+      spec: "на распайку коробок",
+      note: "По две клеммы на коробку: фаза и ноль"
+    },
+    {
+      id: "light-harnesses",
+      label: "Косы светильников",
+      qty: lightHarnessCount,
+      unit: "шт",
+      spec: `${lightHarnessPerStandM} м на стойку`,
+      note: "Для подключения светильников от стойки"
+    },
+    {
+      id: "light-harness-cable",
+      label: "Кабель кос светильников",
+      qty: lightHarnessCableM,
       unit: "м",
-      spec: cableSpecLight,
-      note: `${totalLightLines} линий до стеллажей`
+      spec: lightHarnessCableSpec,
+      note: `${lightHarnessCount} кос по ${lightHarnessPerStandM} м`
+    },
+    {
+      id: "rack-bus-cable",
+      label: "Кабель магистрали стеллажей",
+      qty: rackBusCableM,
+      unit: "м",
+      spec: rackBusCableSpec,
+      note: `${formatInternalNumber(rackLineAmps)} А на стеллажную линию`
+    },
+    {
+      id: "panel-light-cable",
+      label: "Кабель света до щитка",
+      qty: panelToRackCableM,
+      unit: "м",
+      spec: panelToRackCableSpec,
+      note: `${formatInternalNumber(controlGroupAmps)} А на группу света`
     },
     {
       id: "exhaust-cable",
@@ -1105,16 +1170,29 @@ function calculateElectricalModel(context) {
     serviceBreakerA,
     splitBreakerA,
     contactorCount: totalLightLines,
-    contactorRatingA: electricalModel.lineContactorA || 25,
+    contactorRatingA: lightContactorA,
+    contactorPoles: electricalModel.lineContactorPoles || 4,
     serviceSocketPoints: electricalModel.serviceSocketPoints || 7,
     smartRelayCount,
     junctionBoxCount,
+    rackStandCountPerLane,
+    lightHarnessCount,
+    lightHarnessCableM,
+    rackBusCableM,
+    panelToRackCableM,
+    rackLineAmps,
+    controlGroupAmps,
     wagoCount,
+    wagoTwoPortCount,
+    wagoThreePortCount,
     monthlyKwh,
     monthlyPowerCost,
     monthlyElectricitySummary,
     tierLabel: heightProfile.tiers,
-    cableSpecLight,
+    cableSpecLight: panelToRackCableSpec,
+    lightHarnessCableSpec,
+    rackBusCableSpec,
+    panelToRackCableSpec,
     cableSpecExhaust,
     cableSpecSplit,
     cableSpecService,
@@ -1246,6 +1324,26 @@ function pickStandardBreaker(currentA, standardBreakers) {
   const safeCurrent = Math.ceil(currentA || 0);
   const sorted = [...standardBreakers].sort((left, right) => left - right);
   return sorted.find((value) => value >= safeCurrent) || sorted[sorted.length - 1];
+}
+
+function formatInternalNumber(value) {
+  return roundToStep(value, 0.1, "nearest").toLocaleString("ru-RU");
+}
+
+function pickTwoCoreCableSpec(currentA, family, minSectionMm2 = 1.5) {
+  const safeCurrent = normalizeNonNegativeNumber(currentA, 0);
+  const minSection = normalizeNonNegativeNumber(minSectionMm2, 1.5);
+  let section = 1.5;
+
+  if (safeCurrent > 10 && safeCurrent <= 16) {
+    section = 2.5;
+  } else if (safeCurrent > 16 && safeCurrent <= 25) {
+    section = 4;
+  } else if (safeCurrent > 25) {
+    section = 6;
+  }
+
+  return `${family} 2×${Math.max(section, minSection)}`;
 }
 
 function formatCableLayoutMode(mode) {

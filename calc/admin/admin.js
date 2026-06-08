@@ -131,6 +131,48 @@ const CONSTANT_FIELDS = [
     note: "Базовая длина трассы до зоны стеллажей."
   },
   {
+    key: "electricalModel.lightControlGroupCount",
+    label: "Группы света",
+    unit: "шт",
+    note: "Общие группы управления светом, обычно две по 50%."
+  },
+  {
+    key: "electricalModel.lightRackLineCount",
+    label: "Линии на стеллаж",
+    unit: "шт",
+    note: "Силовые линии, которые идут по каждому стеллажу."
+  },
+  {
+    key: "electricalModel.lightHarnessPerStandM",
+    label: "Коса на стойку",
+    unit: "м",
+    note: "Длина косы подключения светильников от стойки."
+  },
+  {
+    key: "electricalModel.rackBusCablePerEightMetersM",
+    label: "Магистраль на 8 м",
+    unit: "м",
+    note: "Стеллажная магистраль для двух совмещённых линий на 8 метров."
+  },
+  {
+    key: "electricalModel.rackBusMinCableSectionMm2",
+    label: "Мин. сечение магистрали",
+    unit: "мм²",
+    note: "Минимальное сечение кабеля по стеллажу."
+  },
+  {
+    key: "electricalModel.panelToRackLightLineM",
+    label: "От стеллажа до щитка",
+    unit: "м",
+    note: "Длина одной общей линии от зоны стеллажей до щитка с запасом."
+  },
+  {
+    key: "electricalModel.panelToRackMinCableSectionMm2",
+    label: "Мин. сечение до щитка",
+    unit: "мм²",
+    note: "Минимальное сечение общей линии света до щитка."
+  },
+  {
     key: "electricalModel.exhaustPowerW",
     label: "Вытяжка",
     unit: "Вт",
@@ -143,6 +185,12 @@ const CONSTANT_FIELDS = [
     note: "Насос, автоматика и свободные точки."
   },
   {
+    key: "electricalModel.lightInputReserveFactor",
+    label: "Запас по свету",
+    unit: "x",
+    note: "Коэффициент запаса света для подбора вводного автомата."
+  },
+  {
     key: "electricalModel.splitColdFactor",
     label: "Коэффициент холода сплита",
     unit: "x",
@@ -153,6 +201,30 @@ const CONSTANT_FIELDS = [
     label: "EER сплита",
     unit: "x",
     note: "Грубый перевод холода в электрическое потребление."
+  },
+  {
+    key: "electricalModel.splitInputPowerW",
+    label: "Потребление сплита",
+    unit: "Вт",
+    note: "Минимальная электрическая мощность сплита для отдельной линии."
+  },
+  {
+    key: "electricalModel.lightLineMinBreakerA",
+    label: "Мин. автомат света",
+    unit: "А",
+    note: "Минимальный номинал автомата на группу света."
+  },
+  {
+    key: "electricalModel.splitMinBreakerA",
+    label: "Мин. автомат сплита",
+    unit: "А",
+    note: "Минимальный номинал автомата сплита с учётом пуска."
+  },
+  {
+    key: "electricalModel.lineContactorPoles",
+    label: "Полюсов пускателя",
+    unit: "P",
+    note: "Количество полюсов общего пускателя света."
   }
 ];
 

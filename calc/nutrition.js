@@ -634,6 +634,8 @@ function bindEvents() {
   elements.saltSearch?.addEventListener("input", () => renderSaltPicker());
   elements.saltResults?.addEventListener("click", handleSaltAdd);
   elements.saltList.addEventListener("click", handleSaltRemove);
+  elements.doseList?.addEventListener("change", handleDoseInput);
+  elements.doseList?.addEventListener("focusout", handleDoseInput);
 
   document.addEventListener("click", (event) => {
     if (!event.target.closest("[data-nutrition-fit-ec]")) return;
@@ -652,6 +654,18 @@ function bindEvents() {
     if (event.target.closest("[data-nutrition-save-profile]")) {
       event.preventDefault();
       saveCurrentProfileToCabinet();
+    }
+    const tankToggle = event.target.closest("[data-nutrition-toggle-tank]");
+    if (tankToggle) {
+      event.preventDefault();
+      toggleFertilizerTank(tankToggle.dataset.nutritionToggleTank);
+    }
+    if (event.target.closest("[data-nutrition-auto-dose]")) {
+      event.preventDefault();
+      clearManualDoses();
+      setProfileStatus("Авторасчет вернулся к профилю мг/л.");
+      saveState();
+      render();
     }
   });
   elements.ecFactor?.addEventListener("input", () => {
@@ -705,6 +719,7 @@ function handleInput(event) {
   } else {
     state[key] = input.value;
   }
+  if (key === "volume" && isManualDoseMode()) syncTargetsFromManualDoses();
   saveState();
   render();
 }
@@ -712,8 +727,22 @@ function handleInput(event) {
 function handleTargetInput(event) {
   const input = event.target.closest("[data-nutrition-target]");
   if (!input) return;
+  clearManualDoses();
   state.phase = "custom";
   state.targets[input.dataset.nutritionTarget] = positiveNumber(input.value, state.targets[input.dataset.nutritionTarget]);
+  saveState();
+  render();
+}
+
+function handleDoseInput(event) {
+  const input = event.target.closest("[data-nutrition-dose]");
+  if (!input) return;
+  const fertilizerId = input.dataset.nutritionDose;
+  const seedResult = latestResult || calculateNutrition();
+  seedManualDoses(seedResult);
+  state.manualDoses[fertilizerId] = positiveNumber(input.value, 0);
+  syncTargetsFromManualDoses();
+  setProfileStatus("Ручные граммы применены. Профиль пересчитан по навескам.");
   saveState();
   render();
 }
@@ -726,6 +755,10 @@ function handleSaltAdd(event) {
   if (!fertilizer) return;
   state.salts = state.salts.filter((currentId) => !shouldReplaceFertilizer(currentId, fertilizer));
   if (!state.salts.includes(id)) state.salts.push(id);
+  if (isManualDoseMode()) {
+    state.manualDoses = { ...(state.manualDoses || {}), [id]: positiveNumber(state.manualDoses?.[id], 0) };
+    syncTargetsFromManualDoses();
+  }
   elements.saltSearch.value = "";
   saveState();
   render();
@@ -735,6 +768,11 @@ function handleSaltRemove(event) {
   const button = event.target.closest("[data-nutrition-remove-salt]");
   if (!button) return;
   state.salts = state.salts.filter((id) => id !== button.dataset.nutritionRemoveSalt);
+  if (isManualDoseMode() && state.manualDoses) {
+    delete state.manualDoses[button.dataset.nutritionRemoveSalt];
+    syncTargetsFromManualDoses();
+  }
+  if (state.tankOverrides) delete state.tankOverrides[button.dataset.nutritionRemoveSalt];
   saveState();
   render();
 }
@@ -921,7 +959,7 @@ function syncInputs() {
 
   ALL_ELEMENTS.forEach((element) => {
     const input = document.querySelector(`[data-nutrition-target="${element}"]`);
-    if (input && document.activeElement !== input) input.value = formatPlain(state.targets[element]);
+    if (input && document.activeElement !== input) input.value = formatElementValue(element, state.targets[element]);
   });
 
   document.querySelectorAll("[data-nutrition-ec-preset]").forEach((button) => {
@@ -979,6 +1017,7 @@ function handleProfileSelect(event) {
 function applyBuiltInProfile(key) {
   const phase = STRAWBERRY_PHASES[key];
   if (!phase) return;
+  clearManualDoses();
   state.phase = key;
   state.targets = { ...phase.targets };
   state.targetEc = phase.ec;
@@ -989,6 +1028,7 @@ function applyBuiltInProfile(key) {
 }
 
 function applyProfile(profile, message) {
+  clearManualDoses();
   state.phase = profile.phase && STRAWBERRY_PHASES[profile.phase] ? profile.phase : "custom";
   state.targets = normalizeTargets(profile.targets || {});
   state.targetEc = positiveNumber(profile.targetEc, state.targetEc);
@@ -1178,7 +1218,7 @@ function renderSelectedGroup(group) {
           <div class="nutrition-selected-salt">
             <div>
               <strong>${escapeHtml(fertilizer.name)}</strong>
-              <span>${escapeHtml(fertilizer.type)} · бак ${fertilizer.tank}</span>
+              <span>${escapeHtml(fertilizer.type)} · бак ${getFertilizerTank(fertilizer)}</span>
             </div>
             <button type="button" data-nutrition-remove-salt="${fertilizer.id}" aria-label="Удалить ${escapeHtml(fertilizer.name)}">×</button>
           </div>
@@ -1200,6 +1240,8 @@ function renderSearchResult(fertilizer) {
 }
 
 function calculateNutrition() {
+  if (isManualDoseMode()) return calculateManualNutrition();
+
   const selected = new Set(state.salts);
   const sourceEc = positiveNumber(state.sourceEc, 0);
   const targets = normalizeTargets(state.targets);
@@ -1213,7 +1255,7 @@ function calculateNutrition() {
       fertilizer,
       mgL,
       grams: mgL * state.volume / 1000,
-      tank: fertilizer.tank,
+      tank: getFertilizerTank(fertilizer),
       reason
     });
     Object.entries(fertilizer.composition || {}).forEach(([element, fraction]) => {
@@ -1310,6 +1352,130 @@ function calculateNutrition() {
   };
 }
 
+function calculateManualNutrition() {
+  const sourceEc = positiveNumber(state.sourceEc, 0);
+  const targets = normalizeTargets(state.targets);
+  const totals = emptyElements();
+  const doses = [];
+  const warnings = [];
+  const manualDoses = normalizeManualDoses(state.manualDoses);
+
+  selectedFertilizers().forEach((fertilizer) => {
+    const grams = positiveNumber(manualDoses[fertilizer.id], 0);
+    const mgL = state.volume > 0 ? grams * 1000 / state.volume : 0;
+    doses.push({
+      fertilizer,
+      mgL,
+      grams,
+      tank: getFertilizerTank(fertilizer),
+      reason: "ручной вес",
+      manual: true
+    });
+    Object.entries(fertilizer.composition || {}).forEach(([element, fraction]) => {
+      totals[element] = (totals[element] || 0) + mgL * fraction;
+    });
+  });
+
+  const finalElements = emptyElements();
+  ALL_ELEMENTS.forEach((element) => {
+    finalElements[element] = totals[element] || 0;
+  });
+
+  const totalSaltMgL = doses.reduce((sum, dose) => sum + dose.mgL, 0);
+  const fertilizerEc = doses
+    .filter((dose) => !dose.fertilizer.microElement)
+    .reduce((sum, dose) => sum + dose.mgL, 0) * 0.00085;
+  const ec = sourceEc + fertilizerEc;
+  const stockVolumeEach = state.volume / Math.max(1, state.stockRatio) / 2;
+  const tankTotals = {
+    A: doses.filter((dose) => dose.tank === "A").reduce((sum, dose) => sum + dose.grams, 0),
+    B: doses.filter((dose) => dose.tank === "B").reduce((sum, dose) => sum + dose.grams, 0)
+  };
+  const deviations = buildDeviations(targets, finalElements);
+  const nh4 = totals.N_NH4 || 0;
+  const nh4Percent = finalElements.N > 0 ? nh4 / finalElements.N * 100 : 0;
+
+  warnings.push(...buildWarnings({ targets, finalElements, deviations, ec, nh4Percent, sourceEc, selected: new Set(state.salts), doses }));
+
+  return {
+    mode: "manual",
+    phase: getPhase(),
+    sourceEc,
+    fertilizerEc,
+    targets,
+    finalElements,
+    deviations,
+    doses,
+    warnings: unique(warnings),
+    ec,
+    nh4Percent,
+    totalSaltMgL,
+    stockVolumeEach,
+    tankTotals
+  };
+}
+
+function isManualDoseMode() {
+  return state.doseMode === "manual" && state.manualDoses && typeof state.manualDoses === "object";
+}
+
+function clearManualDoses() {
+  state.doseMode = "auto";
+  state.manualDoses = {};
+}
+
+function seedManualDoses(result) {
+  if (!isManualDoseMode()) {
+    state.doseMode = "manual";
+    state.manualDoses = {};
+    (result?.doses || []).forEach((dose) => {
+      state.manualDoses[dose.fertilizer.id] = roundToStep(dose.grams, dose.grams < 1 ? 0.001 : 0.1);
+    });
+  }
+  selectedFertilizers().forEach((fertilizer) => {
+    if (!Object.prototype.hasOwnProperty.call(state.manualDoses, fertilizer.id)) {
+      state.manualDoses[fertilizer.id] = 0;
+    }
+  });
+}
+
+function syncTargetsFromManualDoses() {
+  if (!isManualDoseMode()) return;
+  const result = calculateManualNutrition();
+  state.targets = normalizeTargets(result.finalElements);
+  state.phase = "custom";
+}
+
+function normalizeManualDoses(doses) {
+  return Object.fromEntries(Object.entries(doses || {}).map(([id, grams]) => [id, positiveNumber(grams, 0)]));
+}
+
+function normalizeTankOverrides(overrides) {
+  return Object.fromEntries(Object.entries(overrides || {}).filter(([id, tank]) => {
+    const fertilizer = FERTILIZERS.find((item) => item.id === id);
+    return canToggleTank(fertilizer) && (tank === "A" || tank === "B");
+  }));
+}
+
+function canToggleTank(fertilizer) {
+  return fertilizer?.role === "potassiumNitrate";
+}
+
+function getFertilizerTank(fertilizer) {
+  const override = state.tankOverrides?.[fertilizer.id];
+  return override === "B" || override === "A" ? override : fertilizer.tank;
+}
+
+function toggleFertilizerTank(fertilizerId) {
+  const fertilizer = FERTILIZERS.find((item) => item.id === fertilizerId);
+  if (!canToggleTank(fertilizer)) return;
+  const currentTank = getFertilizerTank(fertilizer);
+  state.tankOverrides = { ...(state.tankOverrides || {}), [fertilizerId]: currentTank === "A" ? "B" : "A" };
+  setProfileStatus(`${fertilizer.name}: перенесено в бак ${state.tankOverrides[fertilizerId]}.`);
+  saveState();
+  render();
+}
+
 function renderResult(result) {
   if (elements.ecPreview) elements.ecPreview.textContent = formatFixed(result.ec, 2);
   if (elements.ecDelta) {
@@ -1338,13 +1504,25 @@ function renderDoseGroups(result) {
   const tankA = doses.filter((dose) => dose.tank === "A");
   const tankB = doses.filter((dose) => dose.tank === "B");
   return `
+    ${renderDoseMode(result)}
+    <div class="nutrition-dose-columns">
+      ${renderDoseGroup("Бак A", "Не смешивать с баком B в концентрате.", tankA)}
+      ${renderDoseGroup("Бак B", "Растворять отдельно после бака A.", tankB)}
+    </div>
     <div class="nutrition-dose-overview">
       ${renderTankTotal("Бак A", "кальций и нитратные соли", tankTotals.A)}
       ${renderTankTotal("Бак B", "фосфаты, сульфаты, микро", tankTotals.B)}
     </div>
-    <div class="nutrition-dose-columns">
-      ${renderDoseGroup("Бак A", "Не смешивать с баком B в концентрате.", tankA)}
-      ${renderDoseGroup("Бак B", "Растворять отдельно после бака A.", tankB)}
+  `;
+}
+
+function renderDoseMode(result) {
+  const isManual = result.mode === "manual";
+  return `
+    <div class="nutrition-dose-mode ${isManual ? "is-manual" : "is-auto"}">
+      <span>${isManual ? "Ручные граммы" : "Авторасчет"}</span>
+      <strong>${isManual ? "профиль пересчитан по навескам" : "граммы рассчитаны по профилю мг/л"}</strong>
+      ${isManual ? `<button type="button" data-nutrition-auto-dose>Вернуть авторасчет</button>` : ""}
     </div>
   `;
 }
@@ -1375,13 +1553,20 @@ function renderDoseGroup(title, hint, doses) {
 
 function renderDoseRow(dose) {
   const digits = dose.grams < 1 ? 3 : 1;
+  const nextTank = dose.tank === "A" ? "B" : "A";
   return `
     <div class="nutrition-dose-row">
-      <div>
+      <div class="nutrition-dose-copy">
         <strong>${escapeHtml(dose.fertilizer.name)}</strong>
         <span>${escapeHtml(dose.fertilizer.type)} · ${escapeHtml(dose.reason)}</span>
       </div>
-      <small>${formatFixed(dose.grams, digits)} г</small>
+      <div class="nutrition-dose-actions">
+        ${canToggleTank(dose.fertilizer) ? `<button class="nutrition-dose-tank-button" type="button" data-nutrition-toggle-tank="${escapeHtml(dose.fertilizer.id)}">В бак ${nextTank}</button>` : ""}
+        <label class="nutrition-dose-amount">
+          <input type="text" inputmode="decimal" data-nutrition-dose="${escapeHtml(dose.fertilizer.id)}" value="${formatFixed(dose.grams, digits)}" aria-label="Граммы ${escapeHtml(dose.fertilizer.name)}" />
+          <span>г</span>
+        </label>
+      </div>
     </div>
   `;
 }
@@ -1413,6 +1598,7 @@ function fitMacroProfileToEc() {
   const result = latestResult || calculateNutrition();
   const factor = manualEcFactor || getManualEcScaleFactor() || getEcScaleFactor(result);
   if (!factor) return;
+  clearManualDoses();
   MACRO_ELEMENTS.forEach((element) => {
     state.targets[element] = roundToStep((state.targets[element] || 0) * factor, 1);
   });
@@ -1498,7 +1684,10 @@ function createDefaultState() {
     targetPh: phase.ph,
     notes: "",
     targets: { ...phase.targets },
-    salts: FERTILIZERS.filter((fertilizer) => fertilizer.default).map((fertilizer) => fertilizer.id)
+    salts: FERTILIZERS.filter((fertilizer) => fertilizer.default).map((fertilizer) => fertilizer.id),
+    doseMode: "auto",
+    manualDoses: {},
+    tankOverrides: {}
   };
 }
 
@@ -1542,7 +1731,10 @@ function normalizeState(raw) {
     targetEc: positiveNumber(raw.targetEc, phase.ec),
     targetPh: raw.targetPh || phase.ph,
     targets: normalizeTargets({ ...phase.targets, ...(raw.targets || {}) }),
-    salts: salts.length ? cleanSaltSelection(salts) : fallback.salts
+    salts: salts.length ? cleanSaltSelection(salts) : fallback.salts,
+    doseMode: raw.doseMode === "manual" ? "manual" : "auto",
+    manualDoses: normalizeManualDoses(raw.manualDoses),
+    tankOverrides: normalizeTankOverrides(raw.tankOverrides)
   };
 }
 
@@ -1576,7 +1768,10 @@ function encodeRecipe(recipeState) {
     targetPh: recipeState.targetPh,
     targets: recipeState.targets,
     salts: recipeState.salts,
-    notes: recipeState.notes
+    notes: recipeState.notes,
+    doseMode: recipeState.doseMode === "manual" ? "manual" : "auto",
+    manualDoses: recipeState.doseMode === "manual" ? normalizeManualDoses(recipeState.manualDoses) : {},
+    tankOverrides: normalizeTankOverrides(recipeState.tankOverrides)
   };
   return window.btoa(unescape(encodeURIComponent(JSON.stringify(compact))));
 }
@@ -1723,6 +1918,15 @@ function formatRatioNumber(value) {
 function formatPlain(value) {
   if (!Number.isFinite(Number(value))) return String(value ?? "");
   return Number(value).toLocaleString("ru-RU", { maximumFractionDigits: 2 });
+}
+
+function formatElementValue(element, value) {
+  if (!Number.isFinite(Number(value))) return String(value ?? "");
+  const digits = MICRO_ELEMENTS.includes(element) ? 2 : 0;
+  return Number(value).toLocaleString("ru-RU", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: digits
+  });
 }
 
 function escapeHtml(value) {

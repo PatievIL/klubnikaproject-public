@@ -1417,8 +1417,8 @@ function renderDetails(calc) {
       { label: "Нагрузка", value: `${formatSmart(calc.electrical.totalPowerKw)} кВт` },
       { label: "Ток", value: `${formatSmart(calc.electrical.runningAmps)} А` },
       { label: "Вводной автомат", value: `${formatSmart(calc.electrical.inputBreakerA)} А` },
-      { label: "Линии света", value: `${formatSmart(calc.electrical.totalLightLines)} шт` },
-      { label: "Контакторы 2P", value: `${formatSmart(calc.electrical.contactorCount)} × ${formatSmart(calc.electrical.contactorRatingA)} А` },
+      { label: "Группы света", value: `${formatSmart(calc.electrical.totalLightLines)} шт` },
+      { label: "Пускатели 4P", value: `${formatSmart(calc.electrical.contactorCount)} × ${formatSmart(calc.electrical.contactorRatingA)} А` },
       { label: "Кабель света", value: `${formatSmart(calc.electrical.allLightLinesM)} м` },
       { label: "Кабель всего", value: `${formatSmart(calc.electrical.totalCableM)} м` }
     ].map(renderSummaryItem).join("");
@@ -1435,15 +1435,15 @@ function renderDetails(calc) {
   }
 
   if (elements.electricalScheme) {
-    elements.electricalScheme.textContent = "ВРУ -> щит фермы -> вводной автомат -> автоматы линий -> 2P контакторы -> линии драйверов 1/2 -> стеллажи. Отдельно идут вытяжка, сплит и сервисная группа.";
+    elements.electricalScheme.textContent = "ВРУ -> щит фермы -> вводной автомат -> автоматы групп света -> 4P пускатели 50% / 50% -> стеллажные магистрали и косы. Отдельно идут вытяжка, сплит и сервисная группа.";
   }
 
   if (elements.electricalLines) {
     const energy = calc.electrical.monthlyElectricitySummary || {};
     elements.electricalLines.innerHTML = [
-      `Свет: ${formatSmart(calc.electrical.lightCount)} светильников = ${formatSmart(calc.electrical.lightPowerTotalKw)} кВт. Считаем ${formatSmart(calc.electrical.driverSideLineCount)} линий драйверов 1 и ${formatSmart(calc.electrical.driverSideLineCount)} линий драйверов 2.`,
-      `На одну линию света закладываем до ${formatSmart(calc.electrical.lightLineAmps)} А. Рекомендуемый автомат линии = ${formatSmart(calc.electrical.lightLineBreakerA)} А, контактор = ${formatSmart(calc.electrical.contactorRatingA)} А 2P.`,
-      `Кабель до стеллажей: ${formatSmart(calc.electrical.totalLightLines)} линий по ${formatSmart(calc.electrical.oneLightLineM)} м. По схеме "${calc.electrical.cableLayoutLabel}" это даёт около ${formatSmart(calc.electrical.allLightLinesM)} м силового кабеля света${calc.rackRunCount > 1 ? ` с учётом проходов между прогонами по ${formatSmart(calc.serviceGapLength)} м` : ""}.`,
+      `Свет: ${formatSmart(calc.electrical.lightCount)} светильников = ${formatSmart(calc.electrical.lightPowerTotalKw)} кВт. Управление делим на ${formatSmart(calc.electrical.totalLightLines)} общие группы примерно по 50% света.`,
+      `На группу света закладываем автомат ${formatSmart(calc.electrical.lightLineBreakerA)} А и пускатель ${formatSmart(calc.electrical.contactorPoles)}P ${formatSmart(calc.electrical.contactorRatingA)} А.`,
+      `Кабель света: косы ${formatSmart(calc.electrical.lightHarnessCount)} шт, ${formatSmart(calc.electrical.lightHarnessCableM)} м ${calc.electrical.lightHarnessCableSpec}; стеллажная магистраль ${formatSmart(calc.electrical.rackBusCableM)} м ${calc.electrical.rackBusCableSpec}; от стеллажей до щитка ${formatSmart(calc.electrical.panelToRackCableM)} м ${calc.electrical.panelToRackCableSpec}. Всего около ${formatSmart(calc.electrical.allLightLinesM)} м.`,
       `Вытяжка: до ${formatSmart(calc.electrical.exhaustPowerW / 1000)} кВт, кабель около ${formatSmart(calc.electrical.exhaustLineM)} м. Сервисная группа: ${formatSmart(calc.electrical.serviceSocketPoints)} точек, резерв ${formatSmart(calc.electrical.serviceReserveW / 1000)} кВт, кабель около ${formatSmart(calc.electrical.serviceLineM)} м.`
       ,
       `Расход на месяц: ${formatSmart(calc.electrical.monthlyKwh)} кВт⋅ч · ${formatRub(calc.electrical.monthlyPowerCost)} (свет: ${formatSmart(energy.lightKwhPerDay || 0)} кВт⋅ч/день, кондер: ${formatSmart(energy.condenserKwhPerDay || 0)} кВт⋅ч/день, вытяжка: ${formatSmart(energy.exhaustKwhPerDay || 0)} кВт⋅ч/день, насос: ${formatSmart(energy.pumpKwhPerDay || 0)} кВт⋅ч/день, автоматика: ${formatSmart(energy.automationKwhPerDay || 0)} кВт⋅ч/день), вода: ${formatSmart(calc.water.monthlyM3)} м³ · ${formatRub(calc.water.monthlyWaterCost)}, аренда: ${formatRub(calc.monthlyRentCost)}, работа: ${formatRub(calc.monthlyLaborCost)}, всего: ${formatRub(calc.monthlyOperatingCost)}.`
