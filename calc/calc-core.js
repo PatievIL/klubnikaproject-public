@@ -852,7 +852,6 @@ function calculateElectricalModel(context) {
   } = context;
   const electricalModel = loadedPricing.constants.electricalModel || {};
   const energyProfile = loadedPricing.constants.energyProfile || {};
-  const phaseMode = currentState.phaseMode === "one-phase" ? "one-phase" : "three-phase";
   const cableLayoutMode = electricalModel.layoutCoefficients?.[currentState.cableLayoutMode]
     ? currentState.cableLayoutMode
     : "tray";
@@ -933,11 +932,13 @@ function calculateElectricalModel(context) {
   const serviceLineM = Math.ceil((panelToRackZoneM + rackLayout.occupiedLengthPerLane + 3) * layoutCoeff);
   const totalCableM = allLightLinesM + exhaustLineM + splitLineM + serviceLineM;
   const totalPowerW = lightPowerTotalW + exhaustPowerW + splitInputW + serviceReserveW;
+  const lightInputReserveFactor = electricalModel.lightInputReserveFactor || 1.5;
+  const inputSizingPowerW = lightPowerTotalW * lightInputReserveFactor + exhaustPowerW + splitInputW + serviceReserveW;
+  const singlePhaseMaxPowerW = electricalModel.singlePhaseMaxPowerW || 15000;
+  const phaseMode = inputSizingPowerW <= singlePhaseMaxPowerW ? "one-phase" : "three-phase";
   const runningAmps = phaseMode === "one-phase"
     ? totalPowerW / 220
     : totalPowerW / (1.73 * 380);
-  const lightInputReserveFactor = electricalModel.lightInputReserveFactor || 1.5;
-  const inputSizingPowerW = lightPowerTotalW * lightInputReserveFactor + exhaustPowerW + splitInputW + serviceReserveW;
   const inputSizingAmps = phaseMode === "one-phase"
     ? inputSizingPowerW / 220
     : inputSizingPowerW / (1.73 * 380);

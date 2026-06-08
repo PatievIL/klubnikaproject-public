@@ -191,6 +191,12 @@ const CONSTANT_FIELDS = [
     note: "Коэффициент запаса света для подбора вводного автомата."
   },
   {
+    key: "electricalModel.singlePhaseMaxPowerW",
+    label: "Порог 1 фазы",
+    unit: "Вт",
+    note: "До этой расчётной мощности ввод считается однофазным."
+  },
+  {
     key: "electricalModel.splitColdFactor",
     label: "Коэффициент холода сплита",
     unit: "x",
