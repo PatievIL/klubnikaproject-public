@@ -28,10 +28,10 @@
     }
 
     body.study-page .hero-shell-study {
-      min-height: 84svh;
+      min-height: clamp(380px, 52svh, 520px);
       display: grid;
       align-items: end;
-      padding: 132px 32px 76px;
+      padding: 100px 32px 50px;
       border-radius: 0;
       background: #042f1d;
       box-shadow: none;
@@ -43,7 +43,7 @@
       position: absolute;
       inset: 0;
       z-index: 0;
-      background: url("../assets/site-drive/for-site/selected/for-site-41-proof.jpg") center 58% / cover no-repeat;
+      background: url("../assets/site-drive/for-site/selected/for-site-41-proof.webp") center 58% / cover no-repeat;
     }
 
     body.study-page .hero-shell-study::after {
@@ -88,8 +88,8 @@
     body.study-page .study-hero-grid h1 {
       max-width: 760px;
       margin-top: 0;
-      margin-bottom: 22px;
-      font-size: clamp(42px, 5.55vw, 78px);
+      margin-bottom: 18px;
+      font-size: clamp(34px, 4.2vw, 56px);
       font-weight: 700;
       line-height: 1.08;
       letter-spacing: 0;
@@ -98,14 +98,10 @@
     body.study-page .study-hero-grid .lead {
       max-width: 660px;
       margin-top: 0;
-      margin-bottom: 34px;
-      font-size: clamp(19px, 1.75vw, 25px);
+      margin-bottom: 24px;
+      font-size: clamp(18px, 1.45vw, 21px);
       font-weight: 520;
       line-height: 1.48;
-    }
-
-    body.study-page .study-hero-grid .sublead {
-      display: none;
     }
 
     body.study-page .hero-cta .btn-primary {
@@ -124,19 +120,6 @@
       font-size: 15px;
       font-weight: 750;
       line-height: 1;
-    }
-
-    body.study-page .hero-cta .btn-secondary {
-      min-height: 46px;
-      padding: 0;
-      border-color: transparent;
-      background: transparent;
-      color: rgba(255, 250, 242, 0.84);
-      font-size: 14px;
-      font-weight: 680;
-      text-decoration: underline;
-      text-decoration-color: rgba(253, 246, 234, 0.32);
-      text-underline-offset: 5px;
     }
 
     body.study-page .study-route-strip,
@@ -259,13 +242,13 @@
     @media (max-width: 980px) {
       body.study-page .hero-shell-study {
         min-height: auto;
-        padding: 112px 16px 42px;
+        padding: 92px 16px 34px;
       }
 
       body.study-page .study-hero-grid h1 {
         max-width: 336px;
-        margin-bottom: 18px;
-        font-size: clamp(34px, 8.6vw, 38px);
+        margin-bottom: 16px;
+        font-size: clamp(32px, 8vw, 36px);
         line-height: 1.02;
       }
 
@@ -274,11 +257,6 @@
         width: 100%;
         min-height: 48px;
         padding: 0 16px;
-      }
-
-      body.study-page .hero-cta .btn-secondary {
-        min-height: 46px;
-        padding: 0;
       }
 
       body.study-page .study-route-strip,
@@ -296,14 +274,14 @@
 
     @media (min-width: 641px) and (max-width: 980px) {
       body.study-page .hero-shell-study {
-        min-height: min(76svh, 720px);
-        padding: 120px 22px 56px;
+        min-height: min(62svh, 560px);
+        padding: 96px 22px 44px;
       }
 
       body.study-page .study-hero-grid h1 {
         max-width: 660px;
-        margin-bottom: 22px;
-        font-size: clamp(48px, 7.2vw, 64px);
+        margin-bottom: 18px;
+        font-size: clamp(36px, 6vw, 52px);
         line-height: 1.08;
       }
 
@@ -313,9 +291,6 @@
         padding: 0 20px;
       }
 
-      body.study-page .hero-cta .btn-secondary {
-        padding: 0;
-      }
     }
 
     @media (max-width: 640px) {
@@ -331,14 +306,11 @@
       }
 
       body.study-page .study-hero-grid .lead {
-        margin-bottom: 24px;
-        min-height: 71px;
+        margin-bottom: 20px;
+        min-height: 0;
         font-size: 16px;
       }
 
-      body.study-page .study-hero-grid .sublead {
-        display: none;
-      }
     }
   </style>
   <!-- SEO:START -->
@@ -359,12 +331,28 @@
   }
   </script>
   <!-- SEO:END -->
-  <link rel="stylesheet" href="../assets/css/kp-header.css?v=20260512-cabinet-entry" />
-  <link rel="stylesheet" href="../assets/css/kp-footer.css?v=20260427a" />
+  <link rel="stylesheet" href="../assets/css/kp-header.css?v=20260612-capsule3" />
+  <link rel="stylesheet" href="../assets/css/kp-footer.css?v=20260612-footer5" />
+  <!-- Yandex.Metrika counter 95619008 -->
+  <script type="text/javascript">
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    m[i].l=1*new Date();
+    for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+    (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+    ym(95619008, "init", {
+      clickmap: true,
+      trackLinks: true,
+      accurateTrackBounce: true,
+      webvisor: true
+    });
+  </script>
+  <!-- /Yandex.Metrika counter -->
 </head>
 <body class="study-page" data-header-theme="dark">
   <header class="kp-site-header" data-kp-header data-root="../"></header>
-  <script src="../assets/js/kp-header.js?v=20260512-cabinet-entry"></script>
+  <script src="../assets/js/kp-header.js?v=20260612-capsule3"></script>
   <header class="hero">
     <div class="container">
       <div class="hero-shell hero-shell-service hero-shell-study">
@@ -374,15 +362,11 @@
             <span class="eyebrow">Сопровождение</span>
             <h1>Сопровождение</h1>
             <p class="lead">
-              Для действующих объектов и запусков, где одной консультации уже не хватает.
-            </p>
-            <p class="sublead">
-              Смотрим свет, полив, корневую зону, фазы растения и порядок действий как одну цепочку. Цель — не советы, а спокойное внедрение решений.
+              Для действующих объектов и запусков, где одной консультации уже не хватает: смотрим свет, полив, корневую зону и порядок действий как одну цепочку.
             </p>
 
             <div class="btn-row hero-cta">
               <a class="btn btn-primary" href="#request">Оставить задачу</a>
-              <a class="btn btn-secondary" href="../consultations/">Разовая консультация</a>
             </div>
           </div>
         </div>
@@ -532,7 +516,7 @@
             <ul class="study-brief-list">
               <li>
                 <strong>Контакт</strong>
-                <span>Telegram или WhatsApp для ответа.</span>
+                <span>Телефон или удобный контакт для ответа.</span>
               </li>
               <li>
                 <strong>Стадия</strong>
@@ -548,8 +532,8 @@
           <div class="card form-card">
             <h3>Система, симптом и ограничения</h3>
             <p class="sublead">Опишите, что уже работает, где теряются деньги или стабильность и что нельзя менять без риска.</p>
-            <form class="form-grid" data-brief-form="Сопровождение — рабочая проблема" data-brief-button-label="Описать ситуацию" data-brief-done-label="Ситуация передана" data-brief-link-label="Написать в Telegram">
-              <input class="input" type="text" placeholder="Telegram / WhatsApp для связи" data-field-role="contact" data-field-label="Контакт для связи" />
+            <form class="form-grid" data-brief-form="Сопровождение — рабочая проблема" data-brief-button-label="Описать ситуацию" data-brief-done-label="Ситуация передана" data-brief-link-label="Написать напрямую">
+              <input class="input" type="text" placeholder="Телефон или удобный контакт" data-field-role="contact" data-field-label="Контакт для связи" />
               <div class="field-group">
                 <span class="field-label">Стадия</span>
                 <div class="choice-grid" data-choice-group>
@@ -571,7 +555,7 @@
               <textarea class="textarea" placeholder="Город, площадь, что происходит, что уже проверяли и что менять нельзя" data-field-role="summary" data-field-label="Ситуация"></textarea>
               <div class="brief-form-actions">
                 <button class="btn btn-primary" data-brief-button type="button">Описать ситуацию</button>
-                <a class="brief-telegram-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Написать в Telegram</a>
+                <a class="brief-telegram-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Написать напрямую</a>
               </div>
               <p class="brief-form-note">Если удобнее, можно сразу написать в <a href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">@patiev_admin</a>.</p>
               <p class="brief-form-status" data-brief-status aria-live="polite"></p>
@@ -581,53 +565,9 @@
       </div>
     </div>
   </section>
-  <footer class="home-footer" id="footer" aria-label="Подвал сайта">
-    <div class="home-footer-inner">
-      <div class="home-footer-lead">
-        <a class="home-footer-logo" href="../" aria-label="Klubnika Project">
-          <img src="../assets/logo/klubnika-project-logo-green.svg" alt="Klubnika Project" />
-        </a>
-      </div>
+  <footer class="home-footer" id="footer" aria-label="Подвал сайта" data-kp-footer data-root="../"></footer>
+  <script src="../assets/js/kp-footer.js?v=20260612-footer5"></script>
 
-      <nav class="home-footer-columns" aria-label="Навигация подвала">
-        <div>
-          <span>Маршруты</span>
-          <a href="../calc/">Калькулятор</a>
-          <a href="../catalog/index.html">Каталог</a>
-          <a href="../klubhack/">Курс</a>
-          <a href="../consultations/">Консультации</a>
-          <a href="../cabinet/">Кабинет</a>
-        </div>
-        <div>
-          <span>Система фермы</span>
-          <a href="../catalog/led/index.html">Свет</a>
-          <a href="../catalog/irrigation/index.html">Полив</a>
-          <a href="../catalog/racks/index.html">Стеллажи</a>
-          <a href="../seeds/">Посадочный материал</a>
-        </div>
-        <div>
-          <span>Связь</span>
-          <a href="tel:+79255831669">+7 925 583-16-69</a>
-          <a href="mailto:info@klubnikaproject.ru">info@klubnikaproject.ru</a>
-          <a href="https://wa.me/79891250150" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-          <a href="https://www.youtube.com/@Ilya_patiev" target="_blank" rel="noopener noreferrer">YouTube</a>
-        </div>
-        <div>
-          <span>Документы</span>
-          <a href="../docs/policy/">Политика конфиденциальности</a>
-          <a href="../docs/offero/">Оферта</a>
-          <a href="../docs/warrenty/">Гарантия</a>
-          <a href="../docs/consent/">Согласие на обработку ПД</a>
-        </div>
-      </nav>
-
-      <div class="home-footer-bottom">
-        <span>Klubnika Project, 2026</span>
-        <span>Работаем по России и СНГ</span>
-      </div>
-    </div>
-  </footer>
-
-  <script src="../site.js?v=20260509-qa1" defer></script>
+  <script src="../site.js?v=20260608-metrika1" defer></script>
 </body>
 </html>

@@ -2,11 +2,11 @@
   const NAV_ITEMS = [
     { label: "Фермы", href: "farm/" },
     { label: "Курс", href: "klubhack/" },
-    { label: "Калькулятор", href: "calc/" },
     { label: "Оборудование", href: "catalog/" },
-    { label: "Контакты", href: "consultations/" },
+    { label: "Контакты", href: "contacts/" },
   ];
   const CABINET_ITEM = { label: "Кабинет", href: "cabinet/" };
+  const CTA_ITEM = { label: "Рассчитать ферму", href: "calc/" };
 
   function getRoot() {
     const script = document.currentScript || document.querySelector('script[src*="kp-header.js"]');
@@ -64,7 +64,7 @@
         </nav>
         <div class="kp-site-header__actions">
           <a class="kp-site-header__cabinet${isActive(pagePath, CABINET_ITEM.href) ? " is-active" : ""}" href="${resolveHref(root, "cabinet/login/")}">${CABINET_ITEM.label}</a>
-          <a class="kp-site-header__cta" href="${root}#contact">Обсудить ферму</a>
+          <a class="kp-site-header__cta${isActive(pagePath, CTA_ITEM.href) ? " is-active" : ""}" href="${resolveHref(root, CTA_ITEM.href)}">${CTA_ITEM.label}</a>
           <button class="kp-site-header__toggle" type="button" aria-label="Открыть меню" aria-expanded="false">
             <span></span>
           </button>
@@ -75,7 +75,7 @@
           <a class="kp-site-header__link${isActive(pagePath, item.href) ? " is-active" : ""}" href="${resolveHref(root, item.href)}">${item.label}</a>
         `).join("")}
         <a class="kp-site-header__link${isActive(pagePath, CABINET_ITEM.href) ? " is-active" : ""}" href="${resolveHref(root, "cabinet/login/")}">${CABINET_ITEM.label}</a>
-        <a class="kp-site-header__cta" href="${root}#contact">Обсудить ферму</a>
+        <a class="kp-site-header__cta" href="${resolveHref(root, CTA_ITEM.href)}">${CTA_ITEM.label}</a>
       </nav>
     `;
     return header;

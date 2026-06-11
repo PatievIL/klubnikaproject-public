@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
+  <link rel="manifest" href="../site.webmanifest" />
+  <title>Контакты — Klubnika Project</title>
+  <meta
+    name="description"
+    content="Контакты Klubnika Project: телефон, Telegram, WhatsApp, почта и соцсети. Подскажем, с чего начать: расчёт фермы, каталог оборудования или консультация."
+  />
+  <link rel="stylesheet" href="../styles.css?v=20260610-contacts" />
+  <style>
+    body.contacts-page {
+      --contacts-deep: #042f1d;
+      --contacts-line-inv: rgba(245, 236, 223, 0.16);
+    }
+
+    /* ---------- hero ---------- */
+    .kpc-hero {
+      position: relative;
+      padding: 86px var(--container-gutter) 168px;
+      color: var(--white);
+      background: var(--contacts-deep);
+      overflow: hidden;
+    }
+
+    .kpc-hero__media,
+    .kpc-hero__media img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .kpc-hero__media img {
+      object-fit: cover;
+      object-position: center 58%;
+    }
+
+    .kpc-hero__media::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(0, 53, 31, 0.9) 0%, rgba(0, 65, 40, 0.7) 46%, rgba(0, 36, 24, 0.34) 100%);
+    }
+
+    .kpc-hero__inner {
+      position: relative;
+      z-index: 2;
+      width: min(var(--container), 100%);
+      margin: 0 auto;
+    }
+
+    .kpc-hero .eyebrow {
+      display: block;
+      width: auto;
+      min-height: 0;
+      margin: 0 0 18px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+
+    .kpc-hero h1 {
+      max-width: 780px;
+      margin: 0 0 18px;
+      font-size: clamp(38px, 4.4vw, 60px);
+      font-weight: 700;
+      line-height: 1.06;
+      color: var(--white);
+    }
+
+    .kpc-hero p {
+      max-width: 640px;
+      margin: 0;
+      font-size: clamp(17px, 1.5vw, 20px);
+      font-weight: 520;
+      line-height: 1.5;
+      color: rgba(253, 246, 234, 0.92);
+    }
+
+    /* ---------- channels band ---------- */
+    .kpc-band {
+      width: min(var(--container), 100%);
+      margin: -104px auto 0;
+      padding: 0 var(--container-gutter);
+      position: relative;
+      z-index: 2;
+    }
+
+    .kpc-channels {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .kpc-channel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-card);
+      background: var(--surface-3);
+      text-decoration: none;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .kpc-channel:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 48px rgba(20, 52, 37, 0.16);
+    }
+
+    .kpc-channel .kpc-ic {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      background: rgba(0, 77, 43, 0.08);
+      color: var(--green);
+    }
+
+    .kpc-channel small {
+      font-size: 12.5px;
+      font-weight: 750;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .kpc-channel strong,
+    .kpc-channel__mail {
+      font-size: 18px;
+      font-weight: 780;
+      line-height: 1.2;
+      color: var(--green);
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    .kpc-channel p {
+      margin: 0;
+      font-size: 13.5px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .kpc-channel--tg {
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    .kpc-channel--tg .kpc-ic { background: rgba(229, 199, 148, 0.16); color: var(--accent); }
+    .kpc-channel--tg small { color: rgba(229, 199, 148, 0.9); }
+    .kpc-channel--tg strong { color: var(--white); }
+    .kpc-channel--tg p { color: rgba(245, 236, 223, 0.78); }
+
+    .kpc-channel__tag {
+      align-self: flex-start;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      background: var(--accent);
+      color: var(--contacts-deep);
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .kpc-subrow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .kpc-socials { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .kpc-social {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 11px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      background: var(--surface-3);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--green);
+      text-decoration: none;
+      transition: background 160ms ease, transform 160ms ease;
+    }
+
+    a.kpc-social:hover { background: var(--surface-2); transform: translateY(-2px); }
+
+    .kpc-social .kpc-mono {
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: 0.02em;
+    }
+
+    .kpc-social span.kpc-note {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .kpc-promise {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 18px;
+      border-radius: var(--radius-pill);
+      background: var(--surface-2);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    /* ---------- routes ---------- */
+    .kpc-routes {
+      width: min(var(--container), 100%);
+      margin: 0 auto;
+      padding: 78px var(--container-gutter) 8px;
+    }
+
+    .kpc-routes__head { max-width: 660px; margin-bottom: 30px; }
+
+    .kpc-routes .eyebrow {
+      display: block;
+      width: auto;
+      min-height: 0;
+      margin: 0 0 18px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+
+    .kpc-routes__head h2 {
+      margin: 0 0 14px;
+      font-size: var(--type-title-section);
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--text);
+    }
+
+    .kpc-routes__head p {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .kpc-routes__grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .kpc-route {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 26px 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-card);
+      background: var(--surface);
+      text-decoration: none;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    }
+
+    .kpc-route:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 48px rgba(20, 52, 37, 0.16);
+      background: var(--surface-3);
+    }
+
+    .kpc-route > span {
+      font-size: 13px;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      color: var(--green);
+    }
+
+    .kpc-route strong {
+      font-size: 22px;
+      font-weight: 750;
+      line-height: 1.18;
+      color: var(--text);
+    }
+
+    .kpc-route small {
+      font-size: 14.5px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .kpc-route em {
+      font-style: normal;
+      margin-top: 8px;
+      font-size: 15px;
+      font-weight: 750;
+      color: var(--green);
+    }
+
+    .kpc-route:hover em { text-decoration: underline; text-underline-offset: 4px; }
+
+    /* ---------- request ---------- */
+    .kpc-request {
+      width: min(var(--container), 100%);
+      margin: 0 auto;
+      padding: 48px var(--container-gutter) 72px;
+    }
+
+    .kpc-request__frame {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      gap: 52px;
+      padding: 52px;
+      border-radius: var(--radius-shell);
+      border: 1px solid rgba(245, 236, 223, 0.12);
+      background: var(--green);
+      color: var(--bg);
+      box-shadow: 0 20px 38px rgba(6, 38, 24, 0.14);
+    }
+
+    .kpc-request__chip {
+      display: inline-block;
+      margin-bottom: 18px;
+      padding: 7px 13px;
+      border: 1px solid rgba(245, 236, 223, 0.14);
+      border-radius: var(--radius-pill);
+      background: rgba(255, 250, 242, 0.12);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--bg);
+    }
+
+    .kpc-request__copy h2 {
+      margin: 0 0 16px;
+      font-size: clamp(28px, 2.8vw, 38px);
+      font-weight: 700;
+      line-height: 1.12;
+      color: rgba(245, 236, 223, 0.95);
+    }
+
+    .kpc-request__copy > p {
+      margin: 0;
+      font-size: 16.5px;
+      line-height: 1.55;
+      color: rgba(245, 236, 223, 0.82);
+    }
+
+    .kpc-request__list { display: grid; gap: 10px; margin-top: 24px; }
+
+    .kpc-request__list div {
+      padding: 16px 18px;
+      border: 1px solid rgba(245, 236, 223, 0.12);
+      border-radius: 20px;
+      background: rgba(245, 236, 223, 0.08);
+    }
+
+    .kpc-request__list strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 16.5px;
+      color: var(--bg);
+    }
+
+    .kpc-request__list span {
+      font-size: 14px;
+      line-height: 1.45;
+      color: rgba(245, 236, 223, 0.8);
+    }
+
+    .kpc-request__card {
+      padding: 30px;
+      border-radius: var(--radius-card);
+      background: var(--surface-3);
+      color: var(--text);
+    }
+
+    .kpc-request__card h3 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 750;
+      color: var(--green);
+    }
+
+    .kpc-request__card > .sublead {
+      margin: 0 0 18px;
+      font-size: 14.5px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .kpc-request__card .field-label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: 750;
+      color: var(--green);
+    }
+
+    .kpc-request__card .textarea { min-height: 118px; }
+
+    /* ---------- responsive ---------- */
+    @media (max-width: 980px) {
+      .kpc-hero { padding: 64px var(--container-gutter) 140px; }
+      .kpc-band { margin-top: -92px; }
+      .kpc-channels { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpc-routes { padding-top: 56px; }
+      .kpc-routes__grid { grid-template-columns: 1fr; }
+      .kpc-request__frame {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        padding: 32px 26px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .kpc-hero { padding: 48px var(--container-gutter) 124px; }
+      .kpc-band { margin-top: -84px; }
+      .kpc-channels { grid-template-columns: 1fr; }
+      .kpc-subrow { flex-direction: column; align-items: flex-start; }
+      .kpc-request__card { padding: 24px 20px; }
+    }
+  </style>
+  <!-- SEO:START -->
+  <link rel="canonical" href="https://klubnikaproject.ru/contacts/" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "@id": "https://klubnikaproject.ru/contacts/#webpage",
+    "url": "https://klubnikaproject.ru/contacts/",
+    "name": "Контакты Klubnika Project",
+    "description": "Контакты Klubnika Project: телефон, Telegram, WhatsApp, почта и соцсети. Подскажем, с чего начать: расчёт фермы, каталог оборудования или консультация.",
+    "inLanguage": "ru-RU",
+    "isPartOf": {
+      "@id": "https://klubnikaproject.ru/#website"
+    }
+  }
+  </script>
+  <!-- SEO:END -->
+  <link rel="stylesheet" href="../assets/css/kp-header.css?v=20260612-capsule3" />
+  <link rel="stylesheet" href="../assets/css/kp-footer.css?v=20260612-footer5" />
+</head>
+<body class="contacts-page" data-header-theme="dark">
+  <header class="kp-site-header" data-kp-header data-root="../"></header>
+  <script src="../assets/js/kp-header.js?v=20260612-capsule3"></script>
+
+  <main>
+    <section class="kpc-hero" aria-labelledby="contacts-title">
+      <div class="kpc-hero__media" aria-hidden="true">
+        <img src="../assets/site-drive/for-site/selected/for-site-41-proof.jpg" alt="" />
+      </div>
+      <div class="kpc-hero__inner">
+        <p class="eyebrow">Контакты</p>
+        <h1 id="contacts-title">Мы на связи —<br />любым удобным каналом</h1>
+        <p>
+          Телефон, почта и мессенджеры — сразу под этим блоком.
+          А чтобы ответ был полезным с первого сообщения, подскажем,
+          куда лучше зайти с вашей задачей.
+        </p>
+      </div>
+    </section>
+
+    <div class="kpc-band">
+      <div class="kpc-channels" aria-label="Каналы связи">
+        <a class="kpc-channel kpc-channel--tg" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">
+          <span class="kpc-ic" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4 22-7z"></path></svg>
+          </span>
+          <small>Telegram</small>
+          <strong>@patiev_admin</strong>
+          <p>Фото помещения и вводные не потеряются в переписке.</p>
+          <span class="kpc-channel__tag">Быстрее всего</span>
+        </a>
+        <a class="kpc-channel" href="https://wa.me/79030094990" target="_blank" rel="noopener noreferrer">
+          <span class="kpc-ic" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.5-8.5h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+          </span>
+          <small>WhatsApp</small>
+          <strong>+7 903 009-49-90</strong>
+          <p>Если привычнее — тот же диалог, что и в Telegram.</p>
+        </a>
+        <a class="kpc-channel" href="tel:+79030094990">
+          <span class="kpc-ic" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+          </span>
+          <small>Телефон</small>
+          <strong>+7 903 009-49-90</strong>
+          <p>Для короткого разговора по будням, 10:00–19:00 мск.</p>
+        </a>
+        <div class="kpc-channel">
+          <span class="kpc-ic" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><polyline points="22,6 12,13 2,6"></polyline></svg>
+          </span>
+          <small>E-mail</small>
+          <a class="kpc-channel__mail" href="mailto:info@klubnikaproject.ru">info@klubnikaproject.ru</a>
+          <p>Для документов, КП и официальных запросов.</p>
+        </div>
+      </div>
+
+      <div class="kpc-subrow">
+        <div class="kpc-socials" aria-label="Соцсети и мессенджеры">
+          <a class="kpc-social" href="https://www.youtube.com/@Ilya_patiev" target="_blank" rel="noopener noreferrer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20"></polygon></svg>
+            YouTube
+          </a>
+          <a class="kpc-social" href="https://vk.com/klubnikaproject" target="_blank" rel="noopener noreferrer">
+            <span class="kpc-mono">VK</span>
+            ВКонтакте
+          </a>
+          <span class="kpc-social">
+            <span class="kpc-mono">MAX</span>
+            +7 903 009-49-90
+            <span class="kpc-note">поиск по номеру в приложении</span>
+          </span>
+        </div>
+        <span class="kpc-promise">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Отвечаем в течение рабочего дня
+        </span>
+      </div>
+    </div>
+
+    <section class="kpc-routes" aria-labelledby="routes-title">
+      <div class="kpc-routes__head">
+        <p class="eyebrow">Перед тем как писать</p>
+        <h2 id="routes-title">С чем вы пришли?</h2>
+        <p>
+          Для трёх самых частых задач уже есть готовый шаг —
+          он даст ответ быстрее, чем переписка с нуля.
+        </p>
+      </div>
+      <div class="kpc-routes__grid">
+        <a class="kpc-route" href="../calc/">
+          <span>01</span>
+          <strong>Хочу понять бюджет</strong>
+          <small>Посадка, свет, полив и порядок бюджета под вашу площадь — за пару минут.</small>
+          <em>Открыть калькулятор →</em>
+        </a>
+        <a class="kpc-route" href="../catalog/index.html">
+          <span>02</span>
+          <strong>Выбираю оборудование</strong>
+          <small>Свет, полив, стеллажи и посадочный материал — узлы, которые считаются вместе.</small>
+          <em>Смотреть каталог →</em>
+        </a>
+        <a class="kpc-route" href="#request">
+          <span>03</span>
+          <strong>Есть точечный вопрос</strong>
+          <small>Один узел, симптом растения или следующий шаг — без полного проекта.</small>
+          <em>Оставить вопрос →</em>
+        </a>
+      </div>
+    </section>
+
+    <section class="kpc-request" id="request" aria-labelledby="request-title">
+      <div class="kpc-request__frame">
+        <div class="kpc-request__copy">
+          <span class="kpc-request__chip">Ничего не подошло?</span>
+          <h2 id="request-title">Передайте вводные напрямую</h2>
+          <p>
+            Напишите город, площадь, этап проекта и удобный канал связи —
+            в ответ подскажем ближайший рабочий шаг.
+          </p>
+          <div class="kpc-request__list">
+            <div>
+              <strong>Отвечаем в течение рабочего дня</strong>
+              <span>по будням, 10:00–19:00 мск</span>
+            </div>
+            <div>
+              <strong>Работаем онлайн</strong>
+              <span>Россия и СНГ, при необходимости — выезд на объект</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpc-request__card">
+          <h3>Ваши вводные</h3>
+          <p class="sublead">Двух полей достаточно — остальное уточним в ответе.</p>
+          <form class="form-grid" data-brief-form="Контакты — вводные" data-brief-button-label="Передать вводные" data-brief-done-label="Вводные переданы" data-brief-link-label="Написать в Telegram">
+            <span class="field-label">Контакт для ответа</span>
+            <input class="input" type="text" placeholder="Телефон, Telegram или почта" data-field-role="contact" data-field-label="Контакт для связи" />
+            <span class="field-label">Что хотите решить</span>
+            <textarea class="textarea" placeholder="Город, площадь, этап проекта и вопрос" data-field-role="summary" data-field-label="Задача"></textarea>
+            <div class="brief-form-actions">
+              <button class="btn btn-primary" data-brief-button type="button">Передать вводные</button>
+              <a class="brief-telegram-link" href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">Написать в Telegram</a>
+            </div>
+            <p class="brief-legal-note">Нажимая кнопку, вы соглашаетесь на <a href="../docs/consent/">обработку персональных данных</a> и принимаете <a href="../docs/policy/">политику конфиденциальности</a>.</p>
+            <p class="brief-form-note">Если удобнее, можно сразу написать в <a href="https://t.me/patiev_admin" target="_blank" rel="noopener noreferrer">@patiev_admin</a>.</p>
+            <p class="brief-form-status" data-brief-status aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="home-footer" id="footer" aria-label="Подвал сайта" data-kp-footer data-root="../"></footer>
+  <script src="../assets/js/kp-footer.js?v=20260612-footer5"></script>
+
+  <script src="../site.js?v=20260610-contacts" defer></script>
+</body>
+</html>

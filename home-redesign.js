@@ -197,6 +197,16 @@ function detectDeviceType() {
   return 'desktop';
 }
 
+function reachMetrikaGoal(goal, params = {}) {
+  if (typeof window.ym !== 'function') return;
+
+  try {
+    window.ym(95619008, 'reachGoal', goal, params);
+  } catch (error) {
+    // Analytics must never block lead delivery.
+  }
+}
+
 function detectContactFromText(text) {
   const telegram = text.match(/@[a-zA-Z0-9_]{4,}/)?.[0] || '';
   const phone = text.match(/(?:\+7|8)[\s()\\-]*\d{3}[\s()\\-]*\d{3}[\s()\\-]*\d{2}[\s()\\-]*\d{2}/)?.[0] || '';
@@ -299,6 +309,10 @@ function setupFinalBriefForm() {
 
     const rawText = normalizeText(input.value);
     if (rawText.length < 12) {
+      reachMetrikaGoal('lead_validation_failed', {
+        form_name: 'Главная - одно поле CTA',
+        reason: 'text_too_short',
+      });
       if (status) status.textContent = 'Напишите хотя бы город, площадь или контакт для ответа.';
       input.focus();
       return;
@@ -306,6 +320,10 @@ function setupFinalBriefForm() {
 
     const idleLabel = button.textContent;
     const payload = buildFinalBriefPayload(rawText);
+    reachMetrikaGoal('lead_submit_attempt', {
+      form_name: payload.form_name,
+      route: payload.detected_route,
+    });
     button.textContent = 'Отправляем...';
     button.disabled = true;
     if (status) status.textContent = '';
@@ -322,11 +340,30 @@ function setupFinalBriefForm() {
       });
 
       if (!response.ok) throw new Error('Lead API unavailable');
+      const result = await response.json().catch(() => ({}));
+      const leadId = result?.lead?.id || '';
+      const telegramStatus = result?.lead?.telegram?.delivery_status || '';
+
+      reachMetrikaGoal('lead_api_success', {
+        form_name: payload.form_name,
+        route: payload.detected_route,
+        lead_id: leadId,
+      });
+      reachMetrikaGoal(telegramStatus === 'succeeded' ? 'lead_telegram_success' : 'lead_telegram_failed', {
+        form_name: payload.form_name,
+        route: payload.detected_route,
+        lead_id: leadId,
+        telegram_status: telegramStatus || 'unknown',
+      });
 
       input.value = '';
       if (status) status.textContent = 'Вводные переданы. Ответим, какой шаг лучше: расчёт, объект, консультация или курс.';
       button.textContent = 'Вводные переданы';
     } catch (error) {
+      reachMetrikaGoal('lead_api_failed', {
+        form_name: payload.form_name,
+        route: payload.detected_route,
+      });
       const copied = await copyText(payload.brief_text);
       if (status) {
         status.textContent = copied

@@ -23,7 +23,7 @@ import {
   resolveAssetPath,
   sortReviews,
   summarizeReviewStats,
-} from "./catalog-data.mjs?v=20260520-shopcat-hero1";
+} from "./catalog-data.mjs?v=20260609-imgclean1";
 
 const emptyDialogs = {
   search: false,
@@ -39,6 +39,11 @@ const emptyDialogs = {
 const emptySearch = {
   query: "",
   mode: "catalog",
+};
+
+const productCardImageOverrides = {
+  "01-0004-690-komplekt-drayverov-3x50-vt-dlya-svetil-nika-150-vt":
+    "assets/catalog/catalog-products/linear-led/01-0004-690-komplekt-drayverov-3x50-vt-dlya-svetil-nika-150-vt-03.webp",
 };
 
 function escapeHtml(value = "") {
@@ -155,16 +160,16 @@ function toShortListingLine(value = "") {
     .trim();
   if (!normalized) return "";
   const [head] = normalized.split(/(?<=[.!?])\s+/);
-  const base = (head || normalized).trim().replace(/[.!?]+$/, "");
-  if (base.length <= 96) return base;
-  const shortened = base.slice(0, 93).replace(/[,;:\s-]+$/g, "");
-  return `${shortened}…`;
+  return (head || normalized).trim().replace(/[.!?…]+$/, "");
 }
 
 const listingSummaryBySlug = {
-  "luma-line-60": "Для короткой полки или сервисного ряда, когда нужно просто добрать свет без пересборки всего яруса.",
-  "luma-line-95": "Хороший рабочий вариант для типового яруса: ставится спокойно и закрывает обычный пролёт без лишней сборки.",
-  "luma-line-191": "Берут на длинный стеллажный ряд, когда нужна цельная линия света и понятная логика подвеса по всей длине.",
+  "01-0012-786-dimmiruemyy-fitosvetil-nik-m23-s-lampoy-dnat-1000-vt": "ДНаТ-фитосветильник для тепличной досветки и регулируемого ряда.",
+  "01-0007-740-lineynyy-svetil-nik-m23-100-vt-191-sm": "Длинный линейный светильник для ровной линии света на стеллаже.",
+  "01-0002-199-lineynyy-svetil-nik-m23-50-vt-60-sm": "Короткий линейный светильник для полки или сервисного ряда.",
+  "luma-line-60": "Короткий линейный светильник для полки или сервисного ряда.",
+  "luma-line-95": "Рабочий светильник для типового яруса и обычного пролета.",
+  "luma-line-191": "Длинный линейный светильник для ровной линии света на стеллаже.",
   "canopy-boost-140": "Подходит для зоны досветки, где уже понятна высота подвеса и нужно усилить ряд, а не гадать по мощности.",
   "canopy-boost-200": "Для длинного тепличного ряда и серьёзной досветки, когда свет уже считается как часть рабочей схемы.",
   "rivulet-dripper-22": "Готовая капельница под обычную рабочую схему. Удобно брать, когда нужно быстро заменить подачу без пересборки линии.",
@@ -222,6 +227,15 @@ const listingSummaryBySlug = {
   "electrical-panel-kit": "Щиток, автоматы и проводка под базовую сборку фермы, чтобы электрика не расползалась по случайным покупкам.",
 };
 
+const productSignalOverrides = {
+  "luma-line-191": [
+    { label: "Режим", value: "50 / 100 Вт" },
+    { label: "Длина", value: "1,91 м" },
+    { label: "Поток", value: "10 200 / 19 100 Лм" },
+    { label: "Сценарий", value: "длинный стеллажный ярус" },
+  ],
+};
+
 function getListingSummary(product) {
   return toShortListingLine(listingSummaryBySlug[product.slug] || product.shortDescription);
 }
@@ -249,6 +263,19 @@ function resolveHref(ctx, href) {
 
 function resolveAsset(ctx, path) {
   return resolveAssetPath(ctx.siteRoot, path);
+}
+
+function formatChoiceAnswerCount(count) {
+  const value = Number(count) || 0;
+  const mod10 = value % 10;
+  const mod100 = value % 100;
+  let word = "ответов";
+  if (mod10 === 1 && mod100 !== 11) {
+    word = "ответ";
+  } else if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+    word = "ответа";
+  }
+  return `${value} ${word}`;
 }
 
 function withDefaults(state = {}) {
@@ -283,13 +310,14 @@ function isInCart(state, productId) {
 }
 
 function renderBadgeList(badges) {
-  if (!badges.length) return "";
+  const visibleBadges = badges.filter((badge) => BADGE_META[badge]);
+  if (!visibleBadges.length) return "";
   return `
     <div class="catalog-badge-list">
-      ${badges
+      ${visibleBadges
         .map((badge) => {
           const meta = BADGE_META[badge];
-          return `<span class="catalog-badge catalog-badge--${meta?.tone || "gray"}">${escapeHtml(meta?.label || badge)}</span>`;
+          return `<span class="catalog-badge catalog-badge--${meta.tone}">${escapeHtml(meta.label)}</span>`;
         })
         .join("")}
     </div>
@@ -340,36 +368,22 @@ function renderProductCard(ctx, state, categorySlug, product, options = {}) {
   const inCart = isInCart(state, product.id);
   const stock = STOCK_META[product.stockStatus] || STOCK_META.out_of_stock;
   const productHref = getProductCatalogPath(product);
-  const category = getCategoryBySlug(categorySlug) || { name: "Каталог" };
-  const positionMeta = inferPositionMeta(product);
-  const signals = getProductSignals(product, category)
-    .filter((signal) => signal.label !== "Раздел")
-    .slice(0, 2);
+  const cardImage = productCardImageOverrides[product.slug] || product.images[0];
   return `
     <article class="catalog-product-card">
       <a class="catalog-product-card__media" href="${resolveHref(ctx, productHref)}">
         ${renderBadgeList(product.badges)}
-        <img src="${resolveAsset(ctx, product.images[0])}" alt="${escapeHtml(product.name)}" loading="lazy" />
+        <img src="${resolveAsset(ctx, cardImage)}" alt="${escapeHtml(product.name)}" loading="lazy" />
       </a>
       <div class="catalog-product-card__body">
         <div class="catalog-product-card__meta">
           ${renderStockBadge(product.stockStatus)}
           <span>Арт. ${escapeHtml(product.article)}</span>
         </div>
-        <div class="catalog-product-card__position catalog-product-card__position--${positionMeta.tone}">
-          ${escapeHtml(positionMeta.label)}
-        </div>
         <a class="catalog-product-card__title" href="${resolveHref(ctx, productHref)}">${escapeHtml(
           product.name
         )}</a>
         <p class="catalog-product-card__summary">${escapeHtml(getListingSummary(product))}</p>
-        ${
-          signals.length
-            ? `<div class="catalog-product-card__signals">${signals
-                .map((signal) => `<span><strong>${escapeHtml(signal.label)}</strong>${escapeHtml(signal.value)}</span>`)
-                .join("")}</div>`
-            : ""
-        }
         <div class="catalog-product-card__price-row">
           <div>
             <strong>${formatPrice(product.price)}</strong>
@@ -381,7 +395,7 @@ function renderProductCard(ctx, state, categorySlug, product, options = {}) {
             stock.purchasable
               ? `<button type="button" class="catalog-primary-button${inCart ? " is-active" : ""}" data-action="toggle-cart" data-product-id="${
                   product.id
-                }">${inCart ? "Уже в корзине" : "В корзину"}</button>`
+                }">${inCart ? "В корзине" : "В корзину"}</button>`
               : `<button type="button" class="catalog-primary-button" disabled>Нет в наличии</button>`
           }
           <a class="catalog-secondary-button" href="${resolveHref(ctx, productHref)}">Подробнее</a>
@@ -392,7 +406,6 @@ function renderProductCard(ctx, state, categorySlug, product, options = {}) {
               ? `<button type="button" class="catalog-link-button" data-action="open-quick-view" data-product-id="${product.id}">Быстрый просмотр</button>`
               : ""
           }
-          <span>${escapeHtml(positionMeta.summary)}</span>
         </div>
       </div>
     </article>
@@ -405,7 +418,7 @@ function renderAppliedFilterChips(ctx, applied) {
     chips.push(`Цена: ${applied.priceMin ?? "0"}-${applied.priceMax ?? "∞"}`);
   }
   applied.stockStatuses.forEach((value) => chips.push(STOCK_META[value]?.label || value));
-  applied.badges.forEach((value) => chips.push(BADGE_META[value]?.label || value));
+  applied.badges.filter((value) => BADGE_META[value]).forEach((value) => chips.push(BADGE_META[value].label));
   Object.values(applied.attributes).forEach((values) => values.forEach((value) => chips.push(value)));
   if (!chips.length) return "";
   return `
@@ -495,6 +508,7 @@ function renderFilterPanel(data, draft, isMobile = false) {
         <legend>Метки</legend>
         <div class="catalog-filter-options">
           ${data.facets.badges
+            .filter((option) => BADGE_META[option.value])
             .map(
               (option) => `
                 <label class="catalog-check">
@@ -647,7 +661,7 @@ function renderCategoryListing(ctx, state, data) {
   return `
     <section class="catalog-category-listing">
       <div class="catalog-listing-toolbar">
-        <div>
+        <div class="catalog-listing-toolbar__summary">
           <p class="catalog-listing-count">${data.filteredProducts.length} товаров в разделе</p>
           ${renderAppliedFilterChips(ctx, applied)}
         </div>
@@ -686,10 +700,6 @@ function renderCategoryPage(ctx, state, data) {
         <div class="catalog-page-head__titleblock">
           <h1>${escapeHtml(data.category.name)}</h1>
           <p>${escapeHtml(data.category.description)}</p>
-        </div>
-        <div class="catalog-page-head__meta catalog-page-head__meta--toolbar">
-          <span>${data.products.length} товаров</span>
-          <span>Цена и наличие сразу в карточках</span>
         </div>
       </div>
     </section>
@@ -917,6 +927,10 @@ function getProductAttribute(product, keys = []) {
 }
 
 function getProductSignals(product, category) {
+  if (productSignalOverrides[product.slug]) {
+    return productSignalOverrides[product.slug];
+  }
+
   const picked = [];
   const seen = new Set();
   const add = (label, value) => {
@@ -925,8 +939,6 @@ function getProductSignals(product, category) {
     seen.add(normalized);
     picked.push({ label, value });
   };
-
-  add("Раздел", category.name);
 
   const preferredKeys = ["scenario", "zone", "use", "coverage", "phase", "length", "power", "flow", "format", "class", "diameter"];
   preferredKeys.forEach((key) => {
@@ -942,6 +954,45 @@ function getProductSignals(product, category) {
   return picked.slice(0, 4);
 }
 
+function normalizeSpecToken(value = "") {
+  return String(value).trim().replace(/\s+/g, " ").replace(/(\d)([А-Яа-яA-Za-z])/g, "$1 $2");
+}
+
+function buildProductTitleParts(product) {
+  const name = normalizeSpecToken(product.name);
+  const ledMatch = /светодиодный\s+светильник/i.test(name);
+  if (ledMatch) {
+    const rawModel = name.match(/[MМ]\s*\d+/i)?.[0] || "";
+    const model = rawModel ? rawModel.replace(/\s+/g, "").replace(/^М/i, "M").toUpperCase() : "";
+    const length = normalizeSpecToken(name.match(/(\d+(?:[,.]\d+)?)\s*см/i)?.[0] || "");
+    const power = normalizeSpecToken(name.match(/(\d+(?:[,.]\d+)?)\s*Вт/i)?.[0] || "");
+    const voltage = normalizeSpecToken(name.match(/(\d+(?:[,.]\d+)?)\s*В(?![А-Яа-яA-Za-z])/i)?.[0] || "");
+    const spectrum = name.match(/\bMIX\b/i)?.[0]?.toUpperCase() || "";
+    const use = name.match(/для\s+([^,]+)/i)?.[1]?.trim();
+    const title = ["Линейный светильник", model, length].filter(Boolean).join(" ");
+    const subtitle = [power, spectrum, voltage, use ? `для ${use}` : ""].filter(Boolean).join(" / ");
+    return { title: title || name, subtitle };
+  }
+
+  const [title, ...rest] = name.split(",").map((part) => part.trim()).filter(Boolean);
+  return {
+    title: title || name,
+    subtitle: rest.join(" / "),
+  };
+}
+
+function buildProductStoreheadSignals(product, stock) {
+  const signals = [stock.label];
+  const badgeLabels = product.badges
+    .map((badge) => BADGE_META[badge]?.label)
+    .filter(Boolean);
+  if (badgeLabels.length) signals.push(badgeLabels.join(" / "));
+  if (product.documents.length) {
+    signals.push(`${product.documents.length} ${product.documents.length === 1 ? "документ" : "документа"}`);
+  }
+  return [...new Set(signals)].slice(0, 3);
+}
+
 function inferPositionMeta(product) {
   const haystack = `${product.shortDescription} ${product.fullDescription} ${product.faq.map((item) => `${item.question} ${item.answer}`).join(" ")}`.toLowerCase();
   const projectLike =
@@ -953,7 +1004,7 @@ function inferPositionMeta(product) {
   if (projectLike) {
     return {
       label: "Сначала уточнить",
-      summary: "Перед заказом вы можете получить консультацию.",
+      summary: "Наличие и цену подтвердит менеджер. Заодно сверим совместимость с вашей схемой.",
       tone: "project",
     };
   }
@@ -961,14 +1012,14 @@ function inferPositionMeta(product) {
   if (readyLike) {
     return {
       label: "Типовая закупка",
-      summary: "Если хотите, перед заказом можно быстро уточнить совместимость под вашу ферму.",
+      summary: "В наличии. Перед подтверждением можно быстро сверить количество и совместимость.",
       tone: "ready",
     };
   }
 
   return {
     label: "Лучше быстро сверить",
-    summary: "Перед заказом можно быстро уточнить, подходит ли товар под вашу ферму.",
+    summary: "Перед подтверждением заказа можно быстро уточнить, подходит ли товар под вашу ферму.",
     tone: "verify",
   };
 }
@@ -1102,9 +1153,12 @@ function renderProductPage(ctx, state, data) {
   const stock = STOCK_META[data.product.stockStatus] || STOCK_META.out_of_stock;
   const positionMeta = inferPositionMeta(data.product);
   const signals = getProductSignals(data.product, data.category);
+  const titleParts = buildProductTitleParts(data.product);
+  const storeheadSignals = buildProductStoreheadSignals(data.product, stock);
+  const visibleBreadcrumbs = data.breadcrumbs.slice(0, -1);
   return `
     <section class="catalog-page-head catalog-page-head--product">
-      ${renderBreadcrumbs(ctx, data.breadcrumbs)}
+      ${renderBreadcrumbs(ctx, visibleBreadcrumbs)}
       <div class="catalog-product-storehead">
         <div class="catalog-product-gallery catalog-product-brief__media">
           <div class="catalog-product-gallery__main">
@@ -1125,16 +1179,14 @@ function renderProductPage(ctx, state, data) {
         </div>
         <div class="catalog-product-storehead__main">
             <div class="catalog-product-storehead__head">
-              <div class="catalog-product-brief__kickers">
-              <span class="catalog-eyebrow">Товар из каталога</span>
-              <span class="catalog-product-brief__position catalog-product-brief__position--${positionMeta.tone}">${escapeHtml(positionMeta.label)}</span>
-              ${renderStockBadge(data.product.stockStatus)}
-            </div>
-            <h1>${escapeHtml(data.product.name)}</h1>
+              <div class="catalog-product-storehead__signals">
+                ${storeheadSignals.map((signal) => `<span>${escapeHtml(signal)}</span>`).join("")}
+              </div>
+            <h1>${escapeHtml(titleParts.title)}</h1>
+            ${titleParts.subtitle ? `<p class="catalog-product-storehead__subtitle">${escapeHtml(titleParts.subtitle)}</p>` : ""}
             <div class="catalog-product-storehead__meta">
               <span>Арт. ${escapeHtml(data.product.article)}</span>
               <span>${escapeHtml(data.category.name)}</span>
-              <span>${data.product.documents.length} документа</span>
             </div>
             <p class="catalog-product-storehead__thesis">${escapeHtml(normalizeProductCopyText(data.product.shortDescription))}</p>
           </div>
@@ -1149,7 +1201,7 @@ function renderProductPage(ctx, state, data) {
               </div>
                 <button type="button" class="catalog-link-button" data-action="open-price-tiers" data-product-id="${data.product.id}">Цена по объёму</button>
               </div>
-              <p>${escapeHtml(positionMeta.summary)}</p>
+              <p class="catalog-product-storehead__checkout-note">${escapeHtml(positionMeta.summary)}</p>
               <div class="catalog-product-storehead__actions">
                 ${
                   stock.purchasable
@@ -1158,16 +1210,16 @@ function renderProductPage(ctx, state, data) {
                       }">${isInCart(state, data.product.id) ? "Уже в корзине" : "Добавить в корзину"}</button>`
                     : `<button type="button" class="catalog-primary-button" disabled>Нет в наличии</button>`
                 }
-                <button type="button" class="catalog-secondary-button" data-action="open-assistant" data-intent="question">Уточнить перед заказом</button>
+                <button type="button" class="catalog-secondary-button" data-action="open-assistant" data-intent="question">Проверить совместимость</button>
               </div>
               <div class="catalog-product-storehead__buy-meta">
-                <span>${data.product.faq.length} ответов по выбору</span>
-                <span>${stock.label}</span>
+                <span>${escapeHtml(positionMeta.label)}</span>
+                <span>${formatChoiceAnswerCount(data.product.faq.length)}</span>
               </div>
               <div class="catalog-product-storehead__route-note">
                 <strong>Если позиция влияет на схему</strong>
                 <p>${positionMeta.tone === "project"
-                  ? "Лучше быстро уточнить fit до заказа, чтобы не собирать модуль отдельно от всей системы."
+                  ? "Лучше быстро сверить совместимость до заказа, чтобы не собирать модуль отдельно от всей системы."
                   : "Если меняете не один товар, а связку элементов, лучше заранее сверить совместимость."}</p>
                 <div class="catalog-product-brief__buy-meta">
                 <a class="catalog-link-button" href="${resolveHref(ctx, `/catalog/${data.category.slug}/`)}">Открыть раздел</a>
@@ -1278,77 +1330,15 @@ function renderLandingPage(ctx) {
   `;
 }
 
-function renderHowBuy(ctx) {
-  return `
-    <section class="catalog-info-strip" id="catalog-how-buy">
-      <div class="catalog-how-buy-note">
-        <div class="catalog-how-buy-note__copy">
-          <strong>Каталог лучше читать после расчёта</strong>
-          <p>Сначала понятно фиксируем площадь, ряды и базовую нагрузку. После этого разделы каталога становятся списком узлов, а не случайной закупкой.</p>
-        </div>
-        <div class="catalog-how-buy-note__actions">
-          <a class="catalog-link-button" href="${resolveHref(ctx, "/calc/")}">Быстрый расчёт</a>
-          <a class="catalog-link-button" href="${resolveHref(ctx, "/farm/")}">Разбор объекта</a>
-          <a class="catalog-link-button" href="${resolveHref(ctx, "/consultations/")}">Короткий вопрос</a>
-        </div>
-      </div>
-    </section>
-  `;
-}
-
 function renderFooter(ctx, state) {
   return `
-    <footer class="home-footer" id="footer" aria-label="Подвал сайта">
-      <div class="home-footer-inner">
-        <div class="home-footer-lead">
-          <a class="home-footer-logo" href="${resolveHref(ctx, "/")}" aria-label="Klubnika Project">
-            <img src="${resolveHref(ctx, "/assets/logo/klubnika-project-logo-green.svg")}" alt="Klubnika Project" />
-          </a>
-        </div>
-
-        <nav class="home-footer-columns" aria-label="Навигация подвала">
-          <div>
-            <span>Маршруты</span>
-            <a href="${resolveHref(ctx, "/calc/")}">Калькулятор</a>
-            <a href="${resolveHref(ctx, "/catalog/")}">Каталог решений</a>
-            <a href="${resolveHref(ctx, "/klubhack/")}">Клубничный Хак</a>
-            <a href="${resolveHref(ctx, "/consultations/")}">Консультации</a>
-            <a href="${resolveHref(ctx, "/cabinet/")}">Кабинет</a>
-          </div>
-          <div>
-            <span>Система фермы</span>
-            <a href="${resolveHref(ctx, "/catalog/led/")}">Свет</a>
-            <a href="${resolveHref(ctx, "/catalog/irrigation/")}">Полив</a>
-            <a href="${resolveHref(ctx, "/catalog/racks/")}">Стеллажи</a>
-            <a href="${resolveHref(ctx, "/seeds/")}">Посадочный материал</a>
-          </div>
-          <div>
-            <span>Связь</span>
-            ${CATALOG_META.phones.map((phone) => `<a href="${phone.href}">${phone.value}</a>`).join("\n            ")}
-            <a href="mailto:${CATALOG_META.email}">${CATALOG_META.email}</a>
-            <a href="https://wa.me/79891250150" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-            <a href="https://www.youtube.com/@Ilya_patiev" target="_blank" rel="noopener noreferrer">YouTube</a>
-          </div>
-          <div>
-            <span>Документы</span>
-            <a href="${resolveHref(ctx, "/docs/policy/")}">Политика конфиденциальности</a>
-            <a href="${resolveHref(ctx, "/docs/offero/")}">Оферта</a>
-            <a href="${resolveHref(ctx, "/docs/warrenty/")}">Гарантия</a>
-            <a href="${resolveHref(ctx, "/docs/consent/")}">Согласие на обработку ПД</a>
-          </div>
-        </nav>
-
-        <div class="home-footer-bottom">
-          <span>${escapeHtml(CATALOG_META.brandName)}, 2026</span>
-          <span>Работаем по России и СНГ</span>
-        </div>
-      </div>
-    </footer>
+    <footer class="home-footer" id="footer" aria-label="Подвал сайта" data-kp-footer data-root="${resolveHref(ctx, "/")}"></footer>
+    <script src="${resolveHref(ctx, "/assets/js/kp-footer.js?v=20260612-footer5")}"></script>
   `;
 }
 
 function renderSharedFooterStyles(ctx) {
-  return `<link rel="stylesheet" href="${resolveHref(ctx, "/assets/css/kp-footer.css?v=20260427a")}" />`;
+  return `<link rel="stylesheet" href="${resolveHref(ctx, "/assets/css/kp-footer.css?v=20260612-footer5")}" />`;
 }
 
 function renderSearchPanel(ctx, state) {
@@ -1424,9 +1414,12 @@ function renderCartPanel(ctx, state) {
   return `
     <div class="catalog-overlay ${state.dialogs.cart ? "is-open" : ""}" data-overlay="cart" aria-hidden="${state.dialogs.cart ? "false" : "true"}">
       <div class="catalog-overlay__backdrop" data-action="close-dialog" data-dialog="cart"></div>
-      <div class="catalog-overlay__panel catalog-overlay__panel--side" role="dialog" aria-modal="true" aria-labelledby="catalog-cart-title">
+      <div class="catalog-overlay__panel catalog-overlay__panel--side catalog-overlay__panel--cart" role="dialog" aria-modal="true" aria-labelledby="catalog-cart-title">
         <div class="catalog-overlay__head">
-          <h2 id="catalog-cart-title">Корзина</h2>
+          <div>
+            <span class="catalog-overlay__eyebrow">${summary.itemCount ? `${summary.itemCount} позиций` : "Пока пусто"}</span>
+            <h2 id="catalog-cart-title">Корзина</h2>
+          </div>
           <button type="button" class="catalog-icon-button" data-action="close-dialog" data-dialog="cart" aria-label="Закрыть корзину">×</button>
         </div>
         ${
@@ -1437,28 +1430,42 @@ function renderCartPanel(ctx, state) {
                   .map(
                     (entry) => `
                       <article class="catalog-cart-item">
-                        <img src="${resolveAsset(ctx, entry.product.images[0])}" alt="${escapeHtml(entry.product.name)}" loading="lazy" />
-                        <div>
-                          <strong>${escapeHtml(entry.product.name)}</strong>
-                          <span>${formatPrice(entry.product.price)} × ${entry.qty}</span>
+                        <a class="catalog-cart-item__media" href="${resolveHref(ctx, getProductCatalogPath(entry.product))}">
+                          <img src="${resolveAsset(ctx, entry.product.images[0])}" alt="${escapeHtml(entry.product.name)}" loading="lazy" />
+                        </a>
+                        <div class="catalog-cart-item__body">
+                          <a class="catalog-cart-item__title" href="${resolveHref(ctx, getProductCatalogPath(entry.product))}">${escapeHtml(entry.product.name)}</a>
+                          <span class="catalog-cart-item__meta">${formatPrice(entry.product.price)} за шт.</span>
                           <div class="catalog-cart-item__actions">
-                            <button type="button" class="catalog-link-button" data-action="change-qty" data-product-id="${entry.product.id}" data-delta="-1">−</button>
-                            <button type="button" class="catalog-link-button" data-action="change-qty" data-product-id="${entry.product.id}" data-delta="1">+</button>
+                            <div class="catalog-cart-qty" aria-label="Количество">
+                              <button type="button" data-action="change-qty" data-product-id="${entry.product.id}" data-delta="-1" aria-label="Уменьшить количество">−</button>
+                              <strong>${entry.qty}</strong>
+                              <button type="button" data-action="change-qty" data-product-id="${entry.product.id}" data-delta="1" aria-label="Увеличить количество">+</button>
+                            </div>
                             <button type="button" class="catalog-link-button" data-action="remove-from-cart" data-product-id="${entry.product.id}">Удалить</button>
                           </div>
                         </div>
+                        <strong class="catalog-cart-item__total">${formatPrice(entry.product.price * entry.qty)}</strong>
                       </article>
                     `
                   )
                   .join("")}
               </div>
               <div class="catalog-cart-summary">
-                <strong>Итого: ${formatPrice(summary.total)}</strong>
-                <p>Оформление идёт через менеджера, чтобы спокойно проверить совместимость узлов и актуальное наличие.</p>
-                <button type="button" class="catalog-primary-button" data-action="open-assistant" data-intent="checkout">Передать заказ менеджеру</button>
+                <div class="catalog-cart-summary__line">
+                  <span>Итого</span>
+                  <strong>${formatPrice(summary.total)}</strong>
+                </div>
+                <p>Менеджер проверит наличие, совместимость позиций и подскажет, что лучше заменить до оплаты.</p>
+                <button type="button" class="catalog-primary-button catalog-cart-checkout" data-action="open-assistant" data-intent="checkout">Передать заказ менеджеру</button>
               </div>
             `
-            : `<p>Корзина пока пустая. Добавляйте товары из списка или из карточки товара.</p>`
+            : `
+              <div class="catalog-cart-empty">
+                <strong>В корзине пока ничего нет</strong>
+                <p>Добавьте позиции из каталога, а потом отправьте список менеджеру на проверку по схеме фермы.</p>
+              </div>
+            `
         }
       </div>
     </div>
@@ -1472,10 +1479,13 @@ function renderAssistantPanel(state) {
       <div class="catalog-overlay__backdrop" data-action="close-dialog" data-dialog="assistant"></div>
       <div class="catalog-overlay__panel catalog-overlay__panel--assistant" role="dialog" aria-modal="true" aria-labelledby="catalog-assistant-title">
         <div class="catalog-overlay__head">
-          <h2 id="catalog-assistant-title">Нужна помощь с выбором или заказом</h2>
+          <div>
+            <span class="catalog-overlay__eyebrow">Подбор и заказ</span>
+            <h2 id="catalog-assistant-title">Нужна помощь с выбором</h2>
+          </div>
           <button type="button" class="catalog-icon-button" data-action="close-dialog" data-dialog="assistant" aria-label="Закрыть панель помощи">×</button>
         </div>
-        <p>Можно сразу передать запрос в работу или на подбор, не теряя контекст страницы и выбранных товаров.</p>
+        <p class="catalog-assistant-lead">Передайте запрос менеджеру: сохраним контекст страницы, выбранные товары и быстро сверим совместимость.</p>
         <div class="catalog-assistant-actions">
           ${CATALOG_META.phones
             .map((phone) => `<a class="catalog-primary-button" href="${phone.href}">${singlePhone ? phone.value : `${phone.label}: ${phone.value}`}</a>`)
@@ -1573,11 +1583,10 @@ function renderMobileMenu(ctx, state) {
         <nav class="catalog-mobile-nav">
           <a href="${resolveHref(ctx, "/")}">Главная</a>
           <a href="${resolveHref(ctx, "/farm/")}">Расчёт фермы</a>
-          <a href="${resolveHref(ctx, "/consultations/")}">Консультации</a>
+          <a href="${resolveHref(ctx, "/contacts/")}">Контакты</a>
           <a href="${resolveHref(ctx, "/study/")}">Сопровождение</a>
           <a href="${resolveHref(ctx, "/calc/")}">Калькулятор</a>
           <a href="${resolveHref(ctx, "/catalog/")}">Каталог</a>
-          <a href="#catalog-how-buy">Как собрать систему</a>
           <a href="#catalog-contacts">Контакты</a>
         </nav>
         <div class="catalog-mobile-category-tree">
@@ -1641,11 +1650,18 @@ function renderMobileFilters(ctx, state, data) {
   `;
 }
 
-function renderFloatingAssistant() {
+function renderFloatingActions(state) {
+  const summary = getCartSummary(state);
   return `
-    <button type="button" class="catalog-floating-assistant" data-action="open-assistant" data-intent="chat">
-      Ассистент
-    </button>
+    <div class="catalog-floating-actions">
+      <button type="button" class="catalog-floating-cart${summary.itemCount ? " has-items" : ""}" data-action="open-cart" aria-label="Открыть корзину">
+        <span>Корзина</span>
+        <strong>${summary.itemCount}</strong>
+      </button>
+      <button type="button" class="catalog-floating-assistant" data-action="open-assistant" data-intent="chat">
+        Ассистент
+      </button>
+    </div>
   `;
 }
 
@@ -1674,11 +1690,10 @@ export function renderCatalogApp(ctx, rawState = {}) {
       <main class="catalog-main">
         ${state.flashMessage ? `<div class="catalog-flash">${escapeHtml(state.flashMessage)}</div>` : ""}
         ${pageMarkup}
-        ${renderHowBuy(ctx)}
       </main>
       ${renderSharedFooterStyles(ctx)}
       ${renderFooter(ctx, state)}
-      ${renderFloatingAssistant()}
+      ${renderFloatingActions(state)}
       ${renderSearchPanel(ctx, state)}
       ${renderCartPanel(ctx, state)}
       ${renderAssistantPanel(state)}
