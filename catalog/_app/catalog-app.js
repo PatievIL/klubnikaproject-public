@@ -31,6 +31,12 @@ function resolvePublicApiBase() {
   return DEFAULT_PUBLIC_API_BASE;
 }
 
+function shouldHydrateLiveCatalog() {
+  if (window.__KP_DISABLE_LIVE_CATALOG__) return false;
+  if (window.location.hostname === "patievil.github.io") return false;
+  return true;
+}
+
 async function hydrateLiveCatalog() {
   try {
     const response = await fetch(`${resolvePublicApiBase()}/public/catalog/snapshot`, {
@@ -574,7 +580,9 @@ document.addEventListener("input", handleInput);
 document.addEventListener("change", handleChange);
 document.addEventListener("submit", handleSubmit);
 
-hydrateLiveCatalog().finally(() => {
+const initialCatalogReady = shouldHydrateLiveCatalog() ? hydrateLiveCatalog() : Promise.resolve();
+
+initialCatalogReady.finally(() => {
   state = buildStateFromLocation();
   render();
 });
