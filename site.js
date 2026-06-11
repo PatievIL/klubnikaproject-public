@@ -20,12 +20,22 @@ function detectRuntimeApiBase(configuredBase) {
   return normalized;
 }
 
+function reachMetrikaGoal(goal, params = {}) {
+  if (typeof window.ym !== "function") return;
+
+  try {
+    window.ym(95619008, "reachGoal", goal, params);
+  } catch (error) {
+    // Analytics must never block lead delivery.
+  }
+}
+
 const SITE_ADMIN_DEFAULTS = {
   site: {
     supportTelegram: "@patiev_admin",
     supportTelegramUrl: "https://t.me/patiev_admin",
     supportEmail: CANONICAL_SUPPORT_EMAIL,
-    supportWhatsapp: "https://wa.me/79891250150",
+    supportWhatsapp: "https://wa.me/79030094990",
     supportInstagramUrl: "https://www.instagram.com/ilya_patiev/",
     supportYoutubeUrl: "https://www.youtube.com/@Ilya_patiev",
   },
@@ -48,147 +58,6 @@ const SITE_ADMIN_DEFAULTS = {
   },
 };
 
-const LEGACY_CATALOG_REDIRECTS = {
-  "shop/products/blind-tube-white/": {
-    href: "catalog/fittings/tube-blank-16/",
-    label: "White Line 16 мм",
-    categoryLabel: "Фитинги и магистрали",
-    categoryHref: "catalog/fittings/",
-  },
-  "shop/products/blind-tube-white-roll/": {
-    href: "catalog/fittings/tube-blank-roll/",
-    label: "White Line 16 мм, бухта 100 м",
-    categoryLabel: "Фитинги и магистрали",
-    categoryHref: "catalog/fittings/",
-  },
-  "shop/products/disc-filter-3-4/": {
-    href: "catalog/fittings/disc-filter-34/",
-    label: "Clear Disc 3/4",
-    categoryLabel: "Фитинги и магистрали",
-    categoryHref: "catalog/fittings/",
-  },
-  "shop/products/dosatron/": {
-    href: "catalog/irrigation/",
-    label: "Раздел полива и дозирования",
-    categoryLabel: "Полив и дозирование",
-    categoryHref: "catalog/irrigation/",
-  },
-  "shop/products/farm-module/": {
-    href: "catalog/rack-frames/aisle-rack-kit/",
-    label: "Модуль Aisle Rack Kit",
-    categoryLabel: "Каркасы и модули",
-    categoryHref: "catalog/rack-frames/",
-  },
-  "shop/products/fittings-kit-module/": {
-    href: "catalog/irrigation-kits/starter-irrigation-96/",
-    label: "Стартовый набор полива Starter 96",
-    categoryLabel: "Готовые наборы полива",
-    categoryHref: "catalog/irrigation-kits/",
-  },
-  "shop/products/grodan-classic/": {
-    href: "catalog/substrate-slabs/rootslab-classic-100/",
-    label: "RootSlab Classic 100",
-    categoryLabel: "Субстратные маты",
-    categoryHref: "catalog/substrate-slabs/",
-  },
-  "shop/products/grodan-plug/": {
-    href: "catalog/propagation-plugs/plug-cube-36/",
-    label: "Plug Cube 36",
-    categoryLabel: "Кубики и стартовые пробки",
-    categoryHref: "catalog/propagation-plugs/",
-  },
-  "shop/products/grodan-prestige/": {
-    href: "catalog/substrate-slabs/rootslab-prestige-65/",
-    label: "RootSlab Prestige 65",
-    categoryLabel: "Субстратные маты",
-    categoryHref: "catalog/substrate-slabs/",
-  },
-  "shop/products/hole-punch-16-20/": {
-    href: "catalog/fittings/punch-16-20/",
-    label: "Quick Punch 16/20",
-    categoryLabel: "Фитинги и магистрали",
-    categoryHref: "catalog/fittings/",
-  },
-  "shop/products/irrigation-base-rack/": {
-    href: "catalog/irrigation-kits/starter-irrigation-96/",
-    label: "Starter 96",
-    categoryLabel: "Готовые наборы полива",
-    categoryHref: "catalog/irrigation-kits/",
-  },
-  "shop/products/irrigation-extra-rack/": {
-    href: "catalog/irrigation-kits/rack-irrigation-module/",
-    label: "Rack Module",
-    categoryLabel: "Готовые наборы полива",
-    categoryHref: "catalog/irrigation-kits/",
-  },
-  "shop/products/irrigation-kit/": {
-    href: "catalog/irrigation-kits/starter-irrigation-96/",
-    label: "Starter 96",
-    categoryLabel: "Готовые наборы полива",
-    categoryHref: "catalog/irrigation-kits/",
-  },
-  "shop/products/led-300wt/": {
-    href: "catalog/linear-led/luma-line-191/",
-    label: "Luma Line 191",
-    categoryLabel: "Линейные светильники",
-    categoryHref: "catalog/linear-led/",
-  },
-  "shop/products/led-300wt-140cm/": {
-    href: "catalog/greenhouse-led/canopy-boost-140/",
-    label: "Canopy Boost 140",
-    categoryLabel: "Тепличные световые модули",
-    categoryHref: "catalog/greenhouse-led/",
-  },
-  "shop/products/led-450wt-200cm/": {
-    href: "catalog/greenhouse-led/canopy-boost-200/",
-    label: "Canopy Boost 200",
-    categoryLabel: "Тепличные световые модули",
-    categoryHref: "catalog/greenhouse-led/",
-  },
-  "shop/products/led-50wt-60cm/": {
-    href: "catalog/linear-led/luma-line-60/",
-    label: "Luma Line 60",
-    categoryLabel: "Линейные светильники",
-    categoryHref: "catalog/linear-led/",
-  },
-  "shop/products/led-50wt-95cm/": {
-    href: "catalog/linear-led/luma-line-95/",
-    label: "Luma Line 95",
-    categoryLabel: "Линейные светильники",
-    categoryHref: "catalog/linear-led/",
-  },
-  "shop/products/metal-tray-210/": {
-    href: "catalog/trays-gutters/metal-gutter-210/",
-    label: "Metal Gutter 210",
-    categoryLabel: "Лотки и сервисные элементы",
-    categoryHref: "catalog/trays-gutters/",
-  },
-  "shop/products/rack-base-16mats/": {
-    href: "catalog/rack-frames/frame-plus-16/",
-    label: "Plus Frame 16",
-    categoryLabel: "Каркасы и модули",
-    categoryHref: "catalog/rack-frames/",
-  },
-  "shop/products/rack-extra-16mats/": {
-    href: "catalog/rack-frames/frame-plus-16/",
-    label: "Plus Frame 16",
-    categoryLabel: "Каркасы и модули",
-    categoryHref: "catalog/rack-frames/",
-  },
-  "shop/products/rack-system/": {
-    href: "catalog/rack-frames/aisle-rack-kit/",
-    label: "Aisle Rack Kit",
-    categoryLabel: "Каркасы и модули",
-    categoryHref: "catalog/rack-frames/",
-  },
-  "shop/products/rivulis-supertif-22/": {
-    href: "catalog/drippers/rivulet-dripper-22/",
-    label: "Rivulet 2,2 л/ч",
-    categoryLabel: "Капельницы и узлы подачи",
-    categoryHref: "catalog/drippers/",
-  },
-};
-
 let siteAdminConfig = cloneConfig(SITE_ADMIN_DEFAULTS);
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -206,12 +75,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   normalizeSecondaryCtas();
   injectProductRail(root);
-  injectLegacyCatalogBanner(root);
   bindChoiceGroups();
   hydrateBriefFormsFromCalc();
   bindDraftForms(siteAdminConfig);
   applyGlobalContactLayer(siteAdminConfig);
   bindLazyVideoEmbeds();
+  setupSharedPageMotion();
 });
 
 function bindLazyVideoEmbeds() {
@@ -232,6 +101,266 @@ function bindLazyVideoEmbeds() {
       loader.replaceWith(iframe);
     });
   });
+}
+
+function setupSharedPageMotion() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
+
+  injectSharedMotionStyles();
+  setupSharedHeroMotion();
+  setupSharedScrollMotion();
+}
+
+function injectSharedMotionStyles() {
+  if (document.getElementById("kp-shared-motion-style")) return;
+
+  const style = document.createElement("style");
+  style.id = "kp-shared-motion-style";
+  style.textContent = `
+    @media (prefers-reduced-motion: no-preference) {
+      body.kp-hero-motion-ready .kp-hero-motion-item,
+      body.kp-motion-ready .kp-motion-item {
+        opacity: 0;
+        transform: translate3d(0, 10px, 0);
+        transition:
+          opacity 320ms ease,
+          transform 420ms cubic-bezier(0.2, 0.72, 0.18, 1);
+        transition-delay: var(--kp-motion-delay, 0ms);
+        will-change: opacity, transform;
+      }
+
+      body.kp-motion-ready .kp-motion-item.kp-motion-card {
+        transform: perspective(900px) translate3d(0, 8px, 0) rotateX(3deg) scale(0.997);
+        transform-origin: 50% 82%;
+        backface-visibility: hidden;
+      }
+
+      body.kp-motion-ready .kp-motion-item.kp-motion-media {
+        transform: translate3d(0, 12px, 0) scale(0.998);
+      }
+
+      body.kp-hero-motion-ready.kp-hero-motion-visible .kp-hero-motion-item,
+      body.kp-motion-ready .kp-motion-item.is-visible {
+        opacity: 1;
+        transform: perspective(900px) translate3d(0, 0, 0) rotateX(0deg) scale(1);
+        will-change: auto;
+      }
+
+      @keyframes kp-hero-drift {
+        from { transform: scale(1.01) translate3d(-0.25%, -0.2%, 0); }
+        to   { transform: scale(1.025) translate3d(0.35%, 0.25%, 0); }
+      }
+
+      .kp-hero-drift {
+        animation: kp-hero-drift 28s ease-out both;
+        transform-origin: 54% 46%;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// Selectors for hero images that should receive the drift animation.
+// Hero on consultations page uses CSS background-image (::before pseudo), not an <img> element —
+// add img selectors here when pages with real hero <img> elements are built.
+const KP_HERO_DRIFT_SELECTORS = [
+  ".hero-media img", // главная
+  // consultations hero — background-image на ::before, img нет; farm/calc/study — тоже фоны
+];
+
+function setupSharedHeroMotion() {
+  const heroSelectors = [
+    ".hero .hero-content > *",
+    ".farm-hero__copy > *",
+    ".calc-intro-copy > *",
+    ".study-hero-grid .hero-copy > *",
+    ".kh-hero__copy > *",
+    ".consult-hero-grid .hero-copy > *",
+    ".secondary-page .hero-shell",
+    ".section-tight > .container > .crumbs",
+    ".section-tight > .container > .product-detail > *",
+    ".legal-page .hero .container > *",
+  ];
+
+  const heroItems = uniqueElements(heroSelectors.flatMap((selector) => [...document.querySelectorAll(selector)]))
+    .filter(isSharedMotionCandidate)
+    .slice(0, 8);
+
+  if (!heroItems.length) return;
+
+  heroItems.forEach((item, index) => {
+    item.classList.add("kp-hero-motion-item");
+    item.style.setProperty("--kp-motion-delay", `${Math.min(40 + index * 48, 240)}ms`);
+  });
+
+  window.requestAnimationFrame(() => {
+    document.body.classList.add("kp-hero-motion-ready");
+
+    window.setTimeout(() => {
+      document.body.classList.add("kp-hero-motion-visible");
+    }, 80);
+  });
+
+  // Apply drift animation to hero images listed in KP_HERO_DRIFT_SELECTORS.
+  KP_HERO_DRIFT_SELECTORS.forEach((selector) => {
+    document.querySelectorAll(selector).forEach((el) => {
+      el.classList.add("kp-hero-drift");
+    });
+  });
+}
+
+function setupSharedScrollMotion() {
+  const sectionSelectors = [
+    "main > section",
+    ".section-tight",
+    ".legal-page .section",
+  ];
+
+  const itemSelectors = [
+    ".farm-section-head > *",
+    ".farm-card",
+    ".farm-section-cta",
+    ".farm-format-row",
+    ".farm-step",
+    ".farm-media",
+    ".farm-brief-copy > *",
+    ".farm-form-card",
+    ".idea-copy",
+    ".idea-step",
+    ".author-media",
+    ".author-copy > *",
+    ".author-facts li",
+    ".video-proof-head > *",
+    ".video-head > *",
+    ".video-feature",
+    ".video-topic-card",
+    ".calculator-copy > *",
+    ".calc-card-head",
+    ".calc-result-grid article",
+    ".calc-card-note",
+    ".system-head > *",
+    ".system-media",
+    ".system-grid article",
+    ".system-actions",
+    ".result-head > *",
+    ".result-grid article",
+    ".launch-head",
+    ".launch-visual",
+    ".process-roadmap article",
+    ".launch-actions",
+    ".support-media",
+    ".support-copy > *",
+    ".support-list article",
+    ".support-actions",
+    ".course-copy > *",
+    ".course-metrics article",
+    ".course-actions",
+    ".course-media",
+    ".final-contact-media",
+    ".final-contact-copy > *",
+    ".final-telegram-card",
+    ".final-brief-form",
+    ".section-actions",
+    ".request-form",
+    ".calc-config-group",
+    ".calc-result-panel",
+    ".calc-next-steps .calc-section-head > *",
+    ".calc-steps-grid article",
+    ".calc-final-card",
+    ".kh-section-head > *",
+    ".kh-card",
+    ".kh-video__copy > *",
+    ".kh-video__frame",
+    ".kh-program-item",
+    ".kh-route-card",
+    ".kh-format-item",
+    ".kh-request__copy > *",
+    ".kh-request-form",
+    ".section-head > *",
+    ".path-card",
+    ".consult-route-strip__item",
+    ".consult-price-card",
+    ".consult-decision-strip > div",
+    ".consult-brief-list li",
+    ".card",
+    ".form-card",
+    ".note-panel",
+    ".photo-card",
+    ".product-card",
+    ".product-detail-card",
+    ".section-split-copy > *",
+    ".section-split-visual",
+    ".grid > *",
+    ".section-frame",
+    ".object-data-card",
+    ".object-why-card",
+    ".object-final-panel",
+    ".legal-shell",
+  ];
+
+  const motionItems = [];
+  const sectionItems = uniqueElements(sectionSelectors.flatMap((selector) => [...document.querySelectorAll(selector)]));
+
+  sectionItems.forEach((section) => {
+    const items = uniqueElements(itemSelectors.flatMap((selector) => [...section.querySelectorAll(selector)]))
+      .filter(isSharedMotionCandidate)
+      .filter((item) => !item.classList.contains("kp-hero-motion-item"));
+
+    items.forEach((item, index) => {
+      item.classList.add("kp-motion-item");
+      item.style.setProperty("--kp-motion-delay", `${Math.min(index * 34, 220)}ms`);
+
+      if (item.matches(".farm-card, .farm-form-card, .kh-card, .kh-program-item, .kh-route-card, .path-card, .card, .photo-card, .product-card, .product-detail-card, .calc-config-group, .calc-result-panel, .calc-steps-grid article, .farm-step, .form-card, .request-form, .kh-request-form, .section-frame, .object-data-card, .object-why-card, .object-final-panel, .legal-shell, .consult-route-strip__item, .consult-price-card, .consult-decision-strip > div, .consult-brief-list li, .idea-step, .video-topic-card, .system-grid article, .result-grid article, .process-roadmap article, .support-list article, .course-metrics article, .final-telegram-card, .final-brief-form, .calc-result-grid article")) {
+        item.classList.add("kp-motion-card");
+      }
+
+      if (item.matches(".section-split-visual, .kh-video__frame, .farm-media, .author-media, .support-media, .final-contact-media, .course-media, .system-media, .video-feature, .launch-visual")) {
+        item.classList.add("kp-motion-media");
+      }
+
+      motionItems.push(item);
+    });
+  });
+
+  if (!motionItems.length) return;
+
+  document.body.classList.add("kp-motion-ready");
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+
+        entry.target.classList.add("is-visible");
+        window.setTimeout(() => {
+          entry.target.classList.remove("kp-motion-item", "kp-motion-card", "kp-motion-media", "is-visible");
+          entry.target.style.removeProperty("--kp-motion-delay");
+        }, 560);
+        observer.unobserve(entry.target);
+      });
+    },
+    {
+      rootMargin: "0px 0px -12% 0px",
+      threshold: 0.08,
+    }
+  );
+
+  motionItems.forEach((item) => observer.observe(item));
+}
+
+function uniqueElements(elements) {
+  return [...new Set(elements)];
+}
+
+function isSharedMotionCandidate(element) {
+  if (!element || element.dataset.kpMotionBound === "true") return false;
+  if (element.closest("[hidden], .kp-site-header, footer, .catalog-overlay, .legacy-catalog-banner")) return false;
+
+  const rect = element.getBoundingClientRect();
+  if (!rect.width && !rect.height) return false;
+
+  element.dataset.kpMotionBound = "true";
+  return true;
 }
 
 function loadSiteAdminConfig() {
@@ -298,31 +427,23 @@ function buildSharedFooterMarkup(root) {
     <div class="home-footer-inner">
       <div class="home-footer-lead">
         <a class="home-footer-logo" href="${root}" aria-label="Klubnika Project">
-          <img src="${root}assets/logo/klubnika-project-logo-green.svg" alt="Klubnika Project" />
+          <img src="${root}assets/logo/klubnika-project-logo-green-transparent.webp" alt="Klubnika Project" />
         </a>
       </div>
 
       <nav class="home-footer-columns" aria-label="Навигация подвала">
         <div>
-          <span>Маршруты</span>
-          <a href="${root}calc/">Калькулятор</a>
-          <a href="${root}${withStaticIndexPath("catalog/")}">Каталог решений</a>
-          <a href="${root}klubhack/">Клубничный Хак</a>
-          <a href="${root}consultations/">Консультации</a>
-          <a href="${root}cabinet/">Кабинет</a>
-        </div>
-        <div>
-          <span>Система фермы</span>
-          <a href="${root}catalog/led/index.html">Свет</a>
+          <span>Каталог</span>
+          <a href="${root}catalog/linear-led/index.html">LED освещение</a>
           <a href="${root}catalog/irrigation/index.html">Полив</a>
           <a href="${root}catalog/racks/index.html">Стеллажи</a>
-          <a href="${root}seeds/">Посадочный материал</a>
+          <a href="${root}catalog/service/index.html">Обучение</a>
         </div>
         <div>
           <span>Связь</span>
-          <a data-site-contact="phone" href="tel:+79255831669">+7 925 583-16-69</a>
+          <a data-site-contact="phone" href="tel:+79030094990">+7 903 009-49-90</a>
           <a data-site-contact="email" href="mailto:info@klubnikaproject.ru">info@klubnikaproject.ru</a>
-          <a data-site-contact="whatsapp" href="https://wa.me/79891250150" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+          <a data-site-contact="whatsapp" href="https://wa.me/79030094990" target="_blank" rel="noopener noreferrer">WhatsApp</a>
           <a data-site-contact="youtube" href="https://www.youtube.com/@Ilya_patiev" target="_blank" rel="noopener noreferrer">YouTube</a>
         </div>
         <div>
@@ -346,13 +467,13 @@ function ensureSharedFooterStyles(root) {
   if (document.querySelector('link[href*="kp-footer.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = `${root}assets/css/kp-footer.css?v=20260427a`;
+  link.href = `${root}assets/css/kp-footer.css?v=20260611a`;
   document.head.appendChild(link);
 }
 
 function applyGlobalContactLayer(config) {
   const supportEmail = CANONICAL_SUPPORT_EMAIL;
-  const supportWhatsapp = config.site.supportWhatsapp || "https://wa.me/79891250150";
+  const supportWhatsapp = config.site.supportWhatsapp || "https://wa.me/79030094990";
   const telegramHref = config.site.supportTelegramUrl || "https://t.me/patiev_admin";
   const telegramHandle = config.site.supportTelegram || "@patiev_admin";
   const instagramHref = config.site.supportInstagramUrl || "https://www.instagram.com/ilya_patiev/";
@@ -402,53 +523,6 @@ function normalizeSecondaryCtas() {
 }
 
 const PRODUCT_RAIL_GROUPS = [
-  {
-    title: "LED",
-    categoryHref: "shop/led/",
-    items: [
-      ["led-50wt-60cm", "M23 50 Вт / 60 см"],
-      ["led-50wt-95cm", "M23 50 Вт / 95 см"],
-      ["led-300wt", "M23 100 Вт / 1,91 м"],
-      ["led-300wt-140cm", "M23 100 Вт / 1,4 м"],
-      ["led-450wt-200cm", "M23 150 Вт / 2 м"],
-    ],
-  },
-  {
-    title: "Полив",
-    categoryHref: "shop/poliv/",
-    items: [
-      ["blind-tube-white", "Слепая трубка"],
-      ["blind-tube-white-roll", "Слепая трубка, бухта"],
-      ["hole-punch-16-20", "Пробойник 16/20 мм"],
-      ["rivulis-supertif-22", "Капельница Rivulis 2,2 л/ч"],
-      ["disc-filter-3-4", "Фильтр дисковый 3/4"],
-      ["fittings-kit-module", "Комплект фитингов"],
-      ["irrigation-base-rack", "Комплект для базового стеллажа"],
-      ["irrigation-extra-rack", "Комплект для дополнительного стеллажа"],
-      ["irrigation-kit", "Система полива на 96 растений"],
-      ["dosatron", "Dosatron"],
-    ],
-  },
-  {
-    title: "Стеллажи",
-    categoryHref: "shop/stellaj/",
-    items: [
-      ["rack-base-16mats", "Базовый модуль"],
-      ["rack-extra-16mats", "Дополнительный модуль"],
-      ["metal-tray-210", "Лоток 210 см"],
-      ["rack-system", "Стеллажная система"],
-      ["farm-module", "Модуль фермы"],
-    ],
-  },
-  {
-    title: "Субстрат",
-    categoryHref: "shop/substrate/",
-    items: [
-      ["grodan-plug", "Grodan Plug"],
-      ["grodan-classic", "Grodan Classic"],
-      ["grodan-prestige", "Grodan Prestige"],
-    ],
-  },
   {
     title: "Посадочный материал",
     categoryHref: "seeds/",
@@ -504,39 +578,13 @@ function injectProductRail(root) {
 
 function productRailItem(root, group, item, label) {
   const [slug, title] = item;
-  const href = group.categoryHref === "seeds/" ? `${root}seeds/${slug}/` : `${root}shop/products/${slug}/`;
+  const href = `${root}${group.categoryHref}${slug}/`;
   return `
     <a class="product-rail-link" href="${href}">
       <span class="product-rail-link-label">${label}</span>
       <strong>${title}</strong>
     </a>
   `;
-}
-
-function injectLegacyCatalogBanner(root) {
-  const normalizedPath = normalizeSitePath(window.location.pathname);
-  const lookupKey = normalizedPath === "/" ? "/" : `${normalizedPath.replace(/^\/+/, "")}/`;
-  const legacyTarget = LEGACY_CATALOG_REDIRECTS[lookupKey];
-  if (!legacyTarget || document.querySelector(".legacy-catalog-banner")) return;
-
-  const banner = document.createElement("aside");
-  banner.className = "legacy-catalog-banner";
-  banner.innerHTML = `
-    <div class="legacy-catalog-banner-copy">
-      <span class="legacy-catalog-banner-label">Новый каталог</span>
-      <strong>Для этой legacy-страницы уже есть актуальный маршрут в новом каталоге.</strong>
-      <p>Открывайте новую карточку, чтобы работать с фильтрами, вариантами цен, корзиной и обновлённой структурой товара.</p>
-    </div>
-    <div class="legacy-catalog-banner-actions">
-      <a class="btn btn-primary" href="${root}${withStaticIndexPath(legacyTarget.href)}">Открыть ${legacyTarget.label}</a>
-      <a class="btn btn-secondary" href="${root}${withStaticIndexPath(legacyTarget.categoryHref)}">Перейти в раздел «${legacyTarget.categoryLabel}»</a>
-    </div>
-  `;
-
-  const anchor = document.querySelector(".product-rail") || document.querySelector(".crumbs");
-  if (anchor?.parentNode) {
-    anchor.insertAdjacentElement("afterend", banner);
-  }
 }
 
 function normalizeSitePath(pathname) {
@@ -744,6 +792,11 @@ function bindDraftForms(config) {
       const doneLabel = normalizeText(form.dataset.briefDoneLabel || "") || ui.doneLabel;
 
       if (missing.length) {
+        reachMetrikaGoal("lead_validation_failed", {
+          form_name: form.dataset.briefForm || document.title,
+          reason: "missing_required_fields",
+          missing: missing.join(", "),
+        });
         if (status) {
           status.textContent = form.dataset.briefFormVariant === "routing"
             ? missing[0]
@@ -755,6 +808,10 @@ function bindDraftForms(config) {
       }
 
       if (!lines.length) {
+        reachMetrikaGoal("lead_validation_failed", {
+          form_name: form.dataset.briefForm || document.title,
+          reason: "empty_brief",
+        });
         if (status) {
           status.textContent = lang === "en"
             ? "Fill in at least one field to prepare the brief."
@@ -769,6 +826,10 @@ function bindDraftForms(config) {
       const apiBase = detectRuntimeApiBase(latestConfig.integrations?.apiBase || "");
       const leadPayload = buildLeadPayload(form, title, lines, text);
       const routeMeta = detectLeadRoute(leadPayload.stage, leadPayload.what_needed);
+      reachMetrikaGoal("lead_submit_attempt", {
+        form_name: title,
+        route: leadPayload.detected_route,
+      });
       const shouldOpenTelegram =
         latestConfig.forms.primaryChannel === "telegram" &&
         latestConfig.forms.openTelegramAfterCopy &&
@@ -781,6 +842,7 @@ function bindDraftForms(config) {
       let backendLeadId = null;
       let crmDeliveryStatus = "";
       let crmLeadId = null;
+      let telegramDeliveryStatus = "";
 
       if (latestConfig.forms.mode === "backend_submit" && apiBase) {
         try {
@@ -798,11 +860,34 @@ function bindDraftForms(config) {
             backendLeadId = payload?.lead?.id || null;
             crmDeliveryStatus = payload?.lead?.crm?.delivery_status || "";
             crmLeadId = payload?.lead?.crm?.crm_lead_id || null;
+            telegramDeliveryStatus = payload?.lead?.telegram?.delivery_status || "";
+            reachMetrikaGoal("lead_api_success", {
+              form_name: title,
+              route: leadPayload.detected_route,
+              lead_id: backendLeadId || "",
+            });
+            reachMetrikaGoal(telegramDeliveryStatus === "succeeded" ? "lead_telegram_success" : "lead_telegram_failed", {
+              form_name: title,
+              route: leadPayload.detected_route,
+              lead_id: backendLeadId || "",
+              telegram_status: telegramDeliveryStatus || "unknown",
+            });
+          } else {
+            reachMetrikaGoal("lead_api_failed", {
+              form_name: title,
+              route: leadPayload.detected_route,
+              status: response.status,
+            });
           }
         } catch (error) {
           backendLeadId = null;
           crmDeliveryStatus = "";
           crmLeadId = null;
+          telegramDeliveryStatus = "";
+          reachMetrikaGoal("lead_api_failed", {
+            form_name: title,
+            route: leadPayload.detected_route,
+          });
         }
       }
 
@@ -813,6 +898,8 @@ function bindDraftForms(config) {
             if (lang === "en") {
               if (crmDeliveryStatus === "succeeded") {
                 status.textContent = `The brief has been stored in the system as lead #${backendLeadId} and sent to CRM${crmLeadId ? ` as #${crmLeadId}` : ""}.`;
+              } else if (telegramDeliveryStatus === "succeeded") {
+                status.textContent = `The brief has been stored in the system as lead #${backendLeadId} and sent to Telegram.`;
               } else if (crmDeliveryStatus === "failed") {
                 status.textContent = `The brief has been stored in the system as lead #${backendLeadId}, but CRM is unavailable right now.`;
               } else if (crmDeliveryStatus === "disabled") {
@@ -823,6 +910,8 @@ function bindDraftForms(config) {
             } else {
               if (crmDeliveryStatus === "succeeded") {
                 status.textContent = `Задача сохранена в системе как лид #${backendLeadId} и отправлена в CRM${crmLeadId ? ` как #${crmLeadId}` : ""}.`;
+              } else if (telegramDeliveryStatus === "succeeded") {
+                status.textContent = `Задача сохранена в системе как лид #${backendLeadId} и отправлена в Telegram.`;
               } else if (crmDeliveryStatus === "failed") {
                 status.textContent = `Задача сохранена в системе как лид #${backendLeadId}, но CRM сейчас недоступна.`;
               } else if (crmDeliveryStatus === "disabled") {
@@ -1043,7 +1132,7 @@ function validateBriefForm(form, config) {
     const summaryLength = normalizeText(values.summary || "").length;
     const missing = [];
     if (!values.name) missing.push("Укажите, как к вам обращаться.");
-    if (!values.contact) missing.push("Оставьте телефон, Telegram или WhatsApp для связи.");
+    if (!values.contact) missing.push("Оставьте телефон или удобный контакт для ответа.");
     if (!values.stage) missing.push("Выберите текущую стадию проекта.");
     if (!values.request) missing.push("Уточните, что нужно решить в первую очередь.");
     if (summaryLength < 24) missing.push("Добавьте 1–2 предложения: что уже есть и что нужно сделать сейчас.");
@@ -1645,7 +1734,7 @@ const TRANSLATIONS_EN = {
   "Смотреть Frigo": "View Frigo",
   "Все позиции, которые были в старом каталоге семян": "All positions that were listed in the old seed catalog",
   "Имя": "Name",
-  "Telegram / WhatsApp / телефон": "Telegram / WhatsApp / phone",
+  "Телефон или удобный контакт": "Phone or preferred contact",
   "Контакт для связи": "Contact info",
   "Площадь / тип проекта / стадия": "Area / project type / stage",
   "Опишите ситуацию: что уже сделано, где сейчас главная проблема и какой результат нужен": "Describe the situation: what has already been done, what the main issue is now, and what result you need",

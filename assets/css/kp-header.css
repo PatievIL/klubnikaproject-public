@@ -25,17 +25,13 @@
   --kp-header-x: clamp(20px, 3vw, 32px);
 }
 
-html,
+html {
+  max-width: 100%;
+}
+
 body {
   max-width: 100%;
   overflow-x: hidden;
-}
-
-@supports (overflow-x: clip) {
-  html,
-  body {
-    overflow-x: clip;
-  }
 }
 
 body.kp-menu-open {
@@ -59,11 +55,12 @@ body.kp-menu-open {
 }
 
 .kp-site-header.header--dark {
-  --kp-header-bg: var(--kp-green);
+  --kp-header-bg: transparent;
   --kp-header-solid-bg: var(--kp-green);
   --kp-header-ink: var(--kp-peach);
   --kp-header-muted: rgba(255, 213, 160, 0.86);
-  --kp-header-line: rgba(255, 213, 160, 0.18);
+  --kp-header-line: transparent;
+  --kp-header-solid-line: rgba(255, 213, 160, 0.18);
   --kp-header-hover: rgba(255, 213, 160, 0.14);
   --kp-header-active: rgba(255, 213, 160, 0.18);
   --kp-header-cta-bg: var(--kp-peach);
@@ -85,7 +82,7 @@ body.kp-menu-open {
 .kp-site-header.is-scrolled,
 .kp-site-header.is-menu-open {
   background: var(--kp-header-solid-bg);
-  border-bottom-color: var(--kp-header-line);
+  border-bottom-color: var(--kp-header-solid-line, var(--kp-header-line));
 }
 
 .kp-site-header__inner {
@@ -257,6 +254,11 @@ body.kp-menu-open {
   display: block;
   height: calc(var(--kp-header-height) + 1px);
   flex: 0 0 auto;
+}
+
+.kp-site-header.header--dark + .kp-site-header-spacer {
+  display: none;
+  height: 0 !important;
 }
 
 @media (max-width: 1200px) {

@@ -1,5 +1,5 @@
-import { catalogLegacyOverrides } from "./catalog-legacy-overrides.mjs";
-import { catalogUfarmsOverrides } from "./catalog-ufarms-overrides.generated.mjs";
+import { catalogLegacyOverrides } from "./catalog-legacy-overrides.mjs?v=20260609-imgclean1";
+import { catalogUfarmsOverrides } from "./catalog-ufarms-overrides.generated.mjs?v=20260609-imgclean1";
 
 const SITE_ORIGIN = "https://klubnikaproject.ru";
 const CATALOG_BASE_PATH = "/catalog/";
@@ -14,15 +14,15 @@ export const CATALOG_META = {
   phones: [
     {
       label: "Связь",
-      href: "tel:+79255831669",
-      value: "+7 925 583-16-69",
+      href: "tel:+79030094990",
+      value: "+7 903 009-49-90",
     },
   ],
   email: "info@klubnikaproject.ru",
   address: "Москва, проектная комплектация с отгрузкой по РФ",
   socialLinks: [
     { label: "Telegram", href: "https://t.me/patiev_admin" },
-    { label: "WhatsApp", href: "https://wa.me/79891250150" },
+    { label: "WhatsApp", href: "https://wa.me/79030094990" },
     { label: "Instagram", href: "https://www.instagram.com/ilya_patiev/" },
     { label: "YouTube", href: "https://www.youtube.com/@Ilya_patiev" },
   ],
@@ -43,8 +43,8 @@ export const CATALOG_META = {
       summary: "Быстрый ориентир по модулю, полке и базовой смете.",
     },
     {
-      title: "Консультации",
-      href: "/consultations/",
+      title: "Контакты",
+      href: "/contacts/",
       summary: "Разбор действующей фермы, совместимости по системе и того, с чего лучше начать.",
     },
     {
@@ -176,8 +176,14 @@ function normalizeCatalogCopyText(value = "") {
       /Растворный узел Dosatron:\s*растворный узел для схемы полива клубничной фермы\. Покупка имеет смысл только после проверки линии, расхода и логики подачи раствора\./gi,
       "Растворный узел Dosatron для схем полива, где уже понятны расход линии, бак и подача раствора.",
     ],
+    [/проверкой fit/gi, "проверкой совместимости"],
+    [/проверить fit/gi, "проверить совместимость"],
+    [/сверить fit/gi, "сверить совместимость"],
+    [/Проверка fit/gi, "Проверка совместимости"],
+    [/fit по/gi, "совместимость по"],
     [/микроузел подачи/gi, "точечная подача"],
     [/точечный узел подачи/gi, "точечная подача"],
+    [/\bfit\b/gi, "совместимость"],
     [/собранный узел для капельной линии/gi, "готовая сборка для капельной линии"],
     [/готовый узел подачи/gi, "готовая подача"],
     [/узлы подачи/gi, "подача"],
@@ -609,7 +615,8 @@ const productsSeed = [
     slug: "luma-line-60",
     name: "Линейный светильник Luma Line 60",
     article: "LED-L60-50",
-    shortDescription: "Компактный линейный светильник под короткий пролёт, сервисный ряд и дооснащение узких полок.",
+    shortDescription:
+      "Компактный M23 для короткой полки, рассады или сервисного участка стеллажа. Подходит, когда нужен отдельный светильник под небольшой пролёт, а не полноценная линия на весь ряд.",
     fullDescription: fullDescriptionFrom({
       overview:
         "Luma Line 60 собран под короткие пролёты и сервисные зоны, где нужен чистый линейный свет без избыточной мощности.",
@@ -2597,9 +2604,9 @@ const productsSeed = [
     badges: ["recommended"],
     popularity: 67,
     images: [
-      "assets/catalog/catalog-irrigation/osmos-1600-main.jpg",
-      "assets/catalog/catalog-irrigation/membrane-1600-main.png",
-      "assets/catalog/catalog-irrigation/prefilter-set-1600-main.jpg",
+      "assets/catalog/catalog-irrigation/osmos-1600-main.webp",
+      "assets/catalog/catalog-irrigation/membrane-1600-main.webp",
+      "assets/catalog/catalog-irrigation/prefilter-set-1600-main.webp",
     ],
     documents: [sharedDocuments["irrigation-passport"], sharedDocuments["nutrition-sheet"]],
     attributes: [
@@ -2639,9 +2646,9 @@ const productsSeed = [
     badges: [],
     popularity: 58,
     images: [
-      "assets/catalog/catalog-irrigation/membrane-1600-main.png",
-      "assets/catalog/catalog-irrigation/osmos-1600-main.jpg",
-      "assets/catalog/catalog-irrigation/prefilter-set-1600-main.jpg",
+      "assets/catalog/catalog-irrigation/membrane-1600-main.webp",
+      "assets/catalog/catalog-irrigation/osmos-1600-main.webp",
+      "assets/catalog/catalog-irrigation/prefilter-set-1600-main.webp",
     ],
     documents: [sharedDocuments["irrigation-passport"]],
     attributes: [
@@ -2681,9 +2688,9 @@ const productsSeed = [
     badges: ["recommended"],
     popularity: 61,
     images: [
-      "assets/catalog/catalog-irrigation/prefilter-set-1600-main.jpg",
-      "assets/catalog/catalog-irrigation/osmos-1600-main.jpg",
-      "assets/catalog/catalog-irrigation/membrane-1600-main.png",
+      "assets/catalog/catalog-irrigation/prefilter-set-1600-main.webp",
+      "assets/catalog/catalog-irrigation/osmos-1600-main.webp",
+      "assets/catalog/catalog-irrigation/membrane-1600-main.webp",
     ],
     documents: [sharedDocuments["irrigation-passport"]],
     attributes: [
@@ -2723,7 +2730,7 @@ const productsSeed = [
     badges: ["recommended"],
     popularity: 65,
     images: [
-      "assets/catalog/catalog-irrigation/fertilizer-year-1000-main.jpg",
+      "assets/catalog/catalog-irrigation/fertilizer-year-1000-main.webp",
       "assets/catalog/catalog-racks/rack-context-01.webp",
       "assets/catalog/catalog-irrigation/dosatron-main.webp",
     ],
@@ -2765,7 +2772,7 @@ const productsSeed = [
     badges: [],
     popularity: 52,
     images: [
-      "assets/catalog/catalog-irrigation/mixing-kit-scale-main.jpg",
+      "assets/catalog/catalog-irrigation/mixing-kit-scale-main.webp",
       "assets/catalog/catalog-irrigation/dosatron-main.webp",
       "assets/catalog/catalog-context/hero-process-context.webp",
     ],
@@ -2807,7 +2814,7 @@ const productsSeed = [
     badges: ["new"],
     popularity: 60,
     images: [
-      "assets/catalog/catalog-irrigation/smart-home-kit-main.jpg",
+      "assets/catalog/catalog-irrigation/smart-home-kit-main.webp",
       "assets/catalog/catalog-seeds/seed-rowena-main.webp",
       "assets/catalog/catalog-context/berry-reference-main.webp",
     ],
@@ -2849,7 +2856,7 @@ const productsSeed = [
     badges: ["recommended"],
     popularity: 63,
     images: [
-      "assets/catalog/catalog-irrigation/split-system-climate-main.png",
+      "assets/catalog/catalog-irrigation/split-system-climate-main.webp",
       "assets/catalog/catalog-context/hero-process-context.webp",
       "assets/catalog/catalog-racks/greenhouse-rack-context.webp",
     ],
@@ -2891,9 +2898,9 @@ const productsSeed = [
     badges: ["recommended"],
     popularity: 59,
     images: [
-      "assets/catalog/catalog-irrigation/water-tank-kit-main.jpg",
-      "assets/catalog/catalog-irrigation/osmos-1600-main.jpg",
-      "assets/catalog/catalog-irrigation/prefilter-set-1600-main.jpg",
+      "assets/catalog/catalog-irrigation/water-tank-kit-main.webp",
+      "assets/catalog/catalog-irrigation/osmos-1600-main.webp",
+      "assets/catalog/catalog-irrigation/prefilter-set-1600-main.webp",
     ],
     documents: [sharedDocuments["irrigation-passport"], sharedDocuments["nutrition-sheet"]],
     attributes: [
@@ -2934,7 +2941,7 @@ const productsSeed = [
     popularity: 56,
     images: [
       "assets/catalog/catalog-context/hero-process-context.webp",
-      "assets/catalog/catalog-irrigation/split-system-climate-main.png",
+      "assets/catalog/catalog-irrigation/split-system-climate-main.webp",
       "assets/catalog/catalog-racks/greenhouse-rack-context.webp",
     ],
     documents: [sharedDocuments["climate-sheet"]],
@@ -2975,7 +2982,7 @@ const productsSeed = [
     badges: [],
     popularity: 57,
     images: [
-      "assets/catalog/catalog-irrigation/smart-home-kit-main.jpg",
+      "assets/catalog/catalog-irrigation/smart-home-kit-main.webp",
       "assets/catalog/catalog-seeds/seed-rowena-main.webp",
       "assets/catalog/catalog-context/hero-process-context.webp",
     ],
@@ -3245,6 +3252,17 @@ const averageRating = (productId) => {
 };
 
 const EXCLUDED_PRODUCT_SLUGS = new Set(["frame-base-12", "berry-tray-160", "service-shelf-rail"]);
+const PRODUCT_IDENTITY_OVERRIDES = {
+  "tube-blank-16": {
+    name: "Трубка для капельной линии слепая, белая, 1 м",
+    article: "02-0009-539-1M",
+  },
+  "tube-blank-roll": {
+    name: "Трубка для капельной линии слепая, белая, бухта",
+    article: "02-0009-539-ROLL",
+  },
+};
+
 const NON_FILTERABLE_ATTRIBUTE_KEYS = new Set([
   "scenario",
   "role",
@@ -3275,6 +3293,7 @@ const products = productsSeed.map((product) => {
   const categorySlug = getCategoryById(product.categoryId)?.slug || "";
   const legacyOverride = catalogLegacyOverrides[product.slug] || null;
   const ufarmsOverride = catalogUfarmsOverrides[product.slug] || null;
+  const identityOverride = PRODUCT_IDENTITY_OVERRIDES[product.slug] || null;
   const normalized = {
     ...product,
     ...(legacyOverride || {}),
@@ -3291,8 +3310,8 @@ const products = productsSeed.map((product) => {
           : product.images
     ),
     price: legacyOverride?.price ?? product.price,
-    article: ufarmsOverride?.article || legacyOverride?.article || product.article,
-    name: normalizeCatalogCopyText(ufarmsOverride?.name || legacyOverride?.name || product.name),
+    article: identityOverride?.article || ufarmsOverride?.article || legacyOverride?.article || product.article,
+    name: normalizeCatalogCopyText(identityOverride?.name || ufarmsOverride?.name || legacyOverride?.name || product.name),
     shortDescription: normalizeCatalogCopyText(legacyOverride?.shortDescription || product.shortDescription),
     fullDescription: normalizeCatalogCopyText(legacyOverride?.fullDescription || product.fullDescription),
     attributes: (legacyOverride?.attributes?.length ? legacyOverride.attributes : product.attributes).map((attribute) => ({
@@ -3314,10 +3333,17 @@ const products = productsSeed.map((product) => {
   if (EXCLUDED_PRODUCT_SLUGS.has(normalized.slug)) {
     return null;
   }
+  if (normalized.status && normalized.status !== "published") {
+    return null;
+  }
   productsById.set(normalized.id, normalized);
   productsBySlug.set(normalized.slug, normalized);
   return normalized;
 }).filter(Boolean);
+
+function isPublicCatalogProduct(product) {
+  return !product.status || product.status === "published";
+}
 
 const descendantCache = new Map();
 
@@ -3335,6 +3361,40 @@ categories.forEach((category) => {
   category.productCount = products.filter((product) => descendantIds.includes(product.categoryId)).length;
 });
 
+function rebuildCatalogIndexes() {
+  categoryById.clear();
+  categoryBySlug.clear();
+  productsById.clear();
+  productsBySlug.clear();
+  childrenByCategoryId.clear();
+  descendantCache.clear();
+
+  categories.forEach((category) => {
+    categoryById.set(category.id, category);
+    categoryBySlug.set(category.slug, category);
+    if (!childrenByCategoryId.has(category.parentId)) {
+      childrenByCategoryId.set(category.parentId, []);
+    }
+    childrenByCategoryId.get(category.parentId).push(category);
+  });
+
+  products.forEach((product) => {
+    productsById.set(product.id, product);
+    productsBySlug.set(product.slug, product);
+  });
+
+  categories.forEach((category) => {
+    const descendantIds = collectDescendantIds(category.id);
+    category.productCount = products.filter((product) => descendantIds.includes(product.categoryId)).length;
+  });
+}
+
+export function replaceCatalogData(nextCategories, nextProducts) {
+  categories.splice(0, categories.length, ...nextCategories);
+  products.splice(0, products.length, ...nextProducts.filter(isPublicCatalogProduct));
+  rebuildCatalogIndexes();
+}
+
 export const catalogData = {
   categories,
   products,
@@ -3346,6 +3406,8 @@ export function formatPrice(value) {
 }
 
 export function resolveAssetPath(siteRoot, path) {
+  if (!path) return "";
+  if (/^https?:\/\//i.test(path)) return path;
   return `${siteRoot}${path}`;
 }
 
@@ -3864,7 +3926,9 @@ export function buildProductJsonLd(category, product) {
     sku: product.article,
     category: category.name,
     description: normalizeCatalogCopyText(product.shortDescription),
-    image: product.images.map((path) => `${SITE_ORIGIN}/${path}`.replace(/([^:]\/)\/+/g, "$1")),
+    image: product.images.map((path) => (
+      /^https?:\/\//i.test(path) ? path : `${SITE_ORIGIN}/${path}`.replace(/([^:]\/)\/+/g, "$1")
+    )),
     brand: {
       "@type": "Brand",
       name: "Klubnika Project",

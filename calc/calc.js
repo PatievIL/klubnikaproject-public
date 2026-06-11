@@ -5,7 +5,7 @@ import {
   formatRub,
   formatSmart,
   normalizeInputValue
-} from "./calc-core.js?v=20260608-phase-auto1";
+} from "./calc-core.js?v=20260508-break-even1";
 
 const STORAGE_KEY = "klubnikaproject.calc.state.v4";
 const CROP_STORAGE_KEY = "klubnikaproject.calc.crop.v1";
@@ -58,10 +58,10 @@ const UI_DEFAULTS = {
 
 const CROP_CONFIG = {
   strawberry: {
-    pricingFile: "./pricing.json?v=20260608-phase-auto1"
+    pricingFile: "./pricing.json"
   },
   cucumber: {
-    pricingFile: "./pricing-cucumber.json?v=20260608-phase-auto1"
+    pricingFile: "./pricing-cucumber.json"
   }
 };
 

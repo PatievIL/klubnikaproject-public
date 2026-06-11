@@ -4,9 +4,9 @@
     { label: "Курс", href: "klubhack/" },
     { label: "Калькулятор", href: "calc/" },
     { label: "Оборудование", href: "catalog/" },
-    { label: "Контакты", href: "consultations/" },
+    { label: "Контакты", href: "contacts/" },
   ];
-  const CABINET_ITEM = { label: "Кабинет", href: "cabinet/" };
+  const CABINET_ITEM = { label: "Кабинет", href: "/cabinet/" };
 
   function getRoot() {
     const script = document.currentScript || document.querySelector('script[src*="kp-header.js"]');
@@ -33,7 +33,7 @@
   }
 
   function resolveHref(root, href) {
-    if (/^(https?:|tel:|mailto:|#)/.test(href)) return href;
+    if (/^(https?:|tel:|mailto:|#|\/)/.test(href)) return href;
     return `${root}${href}`;
   }
 
@@ -46,8 +46,8 @@
   function createHeader(root, pagePath) {
     const theme = getTheme(pagePath);
     const logo = theme === "dark"
-      ? `${root}assets/logo/klubnika-project-logo-peach.svg`
-      : `${root}assets/logo/klubnika-project-logo-green.svg`;
+      ? `${root}assets/logo/klubnika-project-logo-peach-420.webp`
+      : `${root}assets/logo/klubnika-project-logo-green-420.webp`;
 
     const header = document.createElement("header");
     header.className = `kp-site-header header--${theme}`;
@@ -63,7 +63,7 @@
           `).join("")}
         </nav>
         <div class="kp-site-header__actions">
-          <a class="kp-site-header__cabinet${isActive(pagePath, CABINET_ITEM.href) ? " is-active" : ""}" href="${resolveHref(root, "cabinet/login/")}">${CABINET_ITEM.label}</a>
+          <a class="kp-site-header__cabinet" href="${resolveHref(root, CABINET_ITEM.href)}">${CABINET_ITEM.label}</a>
           <a class="kp-site-header__cta" href="${root}#contact">Обсудить ферму</a>
           <button class="kp-site-header__toggle" type="button" aria-label="Открыть меню" aria-expanded="false">
             <span></span>
@@ -74,7 +74,7 @@
         ${NAV_ITEMS.map((item) => `
           <a class="kp-site-header__link${isActive(pagePath, item.href) ? " is-active" : ""}" href="${resolveHref(root, item.href)}">${item.label}</a>
         `).join("")}
-        <a class="kp-site-header__link${isActive(pagePath, CABINET_ITEM.href) ? " is-active" : ""}" href="${resolveHref(root, "cabinet/login/")}">${CABINET_ITEM.label}</a>
+        <a class="kp-site-header__link" href="${resolveHref(root, CABINET_ITEM.href)}">${CABINET_ITEM.label}</a>
         <a class="kp-site-header__cta" href="${root}#contact">Обсудить ферму</a>
       </nav>
     `;

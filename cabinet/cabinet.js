@@ -6,6 +6,10 @@ const MEMBER_SAVED_STORAGE_KEY = "klubnikaproject.cabinet.saved.v1";
 const MEMBER_CALC_NOTES_STORAGE_KEY = "klubnikaproject.cabinet.calc-notes.v1";
 const CALC_STATE_STORAGE_KEY = "klubnikaproject.calc.state.v4";
 const CALC_CROP_STORAGE_KEY = "klubnikaproject.calc.crop.v1";
+const COURSE_WORKBOOK_URL = "https://docs.google.com/spreadsheets/d/1X1ZAYC85jn6DZI9xvmfXvTN2uc9GGnXS7oaeN4y9Gf0/edit?usp=sharing";
+const COURSE_WORKBOOK_INTRO = "Рабочая тетрадь — основной инструмент курса. Скопируйте её в свой Google аккаунт, фиксируйте решения по каждому уроку и прикладывайте ссылки на файлы, скрины или расчёты.";
+const KINESCOPE_IFRAME_API_URL = "https://player.kinescope.io/latest/iframe.player.js";
+const COURSE_AUTO_WATCH_THRESHOLD_PERCENT = 90;
 
 const DEFAULT_SETTINGS = {
   site: {
@@ -27,11 +31,15 @@ const routes = {
   site: routePath(""),
   catalog: routePath("catalog/"),
   calc: routePath("calc/"),
-  consultations: routePath("consultations/"),
+  consultations: routePath("contacts/"),
 };
 
 let settings = clone(DEFAULT_SETTINGS);
 let currentSession = null;
+let kinescopeIframeApiPromise = null;
+let kinescopePlayerFactory = null;
+const courseAutowatchLessons = new Set();
+const courseAutowatchIframes = new Set();
 
 document.addEventListener("DOMContentLoaded", initCabinet);
 
@@ -39,11 +47,12 @@ async function initCabinet() {
   settings = loadCachedSettings();
   const view = document.body.dataset.cabinetView || "shell";
   const localLoginPreview = view === "login" && isLocalPreview();
-  if (!localLoginPreview) {
-    await refreshSettings();
-  }
 
   if (view === "login") {
+    if (!localLoginPreview) {
+      await refreshSettings();
+    }
+
     if (localLoginPreview) {
       bindLogin();
       return;
@@ -66,6 +75,7 @@ async function initCabinet() {
   }
 
   currentSession = session;
+  await refreshSettings();
   document.body.removeAttribute("data-cabinet-pending");
   renderUserCard(session);
   await renderCabinet(session);
@@ -352,7 +362,7 @@ function redirectAuthenticatedSession(session) {
 
 function redirectToLogin() {
   const next = `${window.location.pathname}${window.location.search || ""}`;
-  window.location.href = `${routes.login}?next=${encodeURIComponent(next)}`;
+  window.location.replace(`${routes.login}?next=${encodeURIComponent(next)}`);
 }
 
 function isAllowedCabinetNext(next) {
@@ -416,7 +426,7 @@ async function renderCabinet(session) {
   const section = sections.find((item) => item.id === active) || sections[0];
   applyShellModel(session, section);
   content.dataset.section = section.id;
-  content.innerHTML = '<div class="account-empty">Собираем раздел и проверяем живые данные...</div>';
+  content.innerHTML = renderCabinetSkeleton(section.label);
 
   try {
     const html = await renderSection(session, section.id);
@@ -427,6 +437,22 @@ async function renderCabinet(session) {
     if (content.dataset.section !== section.id) return;
     content.innerHTML = renderUnavailable(section.label, cleanupError(error.message || "runtime_error"));
   }
+}
+
+function renderCabinetSkeleton(label = "Кабинет") {
+  return `
+    <div class="cabinet-skeleton" aria-label="${escapeAttribute(label)} загружается">
+      <span class="cabinet-skeleton__pill"></span>
+      <span class="cabinet-skeleton__title"></span>
+      <span class="cabinet-skeleton__line"></span>
+      <span class="cabinet-skeleton__line cabinet-skeleton__line--short"></span>
+      <div class="cabinet-skeleton__grid">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  `;
 }
 
 async function renderSection(session, sectionId) {
@@ -575,7 +601,7 @@ async function renderPurchaseSection(session) {
   }
 
   const documents = memberHasScope(session, "documents")
-    ? (await Promise.all(orders.slice(0, 5).map(async (order) => {
+    ? (await Promise.all(orders.map(async (order) => {
         const items = await loadMemberOrderDocuments(order.id).catch(() => []);
         return items.map((item) => ({ ...item, orderTitle: order.title || `Заказ #${order.id || ""}` }));
       }))).flat()
@@ -586,12 +612,16 @@ async function renderPurchaseSection(session) {
       <div class="cabinet-section-intro">
         <div class="cabinet-kicker">Покупка</div>
         <h2 class="calc-card-title">Мои покупки</h2>
-        <p class="sublead">Заказы, документы и корзина собраны в одном месте.</p>
+        <p class="sublead">История заказов, купленные продукты, оплата и документы собраны из кабинета.</p>
       </div>
+      ${renderPurchaseNextStep(orders, documents, cartEntries)}
+      ${renderPurchaseOverview(orders, documents)}
       <div class="cabinet-home-grid cabinet-home-grid--single">
         <div class="cabinet-home-main">
           ${renderOrdersCard(orders, documents)}
-          ${renderCartCard(session, cartEntries)}
+          ${renderPurchasedProductsCard(orders)}
+          ${renderDocumentsCard(documents, orders)}
+          ${renderCartCard(session, cartEntries, orders.length)}
           ${renderSavedCard(session, savedItems)}
         </div>
       </div>
@@ -599,11 +629,11 @@ async function renderPurchaseSection(session) {
   `;
 }
 
-function renderCartCard(session, entries) {
+function renderCartCard(session, entries, orderCount = 0) {
   return `
-    <section class="card card-pad cabinet-card">
-      <div class="cabinet-kicker">Корзина</div>
-      <h3 class="calc-card-title">Корзина</h3>
+    <section class="card card-pad cabinet-card" id="cabinet-cart">
+      <div class="cabinet-kicker">Новая закупка</div>
+      <h3 class="calc-card-title">${orderCount ? "Корзина для следующего заказа" : "Корзина"}</h3>
       ${entries.length ? `
         <div class="cabinet-home-actions">
           ${memberHasScope(session, "orders")
@@ -638,62 +668,267 @@ function renderCartCard(session, entries) {
           </div>
         </div>
       ` : `
-        <div class="account-empty">Корзина пока пустая. Если закупку нужно собрать вручную, напишите команде.</div>
-        <div class="cabinet-home-actions">
-          <a class="btn btn-primary" href="${escapeAttribute(routes.catalog)}">Перейти в каталог</a>
-          <a class="btn btn-secondary" href="${escapeAttribute(cabinetSectionHref("messages"))}">Написать по закупке</a>
-          <a class="btn btn-secondary" href="${escapeAttribute(routes.calc)}">Открыть калькулятор</a>
-        </div>
+        ${renderPurchaseEmptyState({
+          title: orderCount ? "Корзина свободна для новой закупки" : "Корзина пока пустая",
+          text: orderCount ? "История уже купленных продуктов находится выше. Для новой закупки можно написать команде или открыть калькулятор." : "Если закупку нужно собрать вручную, напишите команде или начните с расчёта.",
+          actions: [
+            { label: "Написать по закупке", href: cabinetSectionHref("messages"), tone: "primary" },
+            { label: "Открыть калькулятор", href: routes.calc },
+          ],
+        })}
       `}
     </section>
   `;
 }
 
+function renderPurchaseNextStep(orders, documents, cartEntries) {
+  const summary = summarizePurchases(orders, documents);
+  const hasCart = cartEntries.length > 0;
+  let title = "Собрать первую покупку";
+  let text = "Начните с каталога или напишите команде, если закупку нужно собрать под объект и ограничения.";
+  let primary = { label: "Перейти в каталог", href: routes.catalog };
+  let secondary = { label: "Написать по закупке", href: cabinetSectionHref("messages") };
+
+  if (hasCart) {
+    title = "Завершить текущую корзину";
+    text = `${cartEntries.length} позиций уже в корзине. Можно собрать заказ или уточнить комплект с командой.`;
+    primary = { label: "Проверить корзину", href: "#cabinet-cart" };
+  } else if (summary.orderCount) {
+    title = documents.length ? "Проверить историю и документы" : "Дождаться документов или задать вопрос";
+    text = documents.length
+      ? "Заказы и файлы уже собраны ниже. Если что-то не совпадает, напишите команде из кабинета."
+      : "Заказы уже в кабинете, но документы пока не загружены. Можно написать команде и уточнить статус.";
+    primary = { label: documents.length ? "Открыть документы" : "Спросить по документам", href: documents.length ? "#cabinet-documents" : cabinetSectionHref("messages") };
+  }
+
+  return `
+    <section class="cabinet-purchase-next">
+      <div>
+        <div class="cabinet-kicker">Следующий шаг</div>
+        <h3 class="calc-card-title">${escapeHtml(title)}</h3>
+        <p class="sublead">${escapeHtml(text)}</p>
+      </div>
+      <div class="cabinet-home-actions">
+        <a class="btn btn-primary" href="${escapeAttribute(primary.href)}">${escapeHtml(primary.label)}</a>
+        <a class="btn btn-secondary" href="${escapeAttribute(secondary.href)}">${escapeHtml(secondary.label)}</a>
+      </div>
+    </section>
+  `;
+}
+
+function renderPurchaseOverview(orders, documents) {
+  const summary = summarizePurchases(orders, documents);
+  return `
+    <div class="cabinet-stat-grid cabinet-stat-grid--member cabinet-purchase-summary">
+      ${renderStatCard("Заказы", String(summary.orderCount), summary.orderCount ? `${summary.paidCount} оплачено` : "покупок пока нет")}
+      ${renderStatCard("Продукты", String(summary.productCount), summary.productCount ? "в истории покупок" : "нет позиций")}
+      ${renderStatCard("Оплата", summary.paymentLabel, summary.amountLabel || (summary.orderCount ? "часть сумм уточняется" : "история пуста"))}
+      ${renderStatCard("Документы", String(summary.documentCount), summary.documentCount ? "файлы готовы" : (summary.orderCount ? "пока не загружены" : "пока нет"))}
+    </div>
+  `;
+}
+
 function renderOrdersCard(orders, documents) {
   return `
-    <section class="card card-pad cabinet-card">
-      <div class="cabinet-kicker">Заказы</div>
-      <h3 class="calc-card-title">Мои заказы</h3>
+    <section class="card card-pad cabinet-card cabinet-purchase-history">
+      <div class="cabinet-kicker">История</div>
+      <h3 class="calc-card-title">История покупок</h3>
       ${orders.length ? `
-        <div class="cabinet-list">
-          <div class="cabinet-list-head cabinet-list-head--catalog">
-            <span>Заказ</span><span>Статус и оплата</span><span>Переход</span>
-          </div>
-          <div class="cabinet-list-body">
-            ${orders.map((order) => {
-              const lineItems = orderLineItems(order);
-              const amount = formatOrderAmount(order);
-              return `
-              <article class="cabinet-list-row cabinet-list-row--catalog">
-                <div class="cabinet-list-cell">
-                  <strong>${escapeHtml(order.title || `Заказ #${order.id || ""}`)}</strong>
-                  <span>${escapeHtml([formatDate(order.created_at), amount].filter(Boolean).join(" · "))}</span>
-                </div>
-                <div class="cabinet-list-cell">
-                  <strong>${escapeHtml(humanizeOrderStatus(order.status))}</strong>
-                  <span>${escapeHtml(humanizePaymentStatus(order.payment_status))}</span>
-                </div>
-                <div class="cabinet-list-cell">
-                  <strong><a href="${escapeAttribute(cabinetSectionHref("purchase", { order: order.id }))}">Открыть заказ</a></strong>
-                  <span>${escapeHtml(lineItems.length)} позиций</span>
+        <div class="cabinet-purchase-timeline">
+          ${orders.map((order) => {
+            const lineItems = orderLineItems(order);
+            const amount = formatOrderAmount(order);
+            const docsCount = documents.filter((item) => String(item.order_id) === String(order.id)).length;
+            return `
+              <article class="cabinet-purchase-event">
+                <div class="cabinet-purchase-event__marker" aria-hidden="true"></div>
+                <div class="cabinet-purchase-event__body">
+                  <div class="cabinet-purchase-event__head">
+                    <div>
+                      <strong>${escapeHtml(order.title || `Заказ #${order.id || ""}`)}</strong>
+                      <span>${escapeHtml([formatDate(order.created_at), order.order_number ? `N ${order.order_number}` : ""].filter(Boolean).join(" · "))}</span>
+                    </div>
+                    <div class="cabinet-status-pills">
+                      <span class="cabinet-status-pill is-${escapeAttribute(statusTone(order.status))}">${escapeHtml(humanizeOrderStatus(order.status))}</span>
+                      <span class="cabinet-status-pill is-${escapeAttribute(statusTone(order.payment_status))}">${escapeHtml(humanizePaymentStatus(order.payment_status))}</span>
+                    </div>
+                  </div>
+                  <div class="cabinet-purchase-event__meta">
+                    <span>${escapeHtml(lineItems.length ? `${lineItems.length} позиций` : "позиции не добавлены")}</span>
+                    <span>${escapeHtml(amount || "сумма уточняется")}</span>
+                    <span>${escapeHtml(docsCount ? `${docsCount} документов` : "документов нет")}</span>
+                  </div>
+                  ${lineItems.length ? `
+                    <div class="cabinet-purchase-products-inline">
+                      ${lineItems.slice(0, 4).map((item) => `<span>${escapeHtml(item.title || "Позиция")}</span>`).join("")}
+                      ${lineItems.length > 4 ? `<span>+${lineItems.length - 4}</span>` : ""}
+                    </div>
+                  ` : ""}
+                  <div class="cabinet-home-actions">
+                    <a class="btn btn-secondary" href="${escapeAttribute(cabinetSectionHref("purchase", { order: order.id }))}">Открыть заказ</a>
+                    <a class="btn btn-ghost btn-ghost--small" href="${escapeAttribute(cabinetSectionHref("messages"))}">Вопрос по заказу</a>
+                  </div>
                 </div>
               </article>
-            `; }).join("")}
+            `;
+          }).join("")}
+        </div>
+      ` : renderPurchaseEmptyState({
+        title: "История покупок пока пустая",
+        text: "После подтверждения заказа здесь появятся реальные статусы, позиции и суммы.",
+        actions: [
+          { label: "Написать по заказу", href: cabinetSectionHref("messages"), tone: "primary" },
+        ],
+      })}
+    </section>
+  `;
+}
+
+function renderPurchasedProductsCard(orders) {
+  const products = summarizePurchasedProducts(orders);
+  return `
+    <section class="card card-pad cabinet-card">
+      <div class="cabinet-kicker">Товары</div>
+      <h3 class="calc-card-title">Купленные продукты</h3>
+      ${products.length ? `
+        <div class="cabinet-list">
+          <div class="cabinet-list-head cabinet-list-head--purchases">
+            <span>Продукт</span><span>Количество</span><span>Оплата</span><span>Заказы</span>
+          </div>
+          <div class="cabinet-list-body">
+            ${products.map((product) => `
+              <article class="cabinet-list-row cabinet-list-row--purchases">
+                <div class="cabinet-list-cell">
+                  <strong>${escapeHtml(product.title)}</strong>
+                  <span>${escapeHtml(product.category || product.summary || "покупка")}</span>
+                </div>
+                <div class="cabinet-list-cell">
+                  <strong>${escapeHtml(String(product.quantity || 1))}</strong>
+                  <span>${escapeHtml(product.priceLabel || "цена уточняется")}</span>
+                </div>
+                <div class="cabinet-list-cell">
+                  <strong>${escapeHtml(product.paymentLabel)}</strong>
+                  <span>${escapeHtml(product.amountLabel || "сумма уточняется")}</span>
+                </div>
+                <div class="cabinet-list-cell">
+                  <strong>${escapeHtml(String(product.orderCount))}</strong>
+                  <span>${product.lastOrderId ? `<a href="${escapeAttribute(cabinetSectionHref("purchase", { order: product.lastOrderId }))}">последний заказ</a>` : "история"}</span>
+                </div>
+              </article>
+            `).join("")}
           </div>
         </div>
-      ` : '<div class="account-empty">Заказов пока нет. Они появятся после подтверждения закупки.</div>'}
+      ` : renderPurchaseEmptyState({
+        title: "Купленные продукты пока не добавлены",
+        text: "Когда появятся оплаченные заказы, товары соберутся здесь в одну понятную историю.",
+        actions: [
+          { label: "Задать вопрос", href: cabinetSectionHref("messages"), tone: "primary" },
+        ],
+      })}
+    </section>
+  `;
+}
+
+function renderDocumentsCard(documents, orders) {
+  return `
+    <section class="card card-pad cabinet-card" id="cabinet-documents">
+      <div class="cabinet-kicker">Документы</div>
+      <h3 class="calc-card-title">Документы по покупкам</h3>
       ${documents.length ? `
         <div class="cabinet-list cabinet-list--documents-window">
           <div class="cabinet-list-head cabinet-list-head--documents">
             <span>Документ</span><span>Заказ</span><span>Статус</span><span>Открыть</span>
           </div>
           <div class="cabinet-list-body">
-            ${documents.slice(0, 5).map(renderDocumentRow).join("")}
+            ${documents.map(renderDocumentRow).join("")}
           </div>
         </div>
-      ` : '<div class="cabinet-inline-hint">Документы появятся здесь после подготовки счёта, спецификации или PDF.</div>'}
+      ` : renderPurchaseEmptyState({
+        title: orders.length ? "Документы пока не загружены" : "Документов пока нет",
+        text: orders.length ? "Когда появятся счета, спецификации или PDF, они будут здесь." : "После подтверждения заказа сюда попадут счета, спецификации и другие файлы.",
+        actions: [
+          { label: orders.length ? "Спросить по документам" : "Написать команде", href: cabinetSectionHref("messages"), tone: "primary" },
+        ],
+      })}
     </section>
   `;
+}
+
+function renderPurchaseEmptyState({ title, text, actions = [] } = {}) {
+  return `
+    <div class="account-empty cabinet-purchase-empty">
+      <div>
+        ${title ? `<strong>${escapeHtml(title)}</strong>` : ""}
+        ${text ? `<span>${escapeHtml(text)}</span>` : ""}
+      </div>
+      ${actions.length ? `
+        <div class="cabinet-home-actions">
+          ${actions.map((action) => `<a class="btn ${action.tone === "primary" ? "btn-primary" : "btn-secondary"}" href="${escapeAttribute(action.href)}">${escapeHtml(action.label)}</a>`).join("")}
+        </div>
+      ` : ""}
+    </div>
+  `;
+}
+
+function summarizePurchases(orders, documents) {
+  const orderCount = orders.length;
+  const paidCount = orders.filter((order) => String(order.payment_status || "").toLowerCase() === "paid").length;
+  const productCount = orders.reduce((sum, order) => sum + orderLineItems(order).length, 0);
+  const total = orders.reduce((sum, order) => {
+    const amount = Number(order.total_amount || 0);
+    return Number.isFinite(amount) && amount > 0 ? sum + amount : sum;
+  }, 0);
+  return {
+    orderCount,
+    paidCount,
+    productCount,
+    documentCount: documents.length,
+    paymentLabel: orderCount ? `${paidCount}/${orderCount} оплачено` : "нет заказов",
+    amountLabel: total > 0 ? formatOrderAmount({ total_amount: total, currency: orders.find((order) => Number(order.total_amount || 0) > 0)?.currency || "RUB" }) : "",
+  };
+}
+
+function summarizePurchasedProducts(orders) {
+  const byKey = new Map();
+  for (const order of orders) {
+    for (const item of orderLineItems(order)) {
+      const title = String(item.title || item.product_title || item.product_id || "Позиция").trim();
+      const key = `${title.toLowerCase()}::${item.product_id || ""}`;
+      const existing = byKey.get(key) || {
+        title,
+        quantity: 0,
+        orderCount: 0,
+        orderIds: new Set(),
+        paymentStatuses: new Set(),
+        amount: 0,
+        currency: order.currency || "RUB",
+        category: item.category || "",
+        summary: item.summary || "",
+        lastOrderId: order.id,
+        priceLabel: "",
+      };
+      const quantity = Number(item.qty || item.quantity || 1);
+      existing.quantity += Number.isFinite(quantity) && quantity > 0 ? quantity : 1;
+      existing.orderIds.add(order.id);
+      existing.orderCount = existing.orderIds.size;
+      existing.paymentStatuses.add(order.payment_status || "pending");
+      const price = Number(item.price || 0);
+      if (Number.isFinite(price) && price > 0) {
+        existing.amount += price * (Number.isFinite(quantity) && quantity > 0 ? quantity : 1);
+        existing.priceLabel = formatOrderAmount({ total_amount: price, currency: order.currency || existing.currency });
+      }
+      existing.lastOrderId = order.id || existing.lastOrderId;
+      byKey.set(key, existing);
+    }
+  }
+  return [...byKey.values()]
+    .map((item) => ({
+      ...item,
+      orderIds: undefined,
+      paymentLabel: [...item.paymentStatuses].map(humanizePaymentStatus).join(", ") || "Оплата уточняется",
+      amountLabel: item.amount > 0 ? formatOrderAmount({ total_amount: item.amount, currency: item.currency }) : "",
+    }))
+    .sort((a, b) => b.orderCount - a.orderCount || a.title.localeCompare(b.title, "ru"));
 }
 
 async function renderProfileSection(session) {
@@ -705,16 +940,41 @@ async function renderProfileSection(session) {
         <h2 class="calc-card-title">Контакты и доставка</h2>
         <p class="sublead">Эти данные нужны для счёта, документов и отправки заказа.</p>
       </div>
+      ${renderProfileNextStep(profile)}
       ${renderProfileCard(profile)}
     </div>
   `;
 }
 
+function renderProfileNextStep(profile) {
+  const fields = [
+    ["display_name", "имя"],
+    ["phone", "телефон"],
+    ["delivery_address", "адрес доставки"],
+  ];
+  const missing = fields.filter(([key]) => !String(profile?.[key] || "").trim()).map(([, label]) => label);
+  const complete = missing.length === 0;
+  return `
+    <section class="cabinet-section-next cabinet-profile-next">
+      <div>
+        <div class="cabinet-kicker">Следующий шаг</div>
+        <h3 class="calc-card-title">${complete ? "Профиль готов для заказа" : "Заполнить данные для покупки"}</h3>
+        <p class="sublead">${complete ? "Контакты и доставка заполнены. Если условия изменились, обновите данные до следующей закупки." : `Не хватает: ${missing.join(", ")}. Это ускорит счёт, документы и доставку.`}</p>
+      </div>
+      <div class="cabinet-home-actions">
+        <a class="btn btn-primary" href="#cabinet-profile-form">${complete ? "Проверить данные" : "Заполнить профиль"}</a>
+        <a class="btn btn-secondary" href="${escapeAttribute(cabinetSectionHref("messages"))}">Нужна помощь</a>
+      </div>
+    </section>
+  `;
+}
+
 function renderProfileCard(profile) {
   return `
-    <section class="card card-pad cabinet-card cabinet-profile-card">
+    <section class="card card-pad cabinet-card cabinet-profile-card" id="cabinet-profile-form">
       <div class="cabinet-kicker">Данные</div>
       <h3 class="calc-card-title">Контакты и доставка</h3>
+      <p class="sublead">Сохраняем только рабочие данные для заказа: контакт, доставка и комментарий для команды.</p>
       <div class="cabinet-field-grid">
         ${renderInput("Имя", "display_name", profile.display_name || "")}
         ${renderInput("Email", "email", profile.email || "", "email", { readonly: true })}
@@ -884,10 +1144,12 @@ async function renderCourseSection() {
           <h2 class="calc-card-title">${escapeHtml(course.title || "Клубничный Хак")}</h2>
           <p class="sublead">Курс привязан к покупке и ручной выдаче доступа в новом кабинете.</p>
         </div>
-        <section class="card card-pad cabinet-card">
-          <div class="cabinet-kicker">Доступ</div>
-          <h3 class="calc-card-title">Курс пока закрыт</h3>
-          <p class="sublead">Если курс уже оплачен, отправьте сообщение: мы сверим покупку и откроем материалы.</p>
+        <section class="cabinet-section-next cabinet-course-access">
+          <div>
+            <div class="cabinet-kicker">Доступ</div>
+            <h3 class="calc-card-title">Курс пока закрыт</h3>
+            <p class="sublead">Если курс уже оплачен, отправьте сообщение: мы сверим покупку и откроем материалы.</p>
+          </div>
           <div class="cabinet-home-actions">
             <a class="btn btn-primary" href="${escapeAttribute(cabinetSectionHref("messages"))}">Написать по доступу</a>
             <a class="btn btn-secondary" href="${escapeAttribute(routes.site)}klubhack/">Открыть страницу курса</a>
@@ -926,7 +1188,7 @@ async function renderCourseSection() {
         </div>
       </section>
       <div class="cabinet-stat-grid cabinet-stat-grid--member">
-        ${renderStatCard("Доступ", course.has_access ? "Активен" : "Нет", course.has_access ? "по базе кабинета" : "нужна покупка или ручная выдача")}
+        ${renderStatCard("Доступ", course.has_access ? "Активен" : "Нет", course.has_access ? "доступ сохранён" : "нужна покупка или ручная выдача")}
         ${renderStatCard("Уроки", String(lessons.length), `${available} доступно`)}
         ${renderStatCard("Проверки", String(checked), checked ? "есть результаты тестов" : "пока нет")}
         ${renderStatCard("Пройдено", String(completed), completed ? "прогресс сохранён" : "пока нет")}
@@ -970,7 +1232,7 @@ function renderCourseModule(module, expanded = false) {
       <div class="cabinet-list">
         <div class="cabinet-list-body">
           ${lessons.map((lesson) => `
-            <article class="cabinet-list-row cabinet-list-row--course">
+            <article class="cabinet-list-row cabinet-list-row--course cabinet-list-row--course-${escapeAttribute(getCourseLessonStatus(lesson).id)}">
               <div class="cabinet-list-cell">
                 <strong>${escapeHtml(lesson.title || lesson.id)}</strong>
                 <span>${escapeHtml(lesson.summary || lesson.legacy_alias || "")}</span>
@@ -981,7 +1243,7 @@ function renderCourseModule(module, expanded = false) {
               </div>
               <div class="cabinet-list-cell">
                 ${lesson.available
-                  ? `<strong><a href="${escapeAttribute(cabinetSectionHref("course", { lesson: lesson.id }))}">Открыть</a></strong>`
+                  ? `<a class="btn btn-secondary btn-ghost--small" href="${escapeAttribute(cabinetSectionHref("course", { lesson: lesson.id }))}">Открыть</a>`
                   : "<strong>Закрыт</strong>"}
               </div>
             </article>
@@ -1016,56 +1278,210 @@ function renderCourseLessonDetail(course, lesson) {
   const locked = lesson.locked || !lesson.available;
   const quizPassed = lesson.quiz_passed === true;
   const quizChecked = typeof lesson.quiz_passed === "boolean";
-  const canCompleteLesson = quizPassed && !lesson.quiz_stale;
+  const canCompleteLesson = canCompleteCourseLesson(lesson);
   const nextStep = getCourseNextStep(course, lesson);
+  const videoMaterial = getCourseVideoMaterial(lesson.materials);
+  const supportingMaterials = getCourseSupportingMaterials(lesson.materials);
+  const homeworkMaterials = getCourseHomeworkMaterials(lesson.materials);
+  const transcriptMaterials = getCourseTranscriptMaterials(lesson.materials);
   return `
     <div class="cabinet-section-stack">
-      <div class="cabinet-section-intro">
+      <div class="cabinet-section-intro cabinet-course-lesson-intro">
         <div class="cabinet-kicker">${escapeHtml(lesson.module_title || course.title || "Курс")}</div>
         <h2 class="calc-card-title">${escapeHtml(lesson.title || "Урок")}</h2>
         <p class="sublead">${locked ? "Урок закрыт до выдачи доступа." : escapeHtml(lesson.summary || "Пройдите материал, выполните действие и сдайте короткую проверку.")}</p>
       </div>
-      <section class="card card-pad cabinet-card">
-        <div class="cabinet-kicker">${locked ? "Доступ" : "Урок"}</div>
-        <h3 class="calc-card-title">${locked ? "Нет доступа" : "Прохождение урока"}</h3>
-        ${locked ? `
-          <p class="sublead">Если курс уже оплачен, напишите команде, чтобы сверить оплату и активировать доступ.</p>
+      ${locked ? `
+        <section class="cabinet-section-next cabinet-course-access">
+          <div>
+            <div class="cabinet-kicker">Доступ</div>
+            <h3 class="calc-card-title">Нет доступа</h3>
+            <p class="sublead">Если курс уже оплачен, напишите команде, чтобы сверить оплату и активировать доступ.</p>
+          </div>
           <div class="cabinet-home-actions">
             <a class="btn btn-primary" href="${escapeAttribute(cabinetSectionHref("messages"))}">Написать по доступу</a>
           </div>
-        ` : `
-          <div class="cabinet-mini-list cabinet-mini-list--compact">
-            <article class="cabinet-mini-card"><strong>Этап</strong><span>${escapeHtml(lesson.stage_title || lesson.stage || "Курс")}</span></article>
-            <article class="cabinet-mini-card"><strong>Статус</strong><span>${escapeHtml(getCourseLessonStatus(lesson).label)}</span></article>
-            <article class="cabinet-mini-card"><strong>Прогресс</strong><span>${escapeHtml(String(lesson.progress_percent || 0))}%</span></article>
-            <article class="cabinet-mini-card"><strong>Проверка</strong><span>${lesson.quiz_stale ? "тест обновлён" : quizChecked ? (quizPassed ? "зачтена" : "нужно повторить") : "не сдана"}</span></article>
+        </section>
+      ` : `
+        <section class="card card-pad cabinet-card cabinet-course-lesson-shell cabinet-course-lesson-shell--watch">
+          <div class="cabinet-course-watch">
+            ${renderCourseLessonPlayer(videoMaterial, lesson)}
+            ${renderCourseLessonStatusBar(lesson, nextStep, { quizChecked, quizPassed })}
           </div>
-          ${renderCourseNextStep(nextStep)}
-          <div class="cabinet-course-lesson-grid">
-            <article class="cabinet-course-block">
-              <div class="cabinet-kicker">Материал</div>
+        </section>
+        <div class="cabinet-course-lesson-grid cabinet-course-lesson-grid--support">
+          <article class="cabinet-course-block cabinet-course-block--materials">
+            <div class="cabinet-kicker">Материалы урока</div>
+            <div class="cabinet-course-block__head">
               <h4>Что разобрать</h4>
-              ${renderCourseBulletList(lesson.objectives)}
-              ${renderCourseMaterials(lesson.materials)}
-            </article>
-            <article class="cabinet-course-block">
-              <div class="cabinet-kicker">Задание</div>
-              <h4>Что зафиксировать</h4>
-              <p>${escapeHtml(lesson.assignment || "Запишите решение по уроку и следующий шаг.")}</p>
-              <div class="cabinet-course-note">Позже сюда можно добавить поле ответа/домашки и проверку менеджером.</div>
-            </article>
-          </div>
-          ${renderCourseQuiz(lesson)}
-          <div class="cabinet-user-card-actions" id="course-actions">
+              <span>${escapeHtml(videoMaterial?.duration || "материал урока")}</span>
+            </div>
+            ${renderCourseBulletList(lesson.objectives)}
+            ${renderCourseMaterials(supportingMaterials)}
+          </article>
+          <article class="cabinet-course-block cabinet-course-block--homework" id="course-homework">
+            <div class="cabinet-kicker">Домашнее задание</div>
+            <div class="cabinet-course-homework">
+              <div>
+                <h4>Что зафиксировать</h4>
+                <p>${escapeHtml(lesson.assignment || "Запишите решение по уроку и следующий шаг.")}</p>
+              </div>
+              ${renderCourseMaterials(homeworkMaterials)}
+              ${renderCourseWorkbook(lesson)}
+            </div>
+          </article>
+        </div>
+        ${renderCourseTranscriptBlock(transcriptMaterials)}
+        ${renderCourseQuiz(lesson)}
+        <section class="card card-pad cabinet-card cabinet-course-actions-card" id="course-actions">
+          <div class="cabinet-kicker">Завершение</div>
+          <h3 class="calc-card-title">Действия по уроку</h3>
+          <div class="cabinet-user-card-actions">
             <button class="btn btn-secondary" type="button" data-course-progress="${escapeAttribute(lesson.id)}" data-course-status="started">Сохранить как начатый</button>
+            <button class="btn btn-secondary" type="button" data-course-progress="${escapeAttribute(lesson.id)}" data-course-status="video_watched">Отметить просмотр</button>
             ${canCompleteLesson
               ? `<button class="btn btn-primary" type="button" data-course-progress="${escapeAttribute(lesson.id)}" data-course-status="completed">Отметить урок пройденным</button>`
-              : '<button class="btn btn-primary" type="button" disabled>Сначала сдайте тест</button>'}
+              : '<button class="btn btn-primary" type="button" disabled>Нужны тест и проверенная домашка</button>'}
             <a class="btn btn-secondary" href="${escapeAttribute(cabinetSectionHref("course"))}">К списку уроков</a>
           </div>
           <div class="cabinet-users-status" data-course-progress-status></div>
-        `}
-      </section>
+        </section>
+      `}
+    </div>
+  `;
+}
+
+function canCompleteCourseLesson(lesson) {
+  return Boolean(
+    lesson?.video_watched_at &&
+    lesson?.quiz_passed === true &&
+    !lesson?.quiz_stale &&
+    lesson?.homework?.status === "approved"
+  );
+}
+
+function renderCourseWorkbook(lesson) {
+  const homework = normalizeCourseHomeworkView(lesson.homework);
+  return `
+    <form class="cabinet-course-workbook" data-course-homework="${escapeAttribute(lesson.id)}">
+      <div class="cabinet-course-workbook__intro">
+        <div>
+          <strong>Рабочая тетрадь курса</strong>
+          <p>${escapeHtml(COURSE_WORKBOOK_INTRO)}</p>
+        </div>
+        <a class="btn btn-secondary" href="${escapeAttribute(COURSE_WORKBOOK_URL)}" target="_blank" rel="noreferrer">Открыть тетрадь</a>
+      </div>
+      <label class="cabinet-course-workbook__field">
+        <span>Ответ ученика</span>
+        <textarea data-course-homework-answer rows="5" placeholder="Запишите решение, расчёт, наблюдение или ссылку на заполненный лист тетради.">${escapeHtml(homework.answer)}</textarea>
+      </label>
+      <label class="cabinet-course-workbook__field">
+        <span>Файлы и скрины</span>
+        <textarea data-course-homework-attachments rows="3" placeholder="Вставьте ссылки на Google Drive, таблицу, фото, скрины или другие материалы. Одна ссылка — одна строка.">${escapeHtml(homework.attachments.join("\n"))}</textarea>
+      </label>
+      <div class="cabinet-course-workbook__review">
+        <div class="cabinet-course-workbook__status">
+          <span>Статус проверки</span>
+          <strong>${escapeHtml(humanizeCourseHomeworkStatus(homework.status))}</strong>
+        </div>
+        <label>
+          <span>Комментарий менеджера</span>
+          <textarea data-course-homework-manager rows="3" placeholder="Комментарий появится после проверки менеджером." readonly>${escapeHtml(homework.manager_comment)}</textarea>
+        </label>
+      </div>
+      ${renderCourseHomeworkHistory(homework.history)}
+      <div class="cabinet-user-card-actions">
+        <button class="btn btn-secondary" type="submit" data-homework-save="draft">Сохранить черновик</button>
+        <button class="btn btn-primary" type="submit" data-homework-save="submitted">Отправить на проверку</button>
+      </div>
+    </form>
+  `;
+}
+
+function normalizeCourseHomeworkView(homework) {
+  const source = homework && typeof homework === "object" ? homework : {};
+  return {
+    answer: String(source.answer || ""),
+    attachments: Array.isArray(source.attachments) ? source.attachments.map(String).filter(Boolean) : [],
+    status: String(source.status || "draft"),
+    manager_comment: String(source.manager_comment || ""),
+    history: Array.isArray(source.history) ? source.history : [],
+  };
+}
+
+function renderCourseHomeworkHistory(history) {
+  const items = Array.isArray(history) ? history.filter(Boolean).slice(0, 5) : [];
+  if (!items.length) return '<div class="cabinet-course-note">История появится после первого сохранения.</div>';
+  return `
+    <div class="cabinet-course-workbook__history">
+      <strong>История изменений</strong>
+      ${items.map((item) => `<span>${escapeHtml(formatCourseHomeworkHistoryItem(item))}</span>`).join("")}
+    </div>
+  `;
+}
+
+function formatCourseHomeworkHistoryItem(item) {
+  const status = humanizeCourseHomeworkStatus(item?.status);
+  const date = item?.at ? new Date(item.at) : null;
+  const dateText = date && !Number.isNaN(date.getTime()) ? date.toLocaleString("ru-RU") : "без даты";
+  return `${dateText} · ${status}`;
+}
+
+function renderCourseLessonStatusBar(lesson, nextStep, options = {}) {
+  const quizChecked = options.quizChecked || typeof lesson.quiz_passed === "boolean";
+  const quizPassed = options.quizPassed || lesson.quiz_passed === true;
+  const homeworkStatus = lesson.homework?.status || "draft";
+  return `
+    <aside class="cabinet-course-statusbar">
+      <div class="cabinet-course-statusbar__chips">
+        <div><strong>Статус</strong><span>${escapeHtml(getCourseLessonStatus(lesson).label)}</span></div>
+        <div><strong>Прогресс</strong><span>${escapeHtml(String(lesson.progress_percent || 0))}%</span></div>
+        <div><strong>Видео</strong><span>${lesson.video_watched_at ? "просмотрено" : "не отмечено"}</span></div>
+        <div><strong>Тест</strong><span>${lesson.quiz_stale ? "обновлён" : quizChecked ? (quizPassed ? "сдан" : "повторить") : "не сдан"}</span></div>
+        <div><strong>Домашка</strong><span>${escapeHtml(humanizeCourseHomeworkStatus(homeworkStatus))}</span></div>
+      </div>
+      ${renderCourseNextStep(nextStep)}
+    </aside>
+  `;
+}
+
+function getCourseVideoMaterial(items) {
+  const materials = Array.isArray(items) ? items : [];
+  return materials.find((item) => item?.type === "video" && item.embed_url) || null;
+}
+
+function getCourseSupportingMaterials(items) {
+  return (Array.isArray(items) ? items : []).filter((item) => item?.type !== "video" && item?.type !== "transcript" && item?.type !== "worksheet");
+}
+
+function getCourseHomeworkMaterials(items) {
+  return (Array.isArray(items) ? items : []).filter((item) => item?.type === "worksheet");
+}
+
+function getCourseTranscriptMaterials(items) {
+  return (Array.isArray(items) ? items : []).filter((item) => item?.type === "transcript");
+}
+
+function renderCourseLessonPlayer(item, lesson = null) {
+  if (!item?.embed_url) {
+    return `
+      <div class="cabinet-course-player-shell cabinet-course-player-shell--empty">
+        <div class="cabinet-kicker">Видео</div>
+        <h3>Видео урока готовится</h3>
+        <p>Материал появится здесь после публикации.</p>
+      </div>
+    `;
+  }
+  return `
+    <div class="cabinet-course-player-shell">
+      <div class="cabinet-course-player-head">
+        <div>
+          <div class="cabinet-kicker">Видео урока</div>
+          <h3>${escapeHtml(item.title || "Видео урока")}</h3>
+        </div>
+        <span>${escapeHtml(humanizeCourseMaterialMeta(item))}</span>
+      </div>
+      ${renderCourseVideoPlayer(item, { lessonId: lesson?.id, watched: Boolean(lesson?.video_watched_at), autowatch: true })}
     </div>
   `;
 }
@@ -1108,24 +1524,54 @@ function getCourseNextStep(course, currentLesson = null) {
   }
 
   if (currentLesson && currentLesson.status !== "completed") {
-    if (currentLesson.quiz_passed === true) {
+    if (!currentLesson.video_watched_at) {
       return {
         tone: "active",
         kicker: "Следующий шаг",
-        title: "Зафиксировать прохождение урока",
-        body: "Тест зачтён. Отметьте урок пройденным, чтобы обновить общий прогресс курса.",
+        title: "Отметить просмотр видео",
+        body: "После просмотра видео отметьте этот шаг, затем сдайте тест и отправьте домашку.",
+        anchor: "course-homework",
+        action: "К кнопкам урока",
+      };
+    }
+    if (currentLesson.quiz_passed !== true) {
+      return {
+        tone: "active",
+        kicker: "Следующий шаг",
+        title: "Сдать проверку урока",
+        body: "Ответьте на короткий тест. После зачёта можно будет отправить домашку на проверку.",
+        anchor: "course-quiz",
+        action: "Перейти к тесту",
+      };
+    }
+    if (!["submitted", "needs_revision", "approved"].includes(currentLesson.homework?.status || "draft")) {
+      return {
+        tone: "active",
+        kicker: "Следующий шаг",
+        title: "Отправить домашку",
+        body: "Заполните рабочую тетрадь и отправьте ответ на проверку менеджеру.",
+        anchor: "course-actions",
+        action: "К домашке",
+      };
+    }
+    if (currentLesson.homework?.status !== "approved") {
+      return {
+        tone: "warning",
+        kicker: "Следующий шаг",
+        title: "Дождаться проверки",
+        body: "Домашка отправлена. Урок станет пройденным после принятия менеджером.",
+      };
+    }
+    if (currentLesson.homework?.status === "approved") {
+      return {
+        tone: "active",
+        kicker: "Следующий шаг",
+        title: "Завершить урок",
+        body: "Видео просмотрено, тест сдан, домашка принята. Теперь можно закрыть урок.",
         anchor: "course-actions",
         action: "К кнопкам урока",
       };
     }
-    return {
-      tone: "active",
-      kicker: "Следующий шаг",
-      title: "Сдать проверку урока",
-      body: "Ответьте на короткий тест. После зачёта урок можно будет закрыть как пройденный.",
-      anchor: "course-quiz",
-      action: "Перейти к тесту",
-    };
   }
 
   const startIndex = currentLesson ? Math.max(lessons.findIndex((lesson) => lesson.id === currentLesson.id) + 1, 0) : 0;
@@ -1172,7 +1618,7 @@ function renderCourseNextStep(step) {
       ? `<a class="btn btn-primary" href="#${escapeAttribute(step.anchor)}">${escapeHtml(step.action || "Перейти")}</a>`
       : "";
   return `
-    <article class="cabinet-course-next cabinet-course-next--${escapeAttribute(step.tone || "active")}">
+    <article class="cabinet-section-next cabinet-course-next cabinet-course-next--${escapeAttribute(step.tone || "active")}">
       <div>
         <div class="cabinet-kicker">${escapeHtml(step.kicker || "Следующий шаг")}</div>
         <h3 class="calc-card-title">${escapeHtml(step.title || "Продолжить курс")}</h3>
@@ -1189,18 +1635,143 @@ function renderCourseBulletList(items) {
   return `<ul class="cabinet-course-list">${list.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
 }
 
-function renderCourseMaterials(items) {
-  const materials = Array.isArray(items) ? items : [];
+function renderCourseMaterials(items, options = {}) {
+  const includeVideos = options.includeVideos !== false;
+  const includeTypes = Array.isArray(options.includeTypes) ? new Set(options.includeTypes) : null;
+  const excludeTypes = Array.isArray(options.excludeTypes) ? new Set(options.excludeTypes) : null;
+  const materials = (Array.isArray(items) ? items : []).filter((item) => {
+    if (!includeVideos && item?.type === "video") return false;
+    if (includeTypes && !includeTypes.has(item?.type)) return false;
+    if (excludeTypes && excludeTypes.has(item?.type)) return false;
+    return true;
+  });
   if (!materials.length) return "";
   return `
     <div class="cabinet-course-materials">
       ${materials.map((item) => `
-        <div class="cabinet-course-material">
+        <div class="cabinet-course-material${item.embed_url ? " cabinet-course-material--video" : ""}">
           <strong>${escapeHtml(item.title || "Материал")}</strong>
-          <span>${escapeHtml(humanizeCourseMaterialType(item.type))} · ${escapeHtml(humanizeCourseMaterialStatus(item.status))}</span>
+          ${renderCourseMaterialMeta(item)}
+          ${renderCourseVideoPlayer(item)}
+          ${renderCourseTextMaterial(item)}
         </div>
       `).join("")}
     </div>
+  `;
+}
+
+function renderCourseTranscriptBlock(items) {
+  const transcripts = Array.isArray(items) ? items.filter((item) => item?.content || item?.status) : [];
+  if (!transcripts.length) return "";
+  return `
+    <article class="cabinet-course-block cabinet-course-block--transcript">
+      <div class="cabinet-kicker">Транскрибация урока</div>
+      ${transcripts.map((item) => `
+        <details class="cabinet-course-transcript" data-course-transcript>
+          <summary>
+            <span class="cabinet-course-transcript__summary-text">
+              <strong>${escapeHtml(item.title || "Открыть транскрибацию")}</strong>
+              <small>Свёрнута под уроком: используйте её для поиска, цитат и повторения, не отвлекаясь от плеера, домашки и теста.</small>
+            </span>
+            <span class="cabinet-course-transcript__summary-meta">${renderCourseMaterialMeta(item) || "текст урока"}</span>
+          </summary>
+          ${item.content
+            ? `
+              <div class="cabinet-course-transcript__tools">
+                <label class="cabinet-course-transcript__search">
+                  <span>Поиск по тексту</span>
+                  <input class="cabinet-input" type="search" placeholder="Найти фразу или таймкод" data-course-transcript-search />
+                </label>
+                <button class="btn btn-secondary btn-ghost--small" type="button" data-course-transcript-copy>Копировать</button>
+                <span class="cabinet-course-transcript__count" data-course-transcript-count>Готово к поиску</span>
+              </div>
+              <div class="cabinet-course-transcript__body" data-course-transcript-body>${renderCourseTranscriptContent(item.content)}</div>
+            `
+            : '<div class="cabinet-course-transcript__body cabinet-course-transcript__body--empty">Текст урока готовится.</div>'}
+        </details>
+      `).join("")}
+    </article>
+  `;
+}
+
+function renderCourseTranscriptContent(content, query = "") {
+  const text = String(content || "");
+  const normalizedQuery = String(query || "").trim().toLowerCase();
+  const lines = text.split(/\r?\n/);
+  return lines.map((line) => renderCourseTranscriptLine(line, normalizedQuery)).join("");
+}
+
+function renderCourseTranscriptLine(line, normalizedQuery = "") {
+  const source = String(line || "");
+  const headingMatch = source.match(/^##\s+(.+)$/);
+  if (headingMatch) {
+    return `<h4 class="cabinet-course-transcript__heading">${highlightCourseTranscriptText(headingMatch[1], normalizedQuery)}</h4>`;
+  }
+  const timestampMatch = source.match(/^(\s*(?:(?:\d{1,2}:)?\d{1,2}:\d{2})(?:\s*[–—-]\s*)?)/);
+  const timestamp = timestampMatch ? timestampMatch[1] : "";
+  const body = timestamp ? source.slice(timestamp.length) : source;
+  return `
+    <p class="cabinet-course-transcript__line${timestamp ? "" : " cabinet-course-transcript__line--plain"}">
+      ${timestamp ? `<span class="cabinet-course-transcript__time">${escapeHtml(timestamp.trim())}</span>` : ""}
+      <span>${highlightCourseTranscriptText(timestamp ? body : source, normalizedQuery, Boolean(timestamp))}</span>
+    </p>
+  `;
+}
+
+function highlightCourseTranscriptText(text, normalizedQuery = "", bodyAlreadySliced = false) {
+  const source = String(text || "");
+  if (!normalizedQuery) return escapeHtml(source);
+  const lower = source.toLowerCase();
+  let cursor = 0;
+  let html = "";
+  let index = lower.indexOf(normalizedQuery, cursor);
+  while (index !== -1) {
+    html += escapeHtml(source.slice(cursor, index));
+    html += `<mark>${escapeHtml(source.slice(index, index + normalizedQuery.length))}</mark>`;
+    cursor = index + normalizedQuery.length;
+    index = lower.indexOf(normalizedQuery, cursor);
+  }
+  html += escapeHtml(source.slice(cursor));
+  return html || (bodyAlreadySliced ? "" : escapeHtml(source));
+}
+
+function renderCourseMaterialMeta(item) {
+  const meta = humanizeCourseMaterialMeta(item);
+  if (!meta) return "";
+  return `<span>${escapeHtml(meta)}</span>`;
+}
+
+function renderCourseVideoPlayer(item, options = {}) {
+  if (!item?.embed_url) return "";
+  const lessonId = options.lessonId ? String(options.lessonId) : "";
+  const iframeId = lessonId ? `course-video-${lessonId.replace(/[^a-z0-9_-]/gi, "-")}` : "";
+  const autowatchAttributes = options.autowatch && lessonId
+    ? ` id="${escapeAttribute(iframeId)}" data-course-video-autowatch data-course-video-lesson="${escapeAttribute(lessonId)}" data-course-video-url="${escapeAttribute(item.url || item.embed_url)}" data-course-video-watched="${options.watched ? "true" : "false"}"`
+    : "";
+  return `
+    <div class="cabinet-course-player" data-course-player>
+      <iframe
+        ${autowatchAttributes}
+        src="${escapeAttribute(item.embed_url)}"
+        title="${escapeAttribute(item.title || "Видео урока")}"
+        allow="autoplay; fullscreen; picture-in-picture; encrypted-media;"
+        loading="lazy"
+      ></iframe>
+      <div class="cabinet-course-player__scroll-layer" data-course-player-scroll-layer></div>
+      <button class="cabinet-course-player__enable" type="button" data-course-player-enable>
+        Смотреть видео
+      </button>
+    </div>
+  `;
+}
+
+function renderCourseTextMaterial(item) {
+  if (!item?.content) return "";
+  return `
+    <details class="cabinet-course-text-material">
+      <summary>Открыть текст</summary>
+      <div>${escapeHtml(item.content).replace(/\n/g, "<br>")}</div>
+    </details>
   `;
 }
 
@@ -1266,14 +1837,18 @@ async function renderMessagesSection() {
         <h2 class="calc-card-title">Связь с командой</h2>
         <p class="sublead">Один диалог по подбору, заказу, расчёту и документам.</p>
       </div>
+      ${renderMessagesNextStep(timeline, latestTeamMessage)}
       <section class="card card-pad cabinet-card cabinet-message-panel">
         <div class="cabinet-kicker">Диалог</div>
         <h3 class="calc-card-title">Чат по проекту</h3>
         <div class="cabinet-message-shell">
           <div class="cabinet-message-window">
-            ${timeline.length ? `<div class="cabinet-message-thread">${timeline.map((item) => renderMessageItem(item, latestTeamMessage?.id)).join("")}</div>` : '<div class="cabinet-message-empty"><strong>Сообщений пока нет</strong><span>Напишите вопрос, ответ появится здесь же.</span></div>'}
+            ${timeline.length ? `<div class="cabinet-message-thread">${timeline.map((item) => renderMessageItem(item, latestTeamMessage?.id)).join("")}</div>` : renderCabinetEmptyState({
+              title: "Сообщений пока нет",
+              text: "Напишите вопрос по покупке, курсу, расчёту или документам. Ответ появится здесь же.",
+            })}
           </div>
-          <div class="cabinet-message-composer">
+          <div class="cabinet-message-composer" id="cabinet-message-composer">
             <label class="cabinet-field">
               <span class="cabinet-field-label">Тема</span>
               <input class="cabinet-input" data-member-message-subject type="text" value="Вопрос по проекту" />
@@ -1289,8 +1864,38 @@ async function renderMessagesSection() {
           </div>
         </div>
       </section>
-      <div class="cabinet-inline-hint">
-        Срочно: ${contactLinks || "напишите сообщение в форме выше"}.
+      <div class="cabinet-inline-hint cabinet-message-support">
+        <strong>Срочно</strong>
+        <span>${contactLinks || "напишите сообщение в форме выше"}.</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderMessagesNextStep(timeline, latestTeamMessage) {
+  const hasMessages = timeline.length > 0;
+  const latestDate = latestTeamMessage?.created_at ? formatDate(latestTeamMessage.created_at) : "";
+  return `
+    <section class="cabinet-section-next cabinet-message-next">
+      <div>
+        <div class="cabinet-kicker">Следующий шаг</div>
+        <h3 class="calc-card-title">${hasMessages ? "Продолжить диалог" : "Написать первый вопрос"}</h3>
+        <p class="sublead">${hasMessages ? `В истории ${timeline.length} сообщений${latestDate ? `, последний ответ команды: ${latestDate}` : ""}. Продолжайте в этом же диалоге, чтобы контекст не потерялся.` : "Опишите задачу коротко: что нужно проверить, какой заказ или расчёт обсуждаем, где удобнее получить ответ."}</p>
+      </div>
+      <div class="cabinet-home-actions">
+        <a class="btn btn-primary" href="#cabinet-message-composer">${hasMessages ? "Ответить" : "Написать вопрос"}</a>
+        <a class="btn btn-secondary" href="${escapeAttribute(cabinetSectionHref("purchase"))}">К покупкам</a>
+      </div>
+    </section>
+  `;
+}
+
+function renderCabinetEmptyState({ title, text } = {}) {
+  return `
+    <div class="cabinet-rich-empty">
+      <div>
+        ${title ? `<strong>${escapeHtml(title)}</strong>` : ""}
+        ${text ? `<span>${escapeHtml(text)}</span>` : ""}
       </div>
     </div>
   `;
@@ -1347,6 +1952,10 @@ function bindCourseSection() {
     });
   });
 
+  bindCourseVideoAutowatch();
+  bindCoursePlayerScrollGuards();
+  bindCourseTranscriptTools();
+
   document.querySelectorAll("[data-course-quiz]").forEach((form) => {
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -1379,10 +1988,11 @@ function bindCourseSection() {
       const status = document.querySelector("[data-course-progress-status]");
       if (status) status.textContent = "Сохраняем прогресс...";
       try {
+        const courseStatus = button.dataset.courseStatus || "started";
         await saveMemberCourseProgress({
           lesson_id: button.dataset.courseProgress,
-          status: button.dataset.courseStatus || "started",
-          progress_percent: button.dataset.courseStatus === "completed" ? 100 : 10,
+          status: courseStatus,
+          progress_percent: progressPercentForCourseAction(courseStatus),
         });
         await rerenderCurrentSection();
         const nextStatus = document.querySelector("[data-course-progress-status]");
@@ -1392,6 +2002,250 @@ function bindCourseSection() {
       }
     });
   });
+
+  document.querySelectorAll("[data-course-homework]").forEach((form) => {
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const submitter = event.submitter;
+      const lessonId = form.dataset.courseHomework;
+      const status = document.querySelector("[data-course-progress-status]");
+      const homeworkStatus = submitter?.dataset.homeworkSave || "draft";
+      const homework = collectCourseHomeworkPayload(form, homeworkStatus);
+      if (!homework.answer && !homework.attachments.length) {
+        if (status) status.textContent = "Добавьте ответ или ссылку на файл.";
+        return;
+      }
+      if (status) status.textContent = homeworkStatus === "submitted" ? "Отправляем домашку..." : "Сохраняем домашку...";
+      try {
+        await saveMemberCourseProgress({
+          lesson_id: lessonId,
+          status: "started",
+          progress_percent: homeworkStatus === "submitted" ? 85 : 35,
+          homework,
+        });
+        await rerenderCurrentSection();
+        const nextStatus = document.querySelector("[data-course-progress-status]");
+        if (nextStatus) nextStatus.textContent = homeworkStatus === "submitted" ? "Домашка отправлена на проверку." : "Черновик домашки сохранён.";
+      } catch (error) {
+        if (status) status.textContent = `Домашка не сохранилась: ${cleanupError(error.message || "runtime_error")}`;
+      }
+    });
+  });
+}
+
+function bindCourseTranscriptTools() {
+  document.querySelectorAll("[data-course-transcript]").forEach((transcript) => {
+    const body = transcript.querySelector("[data-course-transcript-body]");
+    const search = transcript.querySelector("[data-course-transcript-search]");
+    const count = transcript.querySelector("[data-course-transcript-count]");
+    const copyButton = transcript.querySelector("[data-course-transcript-copy]");
+    if (!body) return;
+    const originalText = body.innerText || "";
+    const setCount = (text) => {
+      if (!count) return;
+      count.textContent = text;
+    };
+
+    search?.addEventListener("input", () => {
+      const query = search.value.trim();
+      body.innerHTML = renderCourseTranscriptContent(originalText, query);
+      if (!query) {
+        setCount("Готово к поиску");
+        return;
+      }
+      const matches = countTranscriptMatches(originalText, query);
+      setCount(matches ? `${matches} совпадений` : "Не найдено");
+    });
+
+    copyButton?.addEventListener("click", async () => {
+      const copied = await copyTextToClipboard(originalText);
+      setCount(copied ? "Текст скопирован" : "Не удалось скопировать");
+    });
+  });
+}
+
+function countTranscriptMatches(text, query) {
+  const needle = String(query || "").trim().toLowerCase();
+  if (!needle) return 0;
+  const haystack = String(text || "").toLowerCase();
+  let count = 0;
+  let index = haystack.indexOf(needle);
+  while (index !== -1) {
+    count += 1;
+    index = haystack.indexOf(needle, index + needle.length);
+  }
+  return count;
+}
+
+async function copyTextToClipboard(text) {
+  const value = String(text || "").trim();
+  if (!value) return false;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  } catch (_) {
+    // Fall through to the textarea fallback below.
+  }
+  const field = document.createElement("textarea");
+  field.value = value;
+  field.setAttribute("readonly", "");
+  field.style.position = "fixed";
+  field.style.top = "-1000px";
+  document.body.appendChild(field);
+  field.select();
+  try {
+    return document.execCommand("copy");
+  } finally {
+    field.remove();
+  }
+}
+
+function bindCoursePlayerScrollGuards() {
+  document.querySelectorAll("[data-course-player]").forEach((player) => {
+    const enableButton = player.querySelector("[data-course-player-enable]");
+    const scrollLayer = player.querySelector("[data-course-player-scroll-layer]");
+    if (!enableButton) return;
+
+    scrollLayer?.addEventListener("wheel", (event) => {
+      if (player.classList.contains("is-video-active")) return;
+      event.preventDefault();
+      window.scrollBy({
+        top: event.deltaY,
+        left: event.deltaX,
+        behavior: "auto",
+      });
+    }, { passive: false });
+
+    enableButton.addEventListener("click", () => {
+      player.classList.add("is-video-active");
+    });
+
+    player.addEventListener("mouseleave", () => {
+      player.classList.remove("is-video-active");
+    });
+  });
+}
+
+function bindCourseVideoAutowatch() {
+  const iframes = Array.from(document.querySelectorAll("iframe[data-course-video-autowatch]"))
+    .filter((iframe) => iframe.id && iframe.dataset.courseVideoLesson && iframe.dataset.courseVideoWatched !== "true");
+  if (!iframes.length) return;
+
+  loadKinescopeIframeApi()
+    .then((playerFactory) => {
+      iframes.forEach((iframe) => bindKinescopePlayerAutowatch(playerFactory, iframe));
+    })
+    .catch(() => {
+      const status = document.querySelector("[data-course-progress-status]");
+      if (status) status.textContent = "Автопометка видео недоступна, можно отметить просмотр кнопкой ниже.";
+    });
+}
+
+function loadKinescopeIframeApi() {
+  if (kinescopePlayerFactory) return Promise.resolve(kinescopePlayerFactory);
+  if (kinescopeIframeApiPromise) return kinescopeIframeApiPromise;
+
+  kinescopeIframeApiPromise = new Promise((resolve, reject) => {
+    const previousReady = window.onKinescopeIframeAPIReady;
+    window.onKinescopeIframeAPIReady = (playerFactory) => {
+      kinescopePlayerFactory = playerFactory;
+      if (typeof previousReady === "function" && previousReady !== window.onKinescopeIframeAPIReady) {
+        try {
+          previousReady(playerFactory);
+        } catch {
+          // Third-party callbacks should not block the course UI.
+        }
+      }
+      resolve(playerFactory);
+    };
+
+    const existing = document.querySelector(`script[src="${KINESCOPE_IFRAME_API_URL}"]`);
+    if (existing) {
+      existing.addEventListener("error", () => reject(new Error("kinescope_api_error")), { once: true });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = KINESCOPE_IFRAME_API_URL;
+    script.async = true;
+    script.onerror = () => reject(new Error("kinescope_api_error"));
+    document.head.appendChild(script);
+  });
+
+  return kinescopeIframeApiPromise;
+}
+
+function bindKinescopePlayerAutowatch(playerFactory, iframe) {
+  if (!playerFactory?.create || courseAutowatchIframes.has(iframe.id)) return;
+  courseAutowatchIframes.add(iframe.id);
+
+  const lessonId = iframe.dataset.courseVideoLesson;
+  playerFactory.create(iframe.id, {
+    url: iframe.dataset.courseVideoUrl || iframe.src,
+    size: { width: "100%", height: "100%" },
+  }).then((player) => {
+    if (!player?.on || !player.Events) return;
+
+    player.on(player.Events.TimeUpdate, (event) => {
+      const percent = Number(event?.data?.percent);
+      if (Number.isFinite(percent) && percent >= COURSE_AUTO_WATCH_THRESHOLD_PERCENT) {
+        markCourseVideoWatchedAutomatically(lessonId);
+      }
+    });
+
+    player.on(player.Events.Ended, () => {
+      markCourseVideoWatchedAutomatically(lessonId);
+    });
+  }).catch(() => {
+    courseAutowatchIframes.delete(iframe.id);
+  });
+}
+
+async function markCourseVideoWatchedAutomatically(lessonId) {
+  if (!lessonId || courseAutowatchLessons.has(lessonId)) return;
+  courseAutowatchLessons.add(lessonId);
+
+  const status = document.querySelector("[data-course-progress-status]");
+  if (status) status.textContent = "Отмечаем просмотр видео...";
+
+  try {
+    await saveMemberCourseProgress({
+      lesson_id: lessonId,
+      status: "video_watched",
+      progress_percent: progressPercentForCourseAction("video_watched"),
+    });
+    const button = document.querySelector(`[data-course-progress="${cssEscape(lessonId)}"][data-course-status="video_watched"]`);
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Просмотр отмечен";
+    }
+    if (status) status.textContent = "Видео просмотрено. Можно сдавать тест и отправлять домашку.";
+  } catch (error) {
+    courseAutowatchLessons.delete(lessonId);
+    if (status) status.textContent = `Автопометка не сохранилась: ${cleanupError(error.message || "runtime_error")}`;
+  }
+}
+
+function progressPercentForCourseAction(status) {
+  const values = {
+    started: 10,
+    video_watched: 35,
+    completed: 100,
+  };
+  return values[status] || 10;
+}
+
+function collectCourseHomeworkPayload(form, status) {
+  const answer = form.querySelector("[data-course-homework-answer]")?.value.trim() || "";
+  const attachmentText = form.querySelector("[data-course-homework-attachments]")?.value || "";
+  return {
+    answer,
+    attachments: attachmentText.split(/\n+/).map((line) => line.trim()).filter(Boolean).slice(0, 12),
+    status,
+    updated_at: new Date().toISOString(),
+  };
 }
 
 function collectCourseQuizAnswers(form, lessonId) {
@@ -1954,6 +2808,16 @@ function humanizeOrderStatus(status) {
   return labels[String(status || "").toLowerCase()] || status || "В работе";
 }
 
+function humanizeOrderSource(source) {
+  const labels = {
+    tilda: "Tilda",
+    cabinet: "Кабинет",
+    admin: "Админ",
+    import: "Импорт",
+  };
+  return labels[String(source || "").toLowerCase()] || source || "Кабинет";
+}
+
 function humanizePaymentStatus(status) {
   const labels = {
     paid: "Оплачено",
@@ -1965,6 +2829,14 @@ function humanizePaymentStatus(status) {
     cancelled: "Оплата отменена",
   };
   return labels[String(status || "").toLowerCase()] || status || "Оплата уточняется";
+}
+
+function statusTone(status) {
+  const normalized = String(status || "").toLowerCase();
+  if (["paid", "completed", "confirmed", "ready", "sent"].includes(normalized)) return "positive";
+  if (["pending", "authorized", "draft", "new"].includes(normalized)) return "pending";
+  if (["failed", "cancelled", "canceled", "refunded"].includes(normalized)) return "danger";
+  return "neutral";
 }
 
 function formatOrderAmount(order) {
@@ -1996,8 +2868,11 @@ function getCourseLessonStatus(lesson) {
   if (!lesson?.available) return { id: "locked", label: "Закрыт" };
   if (lesson.quiz_stale) return { id: "in_progress", label: "В работе" };
   if (lesson.status === "completed") return { id: "completed", label: "Пройден" };
-  if (lesson.quiz_passed === true || lesson.status === "checked") return { id: "checked", label: "Тест сдан" };
-  if (lesson.status === "started" || Number(lesson.progress_percent || 0) > 0) return { id: "in_progress", label: "В работе" };
+  if (lesson.status === "homework_approved") return { id: "checked", label: "Домашка принята" };
+  if (lesson.status === "homework_submitted") return { id: "in_progress", label: "На проверке" };
+  if (lesson.status === "quiz_passed" || lesson.quiz_passed === true || lesson.status === "checked") return { id: "in_progress", label: "Тест сдан" };
+  if (lesson.status === "video_watched") return { id: "in_progress", label: "Видео просмотрено" };
+  if (lesson.status === "started" || Number(lesson.progress_percent || 0) > 0) return { id: "in_progress", label: "Начат" };
   return { id: "available", label: "Доступен" };
 }
 
@@ -2016,6 +2891,7 @@ function humanizeCourseMaterialType(type) {
   const labels = {
     video: "видео",
     worksheet: "практика",
+    transcript: "транскрибация",
     text: "текст",
   };
   return labels[String(type || "").toLowerCase()] || "материал";
@@ -2025,9 +2901,33 @@ function humanizeCourseMaterialStatus(status) {
   const labels = {
     ready: "готово",
     snapshot_pending: "готовится",
+    tilda_members_shell_only: "готовится",
+    locked: "закрыто",
     draft: "черновик",
   };
   return labels[String(status || "").toLowerCase()] || "в работе";
+}
+
+function humanizeCourseHomeworkStatus(status) {
+  const labels = {
+    draft: "Черновик",
+    submitted: "Отправлено на проверку",
+    needs_revision: "Нужна доработка",
+    approved: "Принято",
+    archived: "Архив",
+  };
+  return labels[String(status || "").toLowerCase()] || "Черновик";
+}
+
+function humanizeCourseMaterialMeta(item) {
+  if (!item?.embed_url && item?.type === "worksheet") return "";
+  const parts = [
+    humanizeCourseMaterialType(item?.type),
+    humanizeCourseMaterialStatus(item?.status),
+  ];
+  if (item?.duration) parts.push(String(item.duration));
+  if (item?.size) parts.push(String(item.size));
+  return parts.filter(Boolean).join(" · ");
 }
 
 function humanizeCategory(value) {
@@ -2113,7 +3013,14 @@ function setLink(selector, label, href) {
 }
 
 function cleanupError(message) {
-  return String(message || "").replace(/^Error:\s*/u, "").replace(/^["']|["']$/g, "");
+  const text = String(message || "").replace(/^Error:\s*/u, "").replace(/^["']|["']$/g, "").trim();
+  if (!text || /^(HTTP\s+\d+|network_error|runtime_error|not_found|server_error|bad_request)$/i.test(text)) {
+    return "Раздел временно недоступен. Попробуйте позже.";
+  }
+  if (/^(Expected JSON body|kinescope_api_error)/i.test(text)) {
+    return "Данные временно не загрузились. Попробуйте позже.";
+  }
+  return text;
 }
 
 function cssEscape(value) {

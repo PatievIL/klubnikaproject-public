@@ -4,6 +4,5 @@ Disallow: /admin/
 Disallow: /account/
 Disallow: /cabinet/
 Disallow: /calc/admin/
-Disallow: /shop/
 
 Sitemap: https://klubnikaproject.ru/sitemap.xml

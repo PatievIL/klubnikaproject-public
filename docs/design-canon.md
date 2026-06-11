@@ -50,6 +50,29 @@ Recommended order:
 
 Do not add sections that repeat the same decision already made above.
 
+## Hero Discipline
+
+Hero is an entry point, not the whole page.
+
+- The home hero may be the largest because it introduces the system.
+- Service heroes should be compact and should lead quickly into the fit, process, or form block.
+- Tool heroes should be the shortest because the working interface is the main value.
+- Course/editorial heroes may keep a product signal such as a cover image, but should not use oversized type or chip rows as filler.
+
+Default hero content:
+
+- one concrete eyebrow;
+- one H1;
+- one short lead;
+- one primary action when an action is needed.
+
+Avoid:
+
+- 2-3 equal actions in the hero;
+- fact chips inside the hero;
+- duplicate CTA routes already available in the next block;
+- forcing internal pages to copy the home hero height.
+
 ## Copywriting
 
 Tone: direct, practical, calm.

@@ -3444,26 +3444,6 @@ html[data-theme="dark"] .route-card-catalog-item {
   gap: 6px;
 }
 
-.form-promise-card {
-  display: grid;
-  gap: 5px;
-  padding: 14px 16px;
-  border: 1px solid rgba(0, 77, 43, 0.11);
-  border-radius: 18px;
-  background: color-mix(in srgb, var(--accent) 18%, var(--surface));
-}
-
-.form-promise-card strong {
-  color: var(--green);
-  line-height: 1.15;
-}
-
-.form-promise-card span {
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.36;
-}
-
 .field-label {
   color: var(--green);
   font-size: 14px;

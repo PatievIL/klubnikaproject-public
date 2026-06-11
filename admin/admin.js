@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
     supportTelegram: "@patiev_admin",
     supportTelegramUrl: "https://t.me/patiev_admin",
     supportEmail: "info@klubnikaproject.ru",
-    supportWhatsapp: "https://wa.me/79891250150",
+    supportWhatsapp: "https://wa.me/79030094990",
     defaultLanguage: "ru",
     defaultTheme: "light",
     activeLogoSystem: "manual-primary",
@@ -21,6 +21,8 @@ const DEFAULT_CONFIG = {
     hubPath: "/cabinet/",
     catalogPath: "/account/catalog/",
     specialPath: "/account/special/",
+    importMembersPath: "members.csv",
+    importOrdersPath: "orders.csv",
   },
   forms: {
     mode: "backend_submit",
@@ -132,6 +134,7 @@ let currentSection = "dashboard";
 let catalogDraft = clone(DEFAULT_CATALOG_ITEMS);
 let catalogSnapshotDraft = null;
 let usersDraft = [];
+const userDetailDraft = new Map();
 let auditDraft = [];
 let backendUser = null;
 let backendAccessPolicy = null;
@@ -795,17 +798,34 @@ function renderInventorySection() {
 
 function renderUsersSection() {
   return `
-    <div class="admin-section-stack">
+    <div class="admin-section-stack admin-users-workspace">
       <div class="admin-section-intro">
-        <div class="tag">Доступ</div>
-        <h3 class="calc-card-title">Пользователи и доступы</h3>
-        <p class="sublead">Здесь управляются роли, закрытые разделы и резервный вход по ключу. Блок нужен, чтобы спокойно разделять доступ команды, клиентов и партнёров.</p>
+        <div class="tag">Админ-контроль</div>
+        <h3 class="calc-card-title">Пользователи, доступы и домашки</h3>
+        <p class="sublead">Рабочее место менеджера: карточка клиента, ручная выдача курса, проверка заданий, комментарии и история действий.</p>
       </div>
       <div class="admin-toolbar-actions">
         <button class="btn btn-secondary" id="load-users-button" type="button">Загрузить пользователей</button>
         <button class="btn btn-primary" id="create-user-button" type="button">Создать пользователя</button>
       </div>
-      <div class="admin-lead-list" id="admin-users-list">
+      <div class="admin-block">
+        <div class="admin-block-head">
+          <div>
+            <strong>Импорт Tilda CSV</strong>
+            <span>Файлы должны лежать локально в ignored-папке ops/tilda-exports. Сначала запускайте dry-run.</span>
+          </div>
+        </div>
+        <div class="admin-grid">
+          ${inputField("members.importMembersPath", "Members CSV", draft.members.importMembersPath || "members.csv", "Относительно ops/tilda-exports")}
+          ${inputField("members.importOrdersPath", "Orders CSV", draft.members.importOrdersPath || "orders.csv", "Относительно ops/tilda-exports")}
+        </div>
+        <div class="admin-toolbar-actions">
+          <button class="btn btn-secondary" id="tilda-import-dry-run-button" type="button">Dry-run импорт</button>
+          <button class="btn btn-primary" id="tilda-import-apply-button" type="button">Применить импорт</button>
+        </div>
+        <div class="admin-code-card"><pre id="tilda-import-result">Импорт ещё не запускался.</pre></div>
+      </div>
+      <div class="admin-lead-list admin-user-list" id="admin-users-list">
         <div class="admin-lead-empty">Пользователи пока не загружены.</div>
       </div>
     </div>
@@ -1963,8 +1983,12 @@ async function loadLeadHistory(leadId, button) {
 function bindUsersSection() {
   const loadButton = document.getElementById("load-users-button");
   const createButton = document.getElementById("create-user-button");
+  const importDryRunButton = document.getElementById("tilda-import-dry-run-button");
+  const importApplyButton = document.getElementById("tilda-import-apply-button");
   if (loadButton) loadButton.addEventListener("click", loadUsers);
   if (createButton) createButton.addEventListener("click", createUser);
+  if (importDryRunButton) importDryRunButton.addEventListener("click", () => runTildaCabinetImport(false));
+  if (importApplyButton) importApplyButton.addEventListener("click", () => runTildaCabinetImport(true));
 }
 
 function bindAuditSection() {
@@ -2002,6 +2026,67 @@ function bindAuditSection() {
   }
 }
 
+function renderAdminUserCard(user) {
+  const detail = userDetailDraft.get(String(user.id));
+  const accessLabel = Number(user.entitlements_count || 0) > 0 ? "курс открыт" : "нет курса";
+  return `
+    <article class="admin-lead-card admin-user-card">
+      <div class="admin-lead-head">
+        <strong>${escapeHtml(user.display_name)}</strong>
+        <span>${escapeHtml(user.role || "member")}</span>
+      </div>
+      <div class="admin-lead-meta">
+        <span>${escapeHtml(user.email || "email не указан")}</span>
+        <span>${escapeHtml(user.status || "active")} · ${accessLabel}</span>
+      </div>
+      <div class="admin-pills">
+        <span class="admin-pill">${escapeHtml(user.account_type || "member")}</span>
+        <span class="admin-pill">${user.has_password ? "password" : "email-code"}</span>
+        <span class="admin-pill">${Number(user.orders_count || 0)} заказов</span>
+        <span class="admin-pill">${Number(user.entitlements_count || 0)} доступов</span>
+        ${user.phone ? `<span class="admin-pill">телефон есть</span>` : ""}
+      </div>
+      <div class="admin-lead-actions admin-user-edit-grid">
+        <label class="admin-field">
+          <span class="admin-field-label">Имя</span>
+          <input class="admin-input" data-user-name="${user.id}" type="text" value="${escapeAttribute(user.display_name)}" />
+        </label>
+        <label class="admin-field">
+          <span class="admin-field-label">Email</span>
+          <input class="admin-input" data-user-email="${user.id}" type="text" value="${escapeAttribute(user.email || "")}" />
+        </label>
+        <label class="admin-field">
+          <span class="admin-field-label">Роль</span>
+          <select class="admin-select" data-user-role="${user.id}">
+            ${["owner","admin","manager","editor","viewer","member"].map((role) => `<option value="${role}" ${user.role === role ? "selected" : ""}>${role}</option>`).join("")}
+          </select>
+        </label>
+        <label class="admin-field">
+          <span class="admin-field-label">Тип аккаунта</span>
+          <select class="admin-select" data-user-account-type="${user.id}">
+            ${["admin","member"].map((accountType) => `<option value="${accountType}" ${user.account_type === accountType ? "selected" : ""}>${accountType}</option>`).join("")}
+          </select>
+        </label>
+        <label class="admin-field admin-lead-note">
+          <span class="admin-field-label">Scopes</span>
+          <textarea class="admin-textarea" data-user-scopes="${user.id}" placeholder="catalog, special_pages, crm">${escapeHtml((user.scopes || []).join(", "))}</textarea>
+        </label>
+        <label class="admin-field">
+          <span class="admin-field-label">Активен</span>
+          <input class="admin-input" data-user-active="${user.id}" type="checkbox" ${user.is_active ? "checked" : ""} />
+        </label>
+        <button class="btn btn-primary admin-user-save" data-user-save="${user.id}" type="button">Сохранить</button>
+        <button class="btn btn-secondary" data-user-detail="${user.id}" type="button">${detail ? "Обновить карточку" : "Открыть карточку"}</button>
+        <button class="btn btn-secondary" data-user-course-access="${user.id}" data-access-status="active" type="button">Выдать курс</button>
+        <button class="btn btn-secondary" data-user-course-access="${user.id}" data-access-status="revoked" type="button">Отозвать курс</button>
+      </div>
+      <div class="admin-user-detail" id="admin-user-detail-${escapeAttribute(cssSafeId(user.id))}" ${detail ? "" : "hidden"}>
+        ${detail ? renderAdminUserDetail(detail) : ""}
+      </div>
+    </article>
+  `;
+}
+
 async function loadUsers() {
   if (!canAccessSection("users")) {
     usersDraft = [];
@@ -2019,60 +2104,23 @@ async function loadUsers() {
       list.innerHTML = '<div class="admin-lead-empty">Пользователей пока нет.</div>';
       return;
     }
-    list.innerHTML = usersDraft.map((user) => `
-      <article class="admin-lead-card">
-        <div class="admin-lead-head">
-          <strong>${escapeHtml(user.display_name)}</strong>
-          <span>${escapeHtml(user.role)}</span>
-        </div>
-        <div class="admin-lead-meta">
-          <span>${escapeHtml(user.slug)}</span>
-          <span>${escapeHtml(user.email || "email не указан")}</span>
-        </div>
-        <div class="admin-pills">
-          <span class="admin-pill">${escapeHtml(user.account_type || "admin")}</span>
-          ${(user.scopes || []).map((scope) => `<span class="admin-pill">${escapeHtml(scope)}</span>`).join("")}
-          <span class="admin-pill">${user.has_password ? "password" : "no password"}</span>
-        </div>
-        <div class="admin-lead-actions">
-          <label class="admin-field">
-            <span class="admin-field-label">Имя</span>
-            <input class="admin-input" data-user-name="${user.id}" type="text" value="${escapeAttribute(user.display_name)}" />
-          </label>
-          <label class="admin-field">
-            <span class="admin-field-label">Email</span>
-            <input class="admin-input" data-user-email="${user.id}" type="text" value="${escapeAttribute(user.email || "")}" />
-          </label>
-          <label class="admin-field">
-            <span class="admin-field-label">Роль</span>
-            <select class="admin-select" data-user-role="${user.id}">
-              ${["owner","admin","manager","editor","viewer"].map((role) => `<option value="${role}" ${user.role === role ? "selected" : ""}>${role}</option>`).join("")}
-            </select>
-          </label>
-          <label class="admin-field">
-            <span class="admin-field-label">Тип аккаунта</span>
-            <select class="admin-select" data-user-account-type="${user.id}">
-              ${["admin","member"].map((accountType) => `<option value="${accountType}" ${user.account_type === accountType ? "selected" : ""}>${accountType}</option>`).join("")}
-            </select>
-          </label>
-          <label class="admin-field admin-lead-note">
-            <span class="admin-field-label">Scopes</span>
-            <textarea class="admin-textarea" data-user-scopes="${user.id}" placeholder="catalog, special_pages, crm">${escapeHtml((user.scopes || []).join(", "))}</textarea>
-          </label>
-          <label class="admin-field">
-            <span class="admin-field-label">Активен</span>
-            <input class="admin-input" data-user-active="${user.id}" type="checkbox" ${user.is_active ? "checked" : ""} />
-          </label>
-          <button class="btn btn-primary admin-user-save" data-user-save="${user.id}" type="button">Сохранить пользователя</button>
-          <button class="btn btn-secondary admin-user-password" data-user-password="${user.id}" type="button">Задать пароль</button>
-        </div>
-      </article>
-    `).join("");
+    list.innerHTML = usersDraft.map(renderAdminUserCard).join("");
     list.querySelectorAll("[data-user-save]").forEach((button) => {
       button.addEventListener("click", () => saveUser(button.dataset.userSave));
     });
     list.querySelectorAll("[data-user-password]").forEach((button) => {
       button.addEventListener("click", () => setUserPassword(button.dataset.userPassword));
+    });
+    list.querySelectorAll("[data-user-detail]").forEach((button) => {
+      button.addEventListener("click", () => loadUserDetail(button.dataset.userDetail));
+    });
+    list.querySelectorAll("[data-user-course-access]").forEach((button) => {
+      button.addEventListener("click", () => setUserCourseAccess(button.dataset.userCourseAccess, button.dataset.accessStatus));
+    });
+    list.querySelectorAll("[data-homework-review]").forEach((button) => {
+      const userId = button.closest(".admin-user-detail")?.id.replace("admin-user-detail-", "");
+      const detail = [...userDetailDraft.keys()].find((key) => cssSafeId(key) === userId);
+      if (detail) button.addEventListener("click", () => reviewUserHomework(detail, button.dataset.homeworkReview, button.dataset.homeworkStatus));
     });
   } catch (error) {
     list.innerHTML = `<div class="admin-lead-empty">Не удалось загрузить пользователей: ${escapeHtml(error.message)}</div>`;
@@ -2133,6 +2181,276 @@ async function saveUser(userId) {
     loadUsers();
   } catch (error) {
     els.status.textContent = `Не удалось обновить пользователя #${userId}: ${error.message}`;
+  }
+}
+
+async function loadUserDetail(userId) {
+  const shell = document.getElementById(`admin-user-detail-${cssSafeId(userId)}`);
+  if (!shell) return;
+  shell.hidden = false;
+  shell.innerHTML = '<div class="admin-lead-empty">Загружаю карточку пользователя...</div>';
+  try {
+    const response = await adminFetch(`/admin/users/${encodeURIComponent(userId)}`);
+    const item = response.item || {};
+    userDetailDraft.set(String(userId), item);
+    shell.innerHTML = renderAdminUserDetail(item);
+    bindAdminUserDetailActions(shell, userId);
+  } catch (error) {
+    shell.innerHTML = `<div class="admin-lead-empty">Не удалось загрузить карточку: ${escapeHtml(error.message)}</div>`;
+  }
+}
+
+async function setUserCourseAccess(userId, status) {
+  const detailShell = document.getElementById(`admin-user-detail-${cssSafeId(userId)}`);
+  const wasOpen = userDetailDraft.has(String(userId)) || Boolean(detailShell && !detailShell.hidden);
+  try {
+    await adminFetch(`/admin/users/${encodeURIComponent(userId)}/entitlements`, {
+      method: "POST",
+      body: JSON.stringify({
+        entitlement_type: "course",
+        entitlement_key: "course:klubhack",
+        status,
+      }),
+    });
+    els.status.textContent = status === "active" ? "Доступ к курсу выдан." : "Доступ к курсу отозван.";
+    userDetailDraft.delete(String(userId));
+    await loadUsers();
+    if (wasOpen) await loadUserDetail(userId);
+  } catch (error) {
+    els.status.textContent = `Не удалось изменить доступ: ${error.message}`;
+  }
+}
+
+function renderAdminUserDetail(item) {
+  const profile = item.profile || {};
+  const entitlements = Array.isArray(item.entitlements) ? item.entitlements : [];
+  const orders = Array.isArray(item.orders) ? item.orders : [];
+  const progress = Array.isArray(item.course_progress) ? item.course_progress : [];
+  const homeworkItems = progress.filter((row) => row.has_homework_activity || ["submitted", "needs_revision", "approved"].includes(row.homework?.status));
+  const auditItems = Array.isArray(item.audit_events) ? item.audit_events : [];
+  const hasCourseAccess = entitlements.some((entry) => entry.entitlement_key === "course:klubhack" && entry.status === "active");
+  return `
+    <div class="admin-user-detail-grid">
+      <section class="admin-block admin-user-overview">
+        <div class="admin-block-head">
+          <div>
+            <strong>Карточка пользователя</strong>
+            <span>${escapeHtml(item.email || "email не указан")}</span>
+          </div>
+          <span class="admin-pill">${hasCourseAccess ? "курс открыт" : "курс закрыт"}</span>
+        </div>
+        <div class="admin-mini-metrics admin-user-metrics">
+          <div class="admin-mini-metric"><span>Заказы</span><strong>${orders.length}</strong></div>
+          <div class="admin-mini-metric"><span>Доступы</span><strong>${entitlements.filter((entry) => entry.status === "active").length}</strong></div>
+          <div class="admin-mini-metric"><span>Домашки</span><strong>${homeworkItems.length}</strong></div>
+        </div>
+        <div class="admin-user-profile">
+          <div><span>Имя</span><strong>${escapeHtml(item.display_name || "не указано")}</strong></div>
+          <div><span>Телефон</span><strong>${escapeHtml(profile.phone || item.phone || "не указан")}</strong></div>
+          <div><span>Доставка</span><strong>${escapeHtml(profile.delivery_address || item.delivery_address || "не указана")}</strong></div>
+          <div><span>Комментарий</span><strong>${escapeHtml(profile.delivery_comment || "нет")}</strong></div>
+        </div>
+      </section>
+      <section class="admin-block">
+        <div class="admin-block-head">
+          <div>
+            <strong>Доступ к курсу</strong>
+            <span>Ручная выдача или отзыв доступа к “Клубничному Хаку”.</span>
+          </div>
+        </div>
+        <div class="admin-pills">
+          ${entitlements.length ? entitlements.map(renderAdminEntitlementPill).join("") : '<span class="admin-pill">доступов нет</span>'}
+        </div>
+        <div class="admin-toolbar-actions admin-user-access-actions">
+          <button class="btn btn-primary" data-user-course-access="${item.id}" data-access-status="active" type="button">Выдать курс</button>
+          <button class="btn btn-secondary" data-user-course-access="${item.id}" data-access-status="revoked" type="button">Отозвать курс</button>
+        </div>
+      </section>
+      <section class="admin-block">
+        <div class="admin-block-head">
+          <div>
+            <strong>Заказы</strong>
+            <span>Покупки и платежные статусы из ledger кабинета.</span>
+          </div>
+        </div>
+        <div class="admin-user-orders">
+          ${orders.length ? orders.map(renderAdminOrderRow).join("") : '<div class="admin-lead-empty">Заказов пока нет.</div>'}
+        </div>
+      </section>
+      <section class="admin-block admin-user-homework-block">
+        <div class="admin-block-head">
+          <div>
+            <strong>Проверка домашек</strong>
+            <span>Ответ ученика, файлы, статус проверки и комментарий менеджера.</span>
+          </div>
+        </div>
+        <div class="admin-homework-list">
+          ${homeworkItems.length ? homeworkItems.map((row) => renderAdminHomeworkCard(item.id, row)).join("") : '<div class="admin-lead-empty">Домашек на проверке пока нет.</div>'}
+        </div>
+      </section>
+      <section class="admin-block admin-user-audit-block">
+        <div class="admin-block-head">
+          <div>
+            <strong>История действий</strong>
+            <span>Последние изменения по пользователю, доступам и домашкам.</span>
+          </div>
+        </div>
+        <div class="admin-user-audit-list">
+          ${auditItems.length ? auditItems.map(renderAdminAuditRow).join("") : '<div class="admin-lead-empty">История по пользователю пока пустая.</div>'}
+        </div>
+      </section>
+    </div>
+  `;
+}
+
+function renderAdminEntitlementPill(entry) {
+  return `<span class="admin-pill">${escapeHtml(formatEntitlementLabel(entry))}</span>`;
+}
+
+function renderAdminOrderRow(order) {
+  const items = Array.isArray(order.items) ? order.items : [];
+  const title = order.title || order.order_number || order.id;
+  return `
+    <div class="admin-user-row">
+      <div>
+        <strong>${escapeHtml(title)}</strong>
+        <span>${items.length ? escapeHtml(items.map((item) => item.title || item.product_title || item.sku || "позиция").join(", ")) : "позиций нет"}</span>
+      </div>
+      <span class="admin-pill">${escapeHtml(order.payment_status || order.status || "status n/a")}</span>
+    </div>
+  `;
+}
+
+function renderAdminHomeworkCard(userId, row) {
+  const homework = row.homework || {};
+  const safeLessonId = cssSafeId(`${userId}-${row.lesson_id}`);
+  const attachments = Array.isArray(homework.attachments) ? homework.attachments : [];
+  return `
+    <article class="admin-homework-card">
+      <div class="admin-homework-head">
+        <div>
+          <strong>${escapeHtml(row.lesson_title || row.lesson_id)}</strong>
+          <span>${escapeHtml(row.module_title || "")}</span>
+        </div>
+        <span class="admin-pill">${escapeHtml(formatHomeworkStatus(homework.status))}</span>
+      </div>
+      <div class="admin-homework-answer">${escapeHtml(homework.answer || "Ответ ученика пока пустой.")}</div>
+      <div class="admin-homework-files">
+        ${attachments.length ? attachments.map((url) => `<a href="${escapeAttribute(url)}" target="_blank" rel="noopener">файл</a>`).join("") : '<span>файлов нет</span>'}
+      </div>
+      <label class="admin-field admin-field-secondary">
+        <span class="admin-field-label">Комментарий менеджера</span>
+        <textarea class="admin-textarea" id="homework-comment-${escapeAttribute(safeLessonId)}" data-homework-comment="${escapeAttribute(row.lesson_id)}" data-homework-user="${escapeAttribute(userId)}">${escapeHtml(homework.manager_comment || "")}</textarea>
+      </label>
+      <div class="admin-toolbar-actions">
+        <button class="btn btn-primary" data-homework-review="${escapeAttribute(row.lesson_id)}" data-homework-status="approved" type="button">Принять</button>
+        <button class="btn btn-secondary" data-homework-review="${escapeAttribute(row.lesson_id)}" data-homework-status="needs_revision" type="button">Вернуть на доработку</button>
+        <button class="btn btn-secondary" data-homework-review="${escapeAttribute(row.lesson_id)}" data-homework-status="${escapeAttribute(homework.status || "submitted")}" type="button">Сохранить комментарий</button>
+      </div>
+      ${renderHomeworkHistory(homework.history)}
+    </article>
+  `;
+}
+
+function renderHomeworkHistory(history) {
+  const items = Array.isArray(history) ? history.slice(0, 4) : [];
+  if (!items.length) return "";
+  return `
+    <div class="admin-homework-history">
+      ${items.map((item) => `
+        <div class="admin-history-item">
+          <strong>${escapeHtml(formatHomeworkStatus(item.status || item.action || "изменение"))}</strong>
+          <span>${escapeHtml([formatAdminDate(item.at), item.actor].filter(Boolean).join(" · "))}</span>
+          ${item.manager_comment ? `<em>${escapeHtml(item.manager_comment)}</em>` : ""}
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderAdminAuditRow(item) {
+  return `
+    <div class="admin-history-item">
+      <strong>${escapeHtml(item.action || "действие")}</strong>
+      <span>${escapeHtml([item.area, item.actor, formatAdminDate(item.created_at)].filter(Boolean).join(" · "))}</span>
+    </div>
+  `;
+}
+
+function bindAdminUserDetailActions(shell, userId) {
+  shell.querySelectorAll("[data-user-course-access]").forEach((button) => {
+    button.addEventListener("click", () => setUserCourseAccess(button.dataset.userCourseAccess, button.dataset.accessStatus));
+  });
+  shell.querySelectorAll("[data-homework-review]").forEach((button) => {
+    button.addEventListener("click", () => reviewUserHomework(userId, button.dataset.homeworkReview, button.dataset.homeworkStatus));
+  });
+}
+
+async function reviewUserHomework(userId, lessonId, status) {
+  const commentField = document.querySelector(`[data-homework-user="${userId}"][data-homework-comment="${lessonId}"]`);
+  try {
+    await adminFetch(`/admin/users/${encodeURIComponent(userId)}/course/lessons/${encodeURIComponent(lessonId)}/homework`, {
+      method: "POST",
+      body: JSON.stringify({
+        status,
+        manager_comment: commentField?.value || "",
+      }),
+    });
+    els.status.textContent = "Домашка обновлена.";
+    userDetailDraft.delete(String(userId));
+    await loadUserDetail(userId);
+  } catch (error) {
+    els.status.textContent = `Не удалось обновить домашку: ${error.message}`;
+  }
+}
+
+function formatEntitlementLabel(entry) {
+  const key = entry.entitlement_key === "course:klubhack" ? "Клубничный Хак" : entry.entitlement_key || "доступ";
+  const status = entry.status === "active" ? "открыт" : entry.status === "revoked" ? "отозван" : entry.status || "status n/a";
+  return `${key} · ${status}`;
+}
+
+function formatHomeworkStatus(status) {
+  const labels = {
+    draft: "черновик",
+    submitted: "на проверке",
+    needs_revision: "доработка",
+    approved: "принято",
+    archived: "архив",
+    manager_review: "проверка менеджером",
+  };
+  return labels[status] || status || "нет статуса";
+}
+
+function formatAdminDate(value) {
+  if (!value) return "";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "";
+  return parsed.toLocaleString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+async function runTildaCabinetImport(apply) {
+  const target = document.getElementById("tilda-import-result");
+  if (target) target.textContent = apply ? "Применяю импорт..." : "Проверяю CSV...";
+  try {
+    const response = await adminFetch("/admin/migration/tilda-cabinet", {
+      method: "POST",
+      body: JSON.stringify({
+        apply,
+        members_path: draft.members.importMembersPath || "members.csv",
+        orders_path: draft.members.importOrdersPath || "orders.csv",
+      }),
+    });
+    if (target) target.textContent = JSON.stringify(response, null, 2);
+    if (apply) loadUsers();
+  } catch (error) {
+    if (target) target.textContent = `Ошибка импорта: ${error.message}`;
   }
 }
 
@@ -3529,6 +3847,10 @@ function escapeHtml(value) {
 
 function escapeAttribute(value) {
   return escapeHtml(value).replaceAll('"', "&quot;");
+}
+
+function cssSafeId(value) {
+  return String(value || "").replace(/[^a-zA-Z0-9_-]/g, "_");
 }
 
 function copyText(text) {

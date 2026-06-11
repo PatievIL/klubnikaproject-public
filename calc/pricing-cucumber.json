@@ -72,7 +72,6 @@
       "exhaustPowerW": 1000,
       "serviceReserveW": 1500,
       "lightInputReserveFactor": 1.5,
-      "singlePhaseMaxPowerW": 15000,
       "splitColdFactor": 1.2,
       "btuPerW": 3.412,
       "splitEer": 3.2,

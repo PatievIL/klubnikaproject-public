@@ -4,8 +4,9 @@ import {
   getCategoryPageData,
   getProductPageData,
   parseCategorySearchParams,
-} from "./catalog-data.mjs?v=20260520-shopcat-hero1";
-import { renderCatalogApp } from "./catalog-renderers.mjs?v=20260520-shopcat-hero1";
+  replaceCatalogData,
+} from "./catalog-data.mjs?v=20260609-imgclean1";
+import { renderCatalogApp } from "./catalog-renderers.mjs?v=20260609-imgclean1";
 
 const CART_KEY = "klubnika.catalog.cart.v1";
 const REVIEW_KEY = "klubnika.catalog.reviews.v1";
@@ -15,7 +16,9 @@ const appRoot = document.getElementById("catalog-app");
 const route = window.__CATALOG_ROUTE__;
 const ctx = window.__CATALOG_CONTEXT__;
 
+const volatileStorage = new Map();
 let state = buildStateFromLocation();
+let catalogMotionInitialized = false;
 let liveCatalogStatus = {
   state: "fallback",
   products: 0,
@@ -43,7 +46,10 @@ async function hydrateLiveCatalog() {
     const products = Array.isArray(snapshot.products) ? snapshot.products : [];
     const categories = Array.isArray(snapshot.categories) ? snapshot.categories : [];
     if (!products.length && !categories.length) throw new Error("Empty catalog snapshot");
-    applyLiveSnapshotToStaticCatalog({ products, categories });
+    replaceCatalogData(
+      categories.map((category, index) => normalizeLiveCategory(category, index)),
+      products.map((product, index) => normalizeLiveProduct(product, index))
+    );
     liveCatalogStatus = {
       state: "live",
       products: products.length,
@@ -62,54 +68,63 @@ async function hydrateLiveCatalog() {
   appRoot.dataset.catalogSource = liveCatalogStatus.state;
 }
 
-function applyLiveSnapshotToStaticCatalog(snapshot) {
-  const liveCategories = new Map(snapshot.categories.map((category) => [category.slug, category]));
-  const liveProducts = new Map(snapshot.products.map((product) => [product.slug, product]));
-
-  catalogData.categories.forEach((category) => {
-    const live = liveCategories.get(category.slug);
-    if (!live) return;
-    Object.assign(category, normalizeLiveCategory(category, live));
-  });
-
-  catalogData.products.forEach((product) => {
-    const live = liveProducts.get(product.slug);
-    if (!live) return;
-    Object.assign(product, normalizeLiveProduct(product, live));
-  });
-}
-
-function normalizeLiveCategory(current, live) {
+function normalizeLiveCategory(live, index) {
+  const seoTitle = live.seoTitle || live.seo_title || live.seo?.title || live.name || live.slug;
+  const seoDescription = live.seoDescription || live.seo_description || live.seo?.description || live.description || "";
   return {
-    ...current,
-    name: live.name || current.name,
-    description: live.description || current.description,
-    seoTitle: live.seoTitle || live.seo_title || current.seoTitle,
-    seoDescription: live.seoDescription || live.seo_description || current.seoDescription,
-    productCount: Number.isFinite(Number(live.productCount)) ? Number(live.productCount) : current.productCount,
+    ...live,
+    id: live.id || live.slug,
+    slug: live.slug,
+    parentId: live.parentId || live.parent_id || null,
+    parent_id: live.parent_id || live.parentId || null,
+    name: live.name || live.title || live.slug,
+    description: live.description || "",
+    sortOrder: Number.isFinite(Number(live.sortOrder ?? live.sort_order)) ? Number(live.sortOrder ?? live.sort_order) : index + 1,
+    status: live.status || "published",
+    seoTitle,
+    seoDescription,
+    seo: {
+      title: seoTitle,
+      description: seoDescription,
+    },
+    productCount: Number.isFinite(Number(live.productCount ?? live.product_count))
+      ? Number(live.productCount ?? live.product_count)
+      : 0,
   };
 }
 
-function normalizeLiveProduct(current, live) {
+function normalizeLiveProduct(live, index) {
   return {
-    ...current,
-    article: live.article || current.article,
-    name: live.name || current.name,
-    shortDescription: live.shortDescription || live.short_description || current.shortDescription,
-    fullDescription: live.fullDescription || live.full_description || current.fullDescription,
-    price: normalizeLiveNumber(live.price, current.price),
-    oldPrice: normalizeLiveNumber(live.oldPrice ?? live.old_price, current.oldPrice),
-    stockStatus: live.stockStatus || live.stock_status || current.stockStatus,
-    status: live.status || current.status || "published",
-    seoTitle: live.seoTitle || live.seo_title || current.seoTitle,
-    seoDescription: live.seoDescription || live.seo_description || current.seoDescription,
-    path: live.path || current.path,
-    images: Array.isArray(live.images) && live.images.length ? live.images : current.images,
-    badges: Array.isArray(live.badges) ? live.badges : current.badges,
-    attributes: Array.isArray(live.attributes) ? live.attributes : current.attributes,
-    documents: Array.isArray(live.documents) ? live.documents : current.documents,
-    faq: Array.isArray(live.faq) ? live.faq : current.faq,
-    relatedProducts: Array.isArray(live.relatedProducts) ? live.relatedProducts : current.relatedProducts,
+    ...live,
+    id: live.id || live.slug || `live-product-${index + 1}`,
+    slug: live.slug,
+    categoryId: live.categoryId || live.category_id || live.categorySlug || live.category_slug || "",
+    category_id: live.category_id || live.categoryId || live.categorySlug || live.category_slug || "",
+    categorySlug: live.categorySlug || live.category_slug || "",
+    category_slug: live.category_slug || live.categorySlug || "",
+    article: live.article || "",
+    name: live.name || live.title || live.slug,
+    shortDescription: live.shortDescription || live.short_description || "",
+    short_description: live.short_description || live.shortDescription || "",
+    fullDescription: live.fullDescription || live.full_description || "",
+    full_description: live.full_description || live.fullDescription || "",
+    price: normalizeLiveNumber(live.price, 0),
+    oldPrice: normalizeLiveNumber(live.oldPrice ?? live.old_price, 0),
+    old_price: normalizeLiveNumber(live.old_price ?? live.oldPrice, 0),
+    stockStatus: live.stockStatus || live.stock_status || "in_stock",
+    stock_status: live.stock_status || live.stockStatus || "in_stock",
+    status: live.status || "published",
+    seoTitle: live.seoTitle || live.seo_title || live.name || "",
+    seoDescription: live.seoDescription || live.seo_description || live.shortDescription || live.short_description || "",
+    path: live.path || "",
+    images: Array.isArray(live.images) ? live.images : [],
+    badges: Array.isArray(live.badges) ? live.badges : [],
+    attributes: Array.isArray(live.attributes) ? live.attributes : [],
+    documents: Array.isArray(live.documents) ? live.documents : [],
+    faq: Array.isArray(live.faq) ? live.faq : [],
+    relatedProducts: Array.isArray(live.relatedProducts) ? live.relatedProducts : [],
+    rating: normalizeLiveNumber(live.rating, 0),
+    reviewCount: normalizeLiveNumber(live.reviewCount ?? live.review_count, 0),
   };
 }
 
@@ -119,27 +134,49 @@ function normalizeLiveNumber(value, fallback) {
 }
 
 function loadCart() {
+  const fallback = volatileStorage.get(CART_KEY) || "{}";
   try {
-    return JSON.parse(window.localStorage.getItem(CART_KEY) || "{}");
+    return JSON.parse(window.localStorage?.getItem(CART_KEY) || fallback);
   } catch {
-    return {};
+    try {
+      return JSON.parse(fallback);
+    } catch {
+      return {};
+    }
   }
 }
 
 function saveCart(cart) {
-  window.localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  const serialized = JSON.stringify(cart);
+  volatileStorage.set(CART_KEY, serialized);
+  try {
+    window.localStorage?.setItem(CART_KEY, serialized);
+  } catch {
+    // Keep the cart usable in browsers or embedded views without localStorage.
+  }
 }
 
 function loadStoredReviews() {
+  const fallback = volatileStorage.get(REVIEW_KEY) || "{}";
   try {
-    return JSON.parse(window.localStorage.getItem(REVIEW_KEY) || "{}");
+    return JSON.parse(window.localStorage?.getItem(REVIEW_KEY) || fallback);
   } catch {
-    return {};
+    try {
+      return JSON.parse(fallback);
+    } catch {
+      return {};
+    }
   }
 }
 
 function saveStoredReviews(reviews) {
-  window.localStorage.setItem(REVIEW_KEY, JSON.stringify(reviews));
+  const serialized = JSON.stringify(reviews);
+  volatileStorage.set(REVIEW_KEY, serialized);
+  try {
+    window.localStorage?.setItem(REVIEW_KEY, serialized);
+  } catch {
+    // Reviews still work for the current page session when persistent storage is blocked.
+  }
 }
 
 function getRouteProductData() {
@@ -203,6 +240,79 @@ function syncBodyState() {
 function render() {
   appRoot.innerHTML = renderCatalogApp(ctx, state);
   syncBodyState();
+  if (!catalogMotionInitialized) {
+    window.requestAnimationFrame(setupCatalogMotion);
+  }
+}
+
+function setupCatalogMotion() {
+  if (catalogMotionInitialized) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) {
+    catalogMotionInitialized = true;
+    return;
+  }
+
+  const selectors = [
+    ".catalog-page-head .catalog-breadcrumbs",
+    ".catalog-page-head__titleblock > *",
+    ".catalog-page-head__copy > *",
+    ".catalog-page-head__toolbar > *",
+    ".catalog-product-storehead > *",
+    ".catalog-landing-hero__copy > *",
+    ".catalog-landing-hero__route",
+    ".catalog-landing-node-card",
+    ".catalog-category-card",
+    ".catalog-product-card",
+    ".catalog-decision-card",
+    ".catalog-product-gallery",
+    ".catalog-product-buybox",
+    ".catalog-product-brief > *",
+    ".catalog-product-section",
+    ".catalog-how-buy-card",
+    ".catalog-contact-card",
+  ];
+
+  const items = [...new Set(selectors.flatMap((selector) => [...appRoot.querySelectorAll(selector)]))]
+    .filter((item) => !item.closest("[hidden], .catalog-overlay"))
+    .filter((item) => {
+      const rect = item.getBoundingClientRect();
+      return rect.width || rect.height;
+    });
+
+  if (!items.length) return;
+
+  catalogMotionInitialized = true;
+  document.body.classList.add("catalog-motion-ready");
+
+  items.forEach((item, index) => {
+    item.classList.add("catalog-motion-item");
+    item.style.setProperty("--catalog-motion-delay", `${Math.min(index * 28, 220)}ms`);
+
+    if (item.matches(".catalog-category-card, .catalog-product-card, .catalog-decision-card, .catalog-product-buybox, .catalog-product-section, .catalog-how-buy-card, .catalog-contact-card, .catalog-landing-node-card")) {
+      item.classList.add("catalog-motion-card");
+    }
+  });
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+
+        entry.target.classList.add("is-visible");
+        window.setTimeout(() => {
+          entry.target.classList.remove("catalog-motion-item", "catalog-motion-card", "is-visible");
+          entry.target.style.removeProperty("--catalog-motion-delay");
+        }, 560);
+        observer.unobserve(entry.target);
+      });
+    },
+    {
+      rootMargin: "0px 0px -12% 0px",
+      threshold: 0.08,
+    }
+  );
+
+  items.forEach((item) => observer.observe(item));
 }
 
 function closeAllDialogs() {
@@ -246,6 +356,7 @@ function addToCart(productId) {
   }
   updateCart(productId, 1);
   state.flashMessage = "Позиция добавлена в корзину";
+  state.dialogs = { ...state.dialogs, cart: true };
   render();
 }
 
@@ -367,7 +478,7 @@ function handleClick(event) {
     return;
   }
   if (action === "open-account") {
-    window.location.href = `${ctx.siteRoot}cabinet/login/`;
+    window.location.href = "/cabinet/";
     return;
   }
   if (action === "open-assistant") {

@@ -83,136 +83,6 @@ main > section {
   scroll-margin-top: var(--anchor-offset);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .hero-media img {
-    animation: hero-photo-drift 28s ease-out both;
-    transform-origin: 54% 46%;
-  }
-
-  body.hero-entrance-ready .hero .eyebrow,
-  body.hero-entrance-ready .hero h1,
-  body.hero-entrance-ready .hero-lead,
-  body.hero-entrance-ready .hero-actions {
-    opacity: 0;
-    transform: translate3d(0, 8px, 0);
-    transition:
-      opacity 360ms ease,
-      transform 420ms cubic-bezier(0.2, 0.72, 0.18, 1);
-    transition-delay: var(--hero-delay, 0ms);
-    will-change: opacity, transform;
-  }
-
-  body.hero-entrance-ready.hero-is-visible .hero .eyebrow,
-  body.hero-entrance-ready.hero-is-visible .hero h1,
-  body.hero-entrance-ready.hero-is-visible .hero-lead,
-  body.hero-entrance-ready.hero-is-visible .hero-actions {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-    will-change: auto;
-  }
-
-  .hero .eyebrow {
-    --hero-delay: 40ms;
-  }
-
-  .hero h1 {
-    --hero-delay: 90ms;
-  }
-
-  .hero-lead {
-    --hero-delay: 140ms;
-  }
-
-  .hero-actions {
-    --hero-delay: 190ms;
-  }
-}
-
-@keyframes hero-photo-drift {
-  from {
-    transform: scale(1.01) translate3d(-0.25%, -0.2%, 0);
-  }
-
-  to {
-    transform: scale(1.025) translate3d(0.35%, 0.25%, 0);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  body.motion-ready .motion-reveal {
-    opacity: 0.82;
-    transform: translate3d(0, 8px, 0);
-    transition:
-      opacity 300ms ease,
-      transform 360ms cubic-bezier(0.2, 0.72, 0.18, 1);
-    transition-delay: var(--motion-delay, 0ms);
-    will-change: opacity, transform;
-  }
-
-  body.motion-ready .motion-reveal.motion-from-left {
-    transform: translate3d(-18px, 0, 0);
-  }
-
-  body.motion-ready .motion-reveal.motion-from-right {
-    transform: translate3d(18px, 0, 0);
-  }
-
-  body.motion-ready .motion-reveal.motion-card {
-    backface-visibility: hidden;
-    transform: perspective(900px) translate3d(0, 7px, 0) rotateX(4deg) scale(0.997);
-    transform-origin: 50% 78%;
-  }
-
-  body.motion-ready .motion-reveal.is-visible {
-    opacity: 1;
-    transform: perspective(900px) translate3d(0, 0, 0) rotateX(0deg) scale(1);
-    will-change: auto;
-  }
-
-  body.motion-ready .motion-assemble .calc-card-head,
-  body.motion-ready .motion-assemble .system-media-note,
-  body.motion-ready .motion-assemble .launch-visual div,
-  body.motion-ready .motion-assemble .course-note,
-  body.motion-ready .motion-assemble .video-feature > div {
-    transition:
-      opacity 300ms ease,
-      transform 360ms cubic-bezier(0.2, 0.72, 0.18, 1),
-      background 180ms ease;
-  }
-
-  body.motion-ready .motion-assemble:not(.is-assembled) .system-media-note,
-  body.motion-ready .motion-assemble:not(.is-assembled) .launch-visual div,
-  body.motion-ready .motion-assemble:not(.is-assembled) .course-note,
-  body.motion-ready .motion-assemble:not(.is-assembled) .video-feature > div {
-    opacity: 0.94;
-    transform: translate3d(0, 4px, 0);
-  }
-
-  body.motion-ready .motion-assemble.is-assembled .system-media-note,
-  body.motion-ready .motion-assemble.is-assembled .launch-visual div,
-  body.motion-ready .motion-assemble.is-assembled .course-note,
-  body.motion-ready .motion-assemble.is-assembled .video-feature > div {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-
-  body.motion-ready .motion-assemble .calc-result-grid article,
-  body.motion-ready .motion-assemble .system-grid article,
-  body.motion-ready .motion-assemble .result-grid article,
-  body.motion-ready .motion-assemble .process-roadmap article,
-  body.motion-ready .motion-assemble .course-metrics article,
-  body.motion-ready .motion-assemble .final-telegram-card,
-  body.motion-ready .motion-assemble .final-brief-form {
-    transform-origin: 50% 100%;
-  }
-
-  body.motion-ready .motion-assemble.is-assembled .system-media img,
-  body.motion-ready .motion-assemble.is-assembled .launch-visual img,
-  body.motion-ready .motion-assemble.is-assembled .course-media img,
-  body.motion-ready .motion-assemble.is-assembled .video-feature img {
-    transform: scale(1.005);
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -295,11 +165,11 @@ button {
 
 .hero {
   position: relative;
-  min-height: 84svh;
+  min-height: clamp(520px, 68svh, 680px);
   display: grid;
   align-items: end;
   overflow: hidden;
-  padding: 132px var(--container-gutter) 76px;
+  padding: 118px var(--container-gutter) 64px;
   color: var(--white);
 }
 
@@ -373,18 +243,18 @@ small {
 }
 
 h1 {
-  max-width: 760px;
-  margin-bottom: 22px;
-  font-size: clamp(42px, 5.55vw, 78px);
+  max-width: 720px;
+  margin-bottom: 20px;
+  font-size: clamp(40px, 4.8vw, 64px);
   line-height: 1.08;
   letter-spacing: 0;
 }
 
 .hero-lead {
-  max-width: 660px;
-  margin-bottom: 34px;
+  max-width: 620px;
+  margin-bottom: 28px;
   color: color-mix(in srgb, var(--white) 93%, transparent);
-  font-size: clamp(19px, 1.75vw, 25px);
+  font-size: clamp(18px, 1.55vw, 22px);
   font-weight: 520;
   line-height: 1.48;
 }
@@ -2125,9 +1995,9 @@ body.motion-ready .author-section .motion-reveal {
   }
 
   .hero {
-    min-height: 78svh;
-    padding-top: 120px;
-    padding-bottom: 56px;
+    min-height: min(68svh, 620px);
+    padding-top: 108px;
+    padding-bottom: 46px;
   }
 
   .hero-media img {
@@ -2149,13 +2019,13 @@ body.motion-ready .author-section .motion-reveal {
   }
 
   h1 {
-    max-width: 700px;
-    font-size: clamp(42px, 11vw, 74px);
+    max-width: 620px;
+    font-size: clamp(38px, 8vw, 58px);
   }
 
   .hero-lead {
-    max-width: 620px;
-    font-size: 18px;
+    max-width: 560px;
+    font-size: 17px;
   }
 
   .idea-section {
@@ -2255,7 +2125,7 @@ body.motion-ready .author-section .motion-reveal {
 
   .hero {
     min-height: auto;
-    padding: 112px 16px 42px;
+    padding: 100px 16px 36px;
   }
 
   .hero::after {
@@ -2268,9 +2138,9 @@ body.motion-ready .author-section .motion-reveal {
   }
 
   h1 {
-    margin-bottom: 18px;
+    margin-bottom: 16px;
     max-width: min(100%, 336px);
-    font-size: clamp(34px, 8.6vw, 38px);
+    font-size: clamp(32px, 8vw, 36px);
     line-height: 1.02;
     overflow-wrap: anywhere;
   }
@@ -2281,7 +2151,7 @@ body.motion-ready .author-section .motion-reveal {
 
   .hero-lead {
     max-width: 340px;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     font-size: 16px;
     line-height: 1.48;
   }

@@ -4,7 +4,7 @@ export const DEFAULT_CATALOG_ITEMS = [
     "title": "LED-освещение",
     "kind": "category",
     "category": "led",
-    "path": "/catalog/led/",
+    "path": "/catalog/linear-led/",
     "cta_mode": "choose",
     "status": "published",
     "summary": "Линейный свет, тепличные штанги и сценарии досветки для полок, рядов и сервисных зон."

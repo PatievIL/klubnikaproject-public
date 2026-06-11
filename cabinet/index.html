@@ -13,8 +13,9 @@
   />
   <link rel="stylesheet" href="../styles.css?v=20260512-hero-label" />
   <link rel="stylesheet" href="../account/account.css?v=20260402b" />
-  <link rel="stylesheet" href="./cabinet.css?v=20260604-course-accordion" />
-  <link rel="stylesheet" href="../assets/css/kp-header.css?v=20260512-cabinet-entry" />
+  <link rel="stylesheet" href="./cabinet.css?v=20260609-cabinet-qa4" />
+  <link rel="stylesheet" href="../assets/css/kp-header.css?v=20260525-overlay1" />
+  <link rel="stylesheet" href="../assets/css/kp-footer.css?v=20260611a" />
   <!-- SEO:START -->
   <meta name="robots" content="noindex, nofollow" />
   <link rel="canonical" href="https://klubnikaproject.ru/cabinet/" />
@@ -50,7 +51,9 @@
   </script>
   <!-- /Yandex.Metrika counter -->
 </head>
-<body data-cabinet-view="shell" data-cabinet-account="member" data-header-theme="light" data-cabinet-pending="true" data-kp-header-disabled="true">
+<body data-cabinet-view="shell" data-cabinet-account="member" data-header-theme="light" data-cabinet-pending="true">
+  <header class="kp-site-header" data-kp-header data-root="../"></header>
+  <script src="../assets/js/kp-header.js?v=20260610-contacts2"></script>
   <main>
     <section class="section cabinet-shell-section">
       <div class="container">
@@ -71,8 +74,9 @@
 
               <div class="cabinet-shell-head__actions">
                 <a class="btn btn-secondary btn-ghost--small" href="../calc/" data-cabinet-shell-secondary>Калькулятор</a>
-                <a class="btn btn-secondary btn-ghost--small" href="../consultations/#request" data-cabinet-shell-tertiary>Поддержка</a>
+                <a class="btn btn-secondary btn-ghost--small" href="../contacts/#request" data-cabinet-shell-tertiary>Поддержка</a>
                 <a class="btn btn-primary" href="./login/" data-cabinet-shell-primary>Войти</a>
+                <button class="btn btn-secondary" type="button" data-cabinet-logout hidden>Выйти</button>
               </div>
             </section>
 
@@ -88,12 +92,21 @@
                 <nav class="cabinet-nav cabinet-nav--rail" id="cabinet-nav" aria-label="Разделы кабинета"></nav>
                 <div class="cabinet-rail__actions">
                   <a class="btn btn-secondary btn-ghost--small" href="../" data-cabinet-site-link>Открыть сайт</a>
-                  <button class="btn btn-secondary" type="button" data-cabinet-logout>Выйти</button>
                 </div>
               </aside>
 
               <section class="card card-pad cabinet-content-panel" id="cabinet-section-content" aria-live="polite">
-                <div class="account-empty">Проверяем доступ и собираем кабинет…</div>
+                <div class="cabinet-skeleton" aria-label="Кабинет загружается">
+                  <span class="cabinet-skeleton__pill"></span>
+                  <span class="cabinet-skeleton__title"></span>
+                  <span class="cabinet-skeleton__line"></span>
+                  <span class="cabinet-skeleton__line cabinet-skeleton__line--short"></span>
+                  <div class="cabinet-skeleton__grid">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
               </section>
             </div>
           </div>
@@ -101,6 +114,45 @@
       </div>
     </section>
   </main>
-  <script src="./cabinet.js?v=20260604-course-accordion" type="module"></script>
+  <footer class="home-footer" id="footer" aria-label="Подвал сайта">
+    <div class="home-footer-inner">
+      <div class="home-footer-lead">
+        <a class="home-footer-logo" href="../" aria-label="Klubnika Project">
+          <img src="../assets/logo/klubnika-project-logo-green-420.webp" loading="lazy" decoding="async" alt="Klubnika Project" />
+        </a>
+      </div>
+
+      <nav class="home-footer-columns" aria-label="Навигация подвала">
+
+        <div>
+          <span>Каталог</span>
+          <a href="../catalog/linear-led/index.html">LED освещение</a>
+          <a href="../catalog/irrigation/index.html">Полив</a>
+          <a href="../catalog/racks/index.html">Стеллажи</a>
+          <a href="../catalog/service/index.html">Обучение</a>
+        </div>
+        <div>
+          <span>Связь</span>
+          <a href="tel:+79030094990">+7 903 009-49-90</a>
+          <a href="mailto:info@klubnikaproject.ru">info@klubnikaproject.ru</a>
+          <a href="https://wa.me/79030094990" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+          <a href="https://www.youtube.com/@Ilya_patiev" target="_blank" rel="noopener noreferrer">YouTube</a>
+        </div>
+        <div>
+          <span>Документы</span>
+          <a href="../docs/policy/index.html">Политика конфиденциальности</a>
+          <a href="../docs/offero/index.html">Оферта</a>
+          <a href="../docs/warrenty/index.html">Гарантия</a>
+          <a href="../docs/consent/index.html">Согласие на обработку ПД</a>
+        </div>
+      </nav>
+
+      <div class="home-footer-bottom">
+        <span>Klubnika Project, 2026</span>
+        <span>Работаем по России и СНГ</span>
+      </div>
+    </div>
+  </footer>
+  <script src="./cabinet.js?v=20260609-cabinet-qa4" type="module"></script>
 </body>
 </html>

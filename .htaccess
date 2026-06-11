@@ -1,0 +1,70 @@
+RewriteEngine On
+
+AddType application/javascript .mjs
+
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=2592000"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  <FilesMatch "\.(?:avif|webp|png|jpe?g|gif|svg|ico|woff2?|css|m?js)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/avif "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/gif "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+</IfModule>
+
+# Canonical domain and protocol.
+RewriteCond %{HTTP_HOST} ^www\.klubnikaproject\.ru$ [NC]
+RewriteRule ^ https://klubnikaproject.ru%{REQUEST_URI} [R=301,L,NE]
+
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
+RewriteRule ^ https://klubnikaproject.ru%{REQUEST_URI} [R=301,L,NE]
+
+# Legacy Tilda URLs.
+RewriteRule ^webinar/?$ /klubhack/ [R=301,L]
+RewriteRule ^seeds/tproduct/.*$ /seeds/ [R=301,L]
+RewriteRule ^shop/tproduct/.*$ https://shop.klubnikaproject.ru/ [R=301,L,NE]
+
+# Legacy shop product URLs now live in the catalog.
+RewriteRule ^shop/products/grodan-classic/?$ /catalog/substrates/03-0013-727-substrat-grodan-classic-1000x150x100-mm-12-sht/ [R=301,L]
+RewriteRule ^shop/products/grodan-prestige/?$ /catalog/substrates/03-0006-534-substrat-grodan-prestige-ng-2-0-1000x150x100-mm-12-sht/ [R=301,L]
+RewriteRule ^shop/products/rack-base-16mats/?$ /catalog/racks/frame-plus-16/ [R=301,L]
+RewriteRule ^shop/products/rack-extra-16mats/?$ /catalog/racks/rack-extra-16mats/ [R=301,L]
+RewriteRule ^shop/products/rivulis-supertif-22/?$ /catalog/irrigation/rivulet-dripper-22/ [R=301,L]
+RewriteRule ^shop/products/fittings-kit-module/?$ /catalog/racks/fittings-kit-module/ [R=301,L]
+RewriteRule ^shop/products/metal-tray-210/?$ /catalog/racks/04-0004-658-metallicheskiy-lotok-dlya-stellazha-210-sm/ [R=301,L]
+RewriteRule ^shop/products/grodan-plug/?$ /catalog/substrates/03-0001-536-probka-mineral-noy-vaty-grodan-10-sht/ [R=301,L]
+RewriteRule ^shop/products/hole-punch-16-20/?$ /catalog/irrigation/punch-16-20/ [R=301,L]
+RewriteRule ^shop/products/led-300wt/?$ /catalog/linear-led/luma-line-191/ [R=301,L]
+RewriteRule ^shop/products/led-300wt-140cm/?$ /catalog/linear-led/canopy-boost-140/ [R=301,L]
+RewriteRule ^shop/products/led-450wt-200cm/?$ /catalog/linear-led/canopy-boost-200/ [R=301,L]
+RewriteRule ^shop/products/led-50wt-60cm/?$ /catalog/linear-led/luma-line-60/ [R=301,L]
+RewriteRule ^shop/products/led-50wt-95cm/?$ /catalog/linear-led/luma-line-95/ [R=301,L]
+RewriteRule ^shop/products/blind-tube-white-roll/?$ /catalog/irrigation/02-0009-539-slepaya-trubka-16-mm-dlya-kapel-noy-linii-belaya/ [R=301,L]
+RewriteRule ^shop/products/blind-tube-white/?$ /catalog/irrigation/02-0009-539-slepaya-trubka-16-mm-dlya-kapel-noy-linii-belaya/ [R=301,L]
+RewriteRule ^shop/products/rack-system/?$ /catalog/racks/ [R=301,L]
+RewriteRule ^shop/products/disc-filter-3-4/?$ /catalog/irrigation/disc-filter-34/ [R=301,L]
+RewriteRule ^shop/products/dosatron/?$ /catalog/irrigation/dosatron/ [R=301,L]
+RewriteRule ^shop/products/irrigation-base-rack/?$ /catalog/irrigation/irrigation-base-rack/ [R=301,L]
+RewriteRule ^shop/products/irrigation-extra-rack/?$ /catalog/irrigation/rack-irrigation-module/ [R=301,L]
+RewriteRule ^shop/products/irrigation-kit/?$ /catalog/irrigation/ [R=301,L]
+
+RewriteRule ^shop/?$ https://shop.klubnikaproject.ru/ [R=301,L]
+RewriteRule ^shop/(.*)$ https://shop.klubnikaproject.ru/$1 [R=301,L]
+RewriteRule ^account/?$ /cabinet/ [R=301,L]
+RewriteRule ^account/(.*)$ /cabinet/ [R=301,L]

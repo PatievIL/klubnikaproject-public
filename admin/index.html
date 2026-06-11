@@ -4,81 +4,50 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Админка - Klubnika Project</title>
-  <link rel="stylesheet" href="../styles.css?v=20260512-hero-label" />
-  <link rel="stylesheet" href="../calc/calc-v2.css?v=20260512-admin" />
-  <link rel="stylesheet" href="./admin.css?v=20260601-login-only1" />
+  <title>Переход в кабинет — Klubnika Project</title>
+  <meta http-equiv="refresh" content="0; url=../cabinet/?section=dashboard" />
+  <link rel="stylesheet" href="../styles.css?v=20260405h" />
+  <!-- SEO:START -->
+  <meta name="robots" content="noindex, nofollow" />
+  <!-- SEO:END -->
+  <!-- Yandex.Metrika counter 95619008 -->
+  <script type="text/javascript">
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    m[i].l=1*new Date();
+    for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+    (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+    ym(95619008, "init", {
+      clickmap: true,
+      trackLinks: true,
+      accurateTrackBounce: true,
+      webvisor: true
+    });
+  </script>
+  <!-- /Yandex.Metrika counter -->
 </head>
-<body data-header-theme="light" data-admin-auth="guest">
+<body>
   <main class="section">
     <div class="container">
-      <section class="hero-section admin-hub-hero">
-        <div class="hero-copy">
-          <div class="tag">Admin</div>
-          <h1 class="hero-title-compact">Админка каталога</h1>
-          <p class="sublead">Рабочий вход в Postgres-каталог, товары, лиды и историю изменений.</p>
-        </div>
-        <aside class="card card-pad admin-hub-note">
-          <div class="tag">Сессия</div>
-          <div class="admin-auth-panel">
-            <label class="admin-field">
-              <span class="admin-field-label">Логин</span>
-              <input class="admin-input" id="admin-login-identity" type="text" autocomplete="username" placeholder="ilya" />
-            </label>
-            <label class="admin-field">
-              <span class="admin-field-label">Пароль</span>
-              <input class="admin-input" id="admin-login-password" type="password" autocomplete="current-password" placeholder="Пароль администратора" />
-            </label>
-            <div class="admin-auth-actions">
-              <button class="btn btn-primary" id="admin-password-login-button" type="button">Войти</button>
-              <button class="btn btn-secondary admin-session-secondary" id="admin-session-button" type="button">Проверить</button>
-              <button class="btn btn-secondary admin-session-secondary" id="admin-logout-button" type="button">Выйти</button>
-            </div>
-            <div class="admin-session-state" id="admin-session-state" aria-live="polite"></div>
+      <div class="section-frame">
+        <div class="card card-pad">
+          <div class="tag">Migration</div>
+          <h1 class="calc-card-title">Старый `/admin/` больше не используется</h1>
+          <p class="sublead">Рабочий admin-контур переведён в единый кабинет. Перенаправляем в новый shell.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="../cabinet/?section=dashboard">Открыть кабинет</a>
+            <a class="btn btn-secondary" href="../cabinet/?section=catalog">Открыть каталог в кабинете</a>
           </div>
-        </aside>
-      </section>
-
-      <section class="section-frame" id="admin-workspace-shell" hidden>
-        <div class="admin-hub-layout">
-          <div class="admin-action-strip">
-            <div class="admin-action-strip-copy">
-              <strong>Живой API</strong>
-              <span id="admin-status">Админка подключается к backend...</span>
-            </div>
-            <div class="admin-toolbar-actions">
-              <button class="btn btn-secondary" id="pull-backend-config" type="button">Загрузить настройки</button>
-              <button class="btn btn-primary" id="push-backend-config" type="button">Сохранить настройки</button>
-              <button class="btn btn-secondary" id="reset-admin-button" type="button">Сбросить черновик</button>
-            </div>
-          </div>
-
-          <div class="admin-summary-grid" id="admin-summary-grid"></div>
-
-          <nav class="admin-tabs" id="admin-tabs" aria-label="Разделы админки"></nav>
-
-          <section class="card card-pad admin-card" id="admin-section-content" aria-live="polite">
-            <div class="admin-lead-empty">Войдите, чтобы открыть админку.</div>
-          </section>
-
-          <section class="card card-pad admin-card">
-            <div class="admin-workspace-head">
-              <div class="tag">JSON</div>
-              <h2 class="calc-card-title">Черновик настроек</h2>
-            </div>
-            <textarea class="admin-json-output" id="admin-json-output" spellcheck="false"></textarea>
-            <div class="admin-toolbar-actions">
-              <button class="btn btn-secondary" id="copy-admin-json" type="button">Скопировать JSON</button>
-              <button class="btn btn-secondary" id="download-admin-json" type="button">Скачать JSON</button>
-              <label class="btn btn-secondary" for="import-admin-json">Импорт JSON</label>
-              <input id="import-admin-json" type="file" accept="application/json,.json" hidden />
-            </div>
-          </section>
         </div>
-      </section>
+      </div>
     </div>
   </main>
-
-  <script src="./admin.js?v=20260601-login-only1" type="module"></script>
+  <script>
+    const target = new URL("../cabinet/?section=dashboard", window.location.href);
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("product")) target.searchParams.set("product", params.get("product"));
+    window.location.replace(target.toString());
+  </script>
 </body>
 </html>

@@ -82,11 +82,11 @@ html {
 
 .kh-hero-section {
   position: relative;
-  min-height: 84svh;
+  min-height: clamp(380px, 50svh, 500px);
   display: grid;
   align-items: end;
   overflow: hidden;
-  padding: 132px 32px 76px;
+  padding: 96px 32px 44px;
   color: var(--kh-bg);
   background: var(--kh-green);
 }
@@ -100,7 +100,7 @@ html {
 }
 
 .kh-hero-section::before {
-  background: url("../assets/site-drive/for-site/selected/for-site-41-proof.jpg") center 58% / cover no-repeat;
+  background: url("../assets/site-drive/for-site/selected/for-site-41-proof.webp") center 58% / cover no-repeat;
 }
 
 .kh-hero-section::after {
@@ -116,10 +116,10 @@ html {
 }
 
 .kh-shell {
-  padding: clamp(22px, 3vw, 34px);
-  border: 1px solid var(--kh-line);
-  border-radius: var(--kh-radius-shell);
-  background: var(--kh-surface-soft);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .kh-section-head {
@@ -306,24 +306,38 @@ html {
 
 .kh-hero .kh-title-xl {
   margin-top: 0;
+  max-width: 720px;
+  font-size: clamp(38px, 4.4vw, 56px);
+  line-height: 1.06;
+}
+
+.kh-hero .kh-lead {
+  max-width: 660px;
+  font-size: clamp(18px, 1.5vw, 20px);
+}
+
+.kh-hero .kh-muted {
+  max-width: 620px;
+  font-size: 15px;
+  line-height: 1.48;
 }
 
 .kh-chip-row {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 24px;
+  margin-top: 18px;
 }
 
 .kh-chip {
-  min-height: 38px;
+  min-height: 34px;
   display: inline-flex;
   align-items: center;
   padding: 0 14px;
   border-radius: 999px;
-  background: rgba(245, 236, 223, 0.14);
-  border: 1px solid rgba(245, 236, 223, 0.18);
-  color: var(--kh-bg);
+  background: rgba(0, 77, 43, 0.06);
+  border: 1px solid rgba(0, 77, 43, 0.14);
+  color: var(--kh-green);
   font-weight: 800;
 }
 
@@ -334,7 +348,11 @@ html {
 }
 
 .kh-hero .kh-actions {
-  margin-top: 28px;
+  margin-top: 24px;
+}
+
+.kh-hero .kh-button {
+  min-height: 48px;
 }
 
 .kh-hero .kh-button--primary {
@@ -359,30 +377,8 @@ html {
   color: var(--kh-bg);
 }
 
-.kh-route-note {
-  margin: 18px 0 0;
-  color: rgba(245, 236, 223, 0.74);
-  font-size: 15px;
-}
-
-.kh-route-note a {
-  color: var(--kh-bg);
-  font-weight: 800;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-
-.kh-hero__media {
-  display: none;
-}
-
-.kh-hero__media img {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  border-radius: 22px;
-  border: 1px solid rgba(245, 236, 223, 0.16);
-  box-shadow: 0 24px 58px rgba(0, 0, 0, 0.2);
+.kh-chip-row--fit {
+  margin: 14px 0 18px;
 }
 
 .kh-grid-3,
@@ -426,14 +422,29 @@ html {
 
 .kh-video {
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(360px, 1fr);
-  gap: 20px;
-  align-items: center;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.kh-video__copy {
+  max-width: 860px;
 }
 
 .kh-video__frame {
-  min-height: 330px;
   position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #000;
+}
+
+.kh-video__frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
 .kh-video-card {
@@ -749,6 +760,118 @@ html {
 }
 
 
+/* ─── Hover-анимации: спокойные, по канону (docs/design-canon.md → Motion) ─── */
+
+.kh-card,
+.kh-route-card,
+.kh-format-item,
+.kh-button,
+.kh-chip,
+.kh-legal-note a,
+.kh-form-note a {
+  transition:
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    background-color 220ms ease,
+    text-decoration-color 220ms ease;
+}
+
+/* Медиа-элемент: плавный zoom на hover контейнера */
+.kh-video__frame {
+  overflow: hidden; /* уже есть, явно гарантируем */
+}
+
+.kh-video-card {
+  transition: transform 600ms cubic-bezier(0.2, 0.72, 0.18, 1);
+}
+
+/* hover: hover — только на устройствах с мышью */
+@media (hover: hover) {
+  /* Карточки */
+  .kh-card:hover,
+  .kh-route-card:hover {
+    border-color: rgba(0, 77, 43, 0.28);
+    box-shadow: 0 18px 48px rgba(20, 52, 37, 0.16);
+  }
+
+  .kh-format-item:hover {
+    border-color: rgba(0, 77, 43, 0.28);
+    box-shadow: 0 8px 24px rgba(20, 52, 37, 0.10);
+  }
+
+  /* Primary-кнопки */
+  .kh-button--primary:hover,
+  .kh-page .kh-button.kh-button--primary:hover {
+    background: color-mix(in srgb, #004d2b 88%, #e5c794);
+    border-color: color-mix(in srgb, #004d2b 88%, #e5c794);
+    box-shadow: 0 18px 48px rgba(20, 52, 37, 0.2);
+  }
+
+  /* Кнопка --light (в price-card) */
+  .kh-button--light:hover {
+    background: color-mix(in srgb, var(--kh-bg) 88%, var(--kh-accent));
+    border-color: color-mix(in srgb, var(--kh-bg) 88%, var(--kh-accent));
+    box-shadow: 0 8px 24px rgba(20, 52, 37, 0.14);
+  }
+
+  /* Secondary-кнопки */
+  .kh-button--secondary:hover,
+  .kh-page .kh-button.kh-button--secondary:hover {
+    background: rgba(0, 77, 43, 0.07);
+    border-color: rgba(0, 77, 43, 0.32);
+  }
+
+  /* Чипы */
+  .kh-chip:not(.kh-chip--price):hover {
+    border-color: rgba(0, 77, 43, 0.32);
+    background: rgba(255, 250, 242, 0.96);
+  }
+
+  /* Текстовые ссылки — проявление подчёркивания */
+  .kh-legal-note a:hover,
+  .kh-form-note a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--kh-green);
+  }
+
+  /* Видео-обложка: scale через контейнер с overflow:hidden */
+  .kh-video__frame:hover .kh-video-card {
+    transform: scale(1.025);
+  }
+}
+
+/* С motion: translateY для объёма */
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  .kh-card,
+  .kh-route-card,
+  .kh-button {
+    transition-property: box-shadow, border-color, background-color, transform;
+  }
+
+  .kh-card:hover,
+  .kh-route-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .kh-button--primary:hover,
+  .kh-page .kh-button.kh-button--primary:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* Reduce motion: отключаем transform-анимации медиа */
+@media (prefers-reduced-motion: reduce) {
+  .kh-video-card {
+    transition: none;
+  }
+
+  .kh-video__frame:hover .kh-video-card {
+    transform: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+
 @media (max-width: 980px) {
   .kh-main {
     padding-top: 0;
@@ -795,8 +918,8 @@ html {
   }
 
   .kh-hero-section {
-    min-height: 78svh;
-    padding: 112px 16px 54px;
+    min-height: auto;
+    padding: 92px 16px 32px;
   }
 
   .kh-hero-section::before {
@@ -809,15 +932,34 @@ html {
   }
 
   .kh-title-xl {
-    font-size: clamp(34px, 10.5vw, 48px);
+    font-size: clamp(32px, 8.6vw, 38px);
   }
 
   .kh-hero .kh-lead {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.48;
   }
 
-  .kh-shell,
+  .kh-hero .kh-muted {
+    font-size: 14px;
+    line-height: 1.44;
+  }
+
+  .kh-chip-row {
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .kh-chip {
+    min-height: 32px;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+
+  .kh-hero .kh-actions {
+    margin-top: 20px;
+  }
+
   .kh-card,
   .kh-module,
   .kh-request-form {
@@ -864,10 +1006,7 @@ html {
   }
 
   .kh-video__frame {
-    min-height: 250px;
+    min-height: 0;
   }
 
-  .kh-hero__media {
-    display: none;
-  }
 }
