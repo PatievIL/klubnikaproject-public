@@ -1650,18 +1650,11 @@ function renderMobileFilters(ctx, state, data) {
   `;
 }
 
-function renderFloatingActions(state) {
-  const summary = getCartSummary(state);
+function renderFloatingAssistant() {
   return `
-    <div class="catalog-floating-actions">
-      <button type="button" class="catalog-floating-cart${summary.itemCount ? " has-items" : ""}" data-action="open-cart" aria-label="Открыть корзину">
-        <span>Корзина</span>
-        <strong>${summary.itemCount}</strong>
-      </button>
-      <button type="button" class="catalog-floating-assistant" data-action="open-assistant" data-intent="chat">
-        Ассистент
-      </button>
-    </div>
+    <button type="button" class="catalog-floating-assistant" data-action="open-assistant" data-intent="chat">
+      Ассистент
+    </button>
   `;
 }
 
@@ -1693,7 +1686,7 @@ export function renderCatalogApp(ctx, rawState = {}) {
       </main>
       ${renderSharedFooterStyles(ctx)}
       ${renderFooter(ctx, state)}
-      ${renderFloatingActions(state)}
+      ${renderFloatingAssistant()}
       ${renderSearchPanel(ctx, state)}
       ${renderCartPanel(ctx, state)}
       ${renderAssistantPanel(state)}
